@@ -1,0 +1,239 @@
+﻿@model IEnumerable<DubiRent.Data.Models.Property>
+@{
+    ViewData["Title"] = "Properties";
+    var searchModel = ViewBag.SearchModel as DubiRent.Models.PropertySearchModel ?? new DubiRent.Models.PropertySearchModel();
+}
+
+<!-- Hero Section -->
+<section class="py-5" >
+    <div class="container">
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold mb-3">
+                Discover <span class="dubirent-red">Luxury Properties</span>
+            </h1>
+            <p class="text-muted fs-5">
+                Browse our exclusive collection of premium properties in Dubai's most prestigious locations
+            </p>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <form asp-action="Properties" method="get">
+            <div class="card border rounded-4 p-4 shadow-lg mb-4">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-2">
+                        <label class="d-block text-sm fw-semibold text-dark mb-2">
+                            <i class="fas fa-map-marker-alt me-2 dubirent-red"></i>Location
+                        </label>
+                        <input type="text" name="LocationName" value="@searchModel.LocationName" class="form-control rounded-4 py-3" placeholder="Enter location..." style="border: 1px solid #e5e7eb;" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="d-block text-sm fw-semibold text-dark mb-2">
+                            <i class="fas fa-dollar-sign me-2 dubirent-red"></i>Min Price ($)
+                        </label>
+                        <input type="number" name="MinPrice" value="@searchModel.MinPrice" class="form-control rounded-4 py-3" placeholder="Min price" min="0" step="100" style="border: 1px solid #e5e7eb;" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="d-block text-sm fw-semibold text-dark mb-2">
+                            <i class="fas fa-dollar-sign me-2 dubirent-red"></i>Max Price ($)
+                        </label>
+                        <input type="number" name="MaxPrice" value="@searchModel.MaxPrice" class="form-control rounded-4 py-3" placeholder="Max price" min="0" step="100" style="border: 1px solid #e5e7eb;" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="d-block text-sm fw-semibold text-dark mb-2">
+                            <i class="fas fa-ruler-combined me-2 dubirent-red"></i>Min Size (m²)
+                        </label>
+                        <input type="number" name="MinSquareMeters" value="@searchModel.MinSquareMeters" class="form-control rounded-4 py-3" placeholder="Min size" min="0" style="border: 1px solid #e5e7eb;" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="d-block text-sm fw-semibold text-dark mb-2">
+                            <i class="fas fa-ruler-combined me-2 dubirent-red"></i>Max Size (m²)
+                        </label>
+                        <input type="number" name="MaxSquareMeters" value="@searchModel.MaxSquareMeters" class="form-control rounded-4 py-3" placeholder="Max size" min="0" style="border: 1px solid #e5e7eb;" />
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100 rounded-4 py-3 d-flex align-items-center justify-content-center gap-2 text-white" style="border: none;">
+                            <i class="fas fa-search"></i>
+                            <span>Search</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Results Summary and Sorting -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <p class="text-dark mb-0">
+                <span class="fw-semibold dubirent-red">@(Model?.Count() ?? 0)</span> properties found
+            </p>
+            <div class="d-flex align-items-center gap-3">
+                <span class="text-dark small">Sort by:</span>
+                <form method="get" style="display: inline;" id="sortForm">
+                    @if (!string.IsNullOrWhiteSpace(searchModel.Title))
+                    {
+                        <input type="hidden" name="Title" value="@searchModel.Title" />
+                    }
+                    @if (!string.IsNullOrWhiteSpace(searchModel.Address))
+                    {
+                        <input type="hidden" name="Address" value="@searchModel.Address" />
+                    }
+                    @if (!string.IsNullOrWhiteSpace(searchModel.LocationName))
+                    {
+                        <input type="hidden" name="LocationName" value="@searchModel.LocationName" />
+                    }
+                    @if (searchModel.LocationId.HasValue)
+                    {
+                        <input type="hidden" name="LocationId" value="@searchModel.LocationId.Value" />
+                    }
+                    @if (searchModel.MinPrice.HasValue)
+                    {
+                        <input type="hidden" name="MinPrice" value="@searchModel.MinPrice.Value" />
+                    }
+                    @if (searchModel.MaxPrice.HasValue)
+                    {
+                        <input type="hidden" name="MaxPrice" value="@searchModel.MaxPrice.Value" />
+                    }
+                    @if (searchModel.MinSquareMeters.HasValue)
+                    {
+                        <input type="hidden" name="MinSquareMeters" value="@searchModel.MinSquareMeters.Value" />
+                    }
+                    @if (searchModel.MaxSquareMeters.HasValue)
+                    {
+                        <input type="hidden" name="MaxSquareMeters" value="@searchModel.MaxSquareMeters.Value" />
+                    }
+                    <select name="SortBy" onchange="document.getElementById('sortForm').submit()" class="form-select rounded-4 py-2" style="border: 1px solid #e5e7eb; width: auto; min-width: 150px;">
+                        @if (searchModel.SortBy == "newest" || string.IsNullOrEmpty(searchModel.SortBy))
+                        {
+                            <option value="newest" selected>Newest First</option>
+                        }
+                        else
+                        {
+                            <option value="newest">Newest First</option>
+                        }
+                        @if (searchModel.SortBy == "price_asc")
+                        {
+                            <option value="price_asc" selected>Price: Low to High</option>
+                        }
+                        else
+                        {
+                            <option value="price_asc">Price: Low to High</option>
+                        }
+                        @if (searchModel.SortBy == "price_desc")
+                        {
+                            <option value="price_desc" selected>Price: High to Low</option>
+                        }
+                        else
+                        {
+                            <option value="price_desc">Price: High to Low</option>
+                        }
+                        @if (searchModel.SortBy == "size_desc")
+                        {
+                            <option value="size_desc" selected>Largest First</option>
+                        }
+                        else
+                        {
+                            <option value="size_desc">Largest First</option>
+                        }
+                    </select>
+                </form>
+            </div>
+        </div>
+
+        <!-- Property Cards -->
+        <div class="row g-4">
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var property in Model)
+                {
+                    var mainImage = property.Images?.FirstOrDefault(img => img.IsMain) ?? property.Images?.FirstOrDefault();
+                    var imageUrl = mainImage != null ? mainImage.ImageUrl : "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600";
+                    var daysListed = (DateTime.Now - property.CreatedAt).Days;
+                    var daysText = daysListed == 0 ? "Today" : daysListed == 1 ? "1 day ago" : $"{daysListed} days ago";
+
+                    <div class="col-md-4">
+                        <div class="card border-0 overflow-hidden modern-card h-100 bg-white" style="border-radius: 20px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);">
+                            <div class="position-relative">
+                                <a asp-action="Details" asp-route-id="@property.Id" class="text-decoration-none">
+                                    <img src="@imageUrl"
+                                         alt="@property.Title"
+                                         class="card-img-top img-hover" style="height: 220px; object-fit: cover;" />
+                                </a>
+                                
+                                <!-- Verified Badge -->
+                                <div class="position-absolute top-0 start-0 m-3 bg-white rounded-pill px-3 py-1 small fw-semibold" style="border: 1px solid rgba(254, 86, 88, 0.3); color: var(--primary-color);">
+                                    <i class="fas fa-check-circle me-1"></i>Verified
+                                </div>
+                                
+                                @if (daysListed <= 2)
+                                {
+                                    <!-- New Badge -->
+                                    <div class="position-absolute top-0 end-0 m-3 rounded-pill px-3 py-1 small fw-semibold text-white" style="background-color: #10b981;">
+                                        <i class="fas fa-clock me-1"></i>New
+                                    </div>
+                                }
+                                else if (property.PricePerMonth >= 10000)
+                                {
+                                    <!-- Premium Badge -->
+                                    <div class="position-absolute top-0 end-0 m-3 rounded-pill px-3 py-1 small fw-semibold text-white" style="background-color: #3b82f6;">
+                                        <i class="fas fa-crown me-1"></i>Premium
+                                    </div>
+                                }
+                            </div>
+                            
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title fw-bold mb-0" style="flex: 1;">@property.Title</h5>
+                                    <button class="btn btn-link p-0 border-0 text-muted" style="font-size: 1.2rem; line-height: 1;">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </div>
+                                
+                                <p class="text-muted small mb-2 d-flex align-items-center">
+                                    <i class="fas fa-map-marker-alt me-2"></i>@property.Location?.Name, @property.Location?.City
+                                </p>
+                                
+                                <p class="dubirent-red fs-5 fw-bold mb-3">
+                                    $@property.PricePerMonth.ToString("N0") <span class="text-muted small fw-normal">/month</span>
+                                </p>
+                                
+                                <div class="d-flex justify-content-between align-items-center mb-3 pb-3" style="border-top: 1px solid #f3f4f6; border-bottom: 1px solid #f3f4f6; padding-top: 0.75rem;">
+                                    <span class="text-muted small d-flex align-items-center">
+                                        <i class="fas fa-ruler-combined me-2 dubirent-red"></i>@property.SquareMeters m²
+                                    </span>
+                                    <span class="text-muted small d-flex align-items-center">
+                                        <i class="fas fa-bed me-2 dubirent-red"></i>@property.Bedrooms Bedrooms
+                                    </span>
+                                    <span class="text-muted small d-flex align-items-center">
+                                        <i class="fas fa-bath me-2 dubirent-red"></i>@property.Bathrooms Bathrooms
+                                    </span>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <p class="text-muted small mb-0 d-flex align-items-center">
+                                        <i class="far fa-calendar me-2"></i>Listed @daysText
+                                    </p>
+                                    <a asp-action="Details" asp-route-id="@property.Id" class="btn btn-primary rounded-4 px-4 py-2 text-white small text-decoration-none" style="border: none;">
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12">
+                    <div class="card empty-state border-0 shadow-sm p-5 text-center">
+                        <div class="mb-4">
+                            <div class="dubirent-bg-red d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-home fa-3x text-white"></i>
+                            </div>
+                        </div>
+                        <h4 class="fw-bold mb-2">No Properties Available</h4>
+                        <p class="text-muted mb-0">We're sorry, but there are no properties available at the moment. Please check back later.</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>

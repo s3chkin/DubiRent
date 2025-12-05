@@ -1,0 +1,352 @@
+@model DubiRent.Models.InputPropertyModel
+@{
+    ViewData["Title"] = "Edit Property";
+    var existingImages = ViewBag.ExistingImages as List<DubiRent.Data.Models.PropertyImage> ?? new List<DubiRent.Data.Models.PropertyImage>();
+}
+
+<style>
+    .form-card {
+        border-radius: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .form-control, .form-select {
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 0.625rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(254, 86, 88, 0.1);
+    }
+    
+    .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .existing-image {
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .existing-image:hover {
+        border-color: var(--primary-color);
+    }
+
+    .existing-image img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+
+    .image-delete-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(220, 38, 38, 0.9);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .image-delete-btn:hover {
+        background: rgba(220, 38, 38, 1);
+        transform: scale(1.1);
+    }
+
+    .image-main-badge {
+        position: absolute;
+        bottom: 8px;
+        left: 8px;
+        background: rgba(34, 197, 94, 0.9);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .existing-image {
+        cursor: pointer;
+    }
+
+    .existing-image.selected {
+        border-color: var(--primary-color) !important;
+        border-width: 3px !important;
+    }
+
+    .existing-image input[type="radio"] {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        z-index: 10;
+    }
+</style>
+
+<div class="container py-5">
+    <!-- Header -->
+    <div class="mb-4">
+        <a asp-action="Admin" class="text-decoration-none text-muted mb-3 d-inline-flex align-items-center gap-2">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to Admin Panel</span>
+        </a>
+        <h1 class="display-5 fw-bold mb-2 mt-3">
+            Edit <span class="dubirent-red">Property</span>
+        </h1>
+        <p class="text-muted">Update the property details below</p>
+    </div>
+
+    <!-- Form -->
+    <div class="card form-card border-0 shadow-sm">
+        <div class="card-body p-4 p-md-5">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="border-radius: 10px;" role="alert"></div>
+
+                <div class="row g-4">
+                    <!-- Title -->
+                    <div class="col-md-12">
+                        <label asp-for="Title" class="form-label">
+                            <i class="fas fa-heading dubirent-red me-2"></i>Property Title
+                        </label>
+                        <input asp-for="Title" class="form-control" placeholder="Enter property title" />
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="col-md-12">
+                        <label asp-for="Description" class="form-label">
+                            <i class="fas fa-align-left dubirent-red me-2"></i>Description
+                        </label>
+                        <textarea asp-for="Description" rows="20" class="form-control form-textarea" placeholder="Enter property description">@Model.Description</textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="col-md-6">
+                        <label asp-for="LocationId" class="form-label">
+                            <i class="fas fa-map-marker-alt dubirent-red me-2"></i>Location
+                        </label>
+                        <select asp-for="LocationId" asp-items="ViewBag.Locations" class="form-select">
+                            <option value="">-- Select Location --</option>
+                        </select>
+                        <span asp-validation-for="LocationId" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="col-md-6">
+                        <label asp-for="Address" class="form-label">
+                            <i class="fas fa-location-dot dubirent-red me-2"></i>Address
+                        </label>
+                        <input asp-for="Address" class="form-control" placeholder="Enter full address" />
+                        <span asp-validation-for="Address" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="col-md-4">
+                        <label asp-for="PricePerMonth" class="form-label">
+                            <i class="fas fa-dollar-sign dubirent-red me-2"></i>Price Per Month ($)
+                        </label>
+                        <input asp-for="PricePerMonth" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                        <span asp-validation-for="PricePerMonth" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Bedrooms -->
+                    <div class="col-md-4">
+                        <label asp-for="Bedrooms" class="form-label">
+                            <i class="fas fa-bed dubirent-red me-2"></i>Bedrooms
+                        </label>
+                        <input asp-for="Bedrooms" type="number" min="0" class="form-control" placeholder="0" />
+                        <span asp-validation-for="Bedrooms" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Bathrooms -->
+                    <div class="col-md-4">
+                        <label asp-for="Bathrooms" class="form-label">
+                            <i class="fas fa-bath dubirent-red me-2"></i>Bathrooms
+                        </label>
+                        <input asp-for="Bathrooms" type="number" min="0" class="form-control" placeholder="0" />
+                        <span asp-validation-for="Bathrooms" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Square Meters -->
+                    <div class="col-md-6">
+                        <label asp-for="SquareMeters" class="form-label">
+                            <i class="fas fa-ruler-combined dubirent-red me-2"></i>Square Meters
+                        </label>
+                        <input asp-for="SquareMeters" type="number" min="0" class="form-control" placeholder="0" />
+                        <span asp-validation-for="SquareMeters" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="col-md-6">
+                        <label asp-for="Status" class="form-label">
+                            <i class="fas fa-info-circle dubirent-red me-2"></i>Status
+                        </label>
+                        <select asp-for="Status" asp-items="ViewBag.Statuses" class="form-select"></select>
+                        <span asp-validation-for="Status" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Existing Images -->
+                    @if (existingImages.Any())
+                    {
+                        <div class="col-md-12">
+                            <label class="form-label">
+                                <i class="fas fa-images dubirent-red me-2"></i>Existing Images
+                            </label>
+                            <small class="form-text text-muted d-block mb-3">Click on an image to set it as the main image. Click the X button to mark images for deletion.</small>
+                            <div class="row g-3">
+                                @foreach (var img in existingImages)
+                                {
+                                    <div class="col-md-3">
+                                        <div class="existing-image @(img.IsMain ? "selected" : "")" onclick="selectMainImage(@img.Id)">
+                                            <input type="radio" name="MainImageId" value="@img.Id" @(img.IsMain ? "checked" : "") id="main-@img.Id" />
+                                            <img src="@img.ImageUrl" alt="Property Image" />
+                                            @if (img.IsMain)
+                                            {
+                                                <span class="image-main-badge">Main</span>
+                                            }
+                                            <button type="button" class="image-delete-btn" onclick="event.stopPropagation(); markImageForDeletion(@img.Id, this)">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                            <input type="hidden" name="ImagesToDelete" id="img-@img.Id" value="" />
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <!-- New Images Upload -->
+                    <div class="col-md-12">
+                        <label class="form-label">
+                            <i class="fas fa-images dubirent-red me-2"></i>Add New Images <span class="text-muted small">(Optional)</span>
+                        </label>
+                        <input asp-for="Images" type="file" class="form-control" multiple accept="image/png,image/jpeg,image/jpg" data-val="false" />
+                        <small class="form-text text-muted">You can select multiple images. Allowed formats: PNG, JPG, JPEG. Max file size: 5MB per image.</small>
+                        <span asp-validation-for="Images" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-end gap-3 mt-5 pt-4 border-top">
+                    <a asp-action="Admin" class="btn btn-outline-secondary px-4" style="border-radius: 10px;">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary px-5" style="border: none; border-radius: 10px; background: var(--primary-color);">
+                        <i class="fas fa-save me-2"></i>Update Property
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        function markImageForDeletion(imageId, button) {
+            const hiddenInput = document.getElementById('img-' + imageId);
+            const imageContainer = button.closest('.existing-image');
+            const radioInput = document.getElementById('main-' + imageId);
+            
+            if (hiddenInput.value === '') {
+                // Mark for deletion
+                hiddenInput.value = imageId;
+                imageContainer.style.opacity = '0.5';
+                imageContainer.style.border = '2px solid #dc2626';
+                button.style.background = 'rgba(34, 197, 94, 0.9)';
+                button.innerHTML = '<i class="fas fa-undo"></i>';
+                // Uncheck radio if it's marked for deletion
+                if (radioInput) {
+                    radioInput.checked = false;
+                    radioInput.disabled = true;
+                }
+                imageContainer.classList.remove('selected');
+            } else {
+                // Unmark
+                hiddenInput.value = '';
+                imageContainer.style.opacity = '1';
+                imageContainer.style.border = '2px solid transparent';
+                button.style.background = 'rgba(220, 38, 38, 0.9)';
+                button.innerHTML = '<i class="fas fa-times"></i>';
+                if (radioInput) {
+                    radioInput.disabled = false;
+                }
+            }
+        }
+
+        function selectMainImage(imageId) {
+            const imageContainer = event.currentTarget;
+            const radioInput = document.getElementById('main-' + imageId);
+            const hiddenInput = document.getElementById('img-' + imageId);
+            
+            // Don't allow selecting if marked for deletion
+            if (hiddenInput && hiddenInput.value !== '') {
+                return;
+            }
+
+            // Uncheck all other radios
+            document.querySelectorAll('input[name="MainImageId"]').forEach(radio => {
+                radio.checked = false;
+                const container = radio.closest('.existing-image');
+                if (container) {
+                    container.classList.remove('selected');
+                    const badge = container.querySelector('.image-main-badge');
+                    if (badge) badge.remove();
+                }
+            });
+
+            // Check this radio
+            if (radioInput) {
+                radioInput.checked = true;
+                imageContainer.classList.add('selected');
+                
+                // Add or update main badge
+                let badge = imageContainer.querySelector('.image-main-badge');
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'image-main-badge';
+                    badge.textContent = 'Main';
+                    imageContainer.appendChild(badge);
+                }
+            }
+        }
+
+        // Initialize selected state on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('input[name="MainImageId"]:checked').forEach(radio => {
+                const container = radio.closest('.existing-image');
+                if (container) {
+                    container.classList.add('selected');
+                }
+            });
+        });
+    </script>
+}
+

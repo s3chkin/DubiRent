@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="bg">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DUBiRent - Luxury Stays in Dubai</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
+    * {
+      font-family: "Inter", sans-serif;
+    }
+
+    :root {
+      --primary-color: #fe5658;
+      --primary-hover: #fe3d40;
+      --primary-light: #ffe5e6;
+      --primary-gradient: linear-gradient(135deg, #fe5658 0%, #ff6b6d 100%);
+    }
+
+    .dubirent-red {
+      color: var(--primary-color);
+    }
+
+    .dubirent-bg-red {
+      background-color: var(--primary-color);
+    }
+
+    .dubirent-border-red {
+      border-color: var(--primary-color);
+    }
+
+    .gradient-pink {
+      background: linear-gradient(135deg, #ffe5e6 0%, #ffffff 100%);
+    }
+
+    .gradient-primary {
+      background: var(--primary-gradient);
+    }
+
+    body {
+      line-height: 1.6;
+      scroll-behavior: smooth;
+    }
+
+    /* Modern Card Styles */
+    .modern-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .modern-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(254, 86, 88, 0.1),
+        0 10px 10px -5px rgba(254, 86, 88, 0.04);
+    }
+
+    /* Glassmorphism */
+    .glass {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    /* Smooth Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    /* Button Hover Effects */
+    .btn-primary {
+      background: var(--primary-gradient);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent);
+      transition: left 0.5s;
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(254, 86, 88, 0.3);
+    }
+
+    /* Input Focus Styles */
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(254, 86, 88, 0.1);
+    }
+
+    /* Image Hover Effects */
+    .img-hover {
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .img-hover:hover {
+      transform: scale(1.05);
+    }
+
+    /* Section Spacing */
+    section {
+      scroll-margin-top: 80px;
+    }
+
+    /* How It Works Card Style */
+    .how-it-works-card {
+      background-color: transparent;
+      padding: 18px;
+      background-image: linear-gradient(180deg,
+          #ffffff 54%,
+          rgba(255, 87, 87, 0.22) 100%);
+      border-radius: 10px;
+      box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+
+<body class="bg-white">
+  <!-- Header -->
+  <header class="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 gradient-primary rounded-xl shadow-lg flex items-center justify-center">
+          <i class="fas fa-home text-white text-sm"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight">
+            <span class="text-gray-900">DUBI</span><span class="dubirent-red">Rent</span>
+          </h1>
+          <p class="text-xs text-gray-500 font-medium">Luxury Stays</p>
+        </div>
+      </div>
+      <div class="flex space-x-8 items-center">
+        <a href="index.html" class="dubirent-red font-semibold border-b-2 dubirent-border-red pb-1 transition">HOME</a>
+        <a href="properties.html"
+          class="text-gray-600 hover:dubirent-red transition-colors duration-200 font-medium">PROPERTIES</a>
+        <a href="#" class="text-gray-600 hover:dubirent-red transition-colors duration-200 font-medium">CONTACT US</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="container mx-auto px-6 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <!-- Left Content -->
+      <div class="fade-in-up">
+        <h2 class="text-5xl font-bold mb-6 leading-tight">
+          Discover Your Dream Space in <span class="dubirent-red">Dubai</span>
+        </h2>
+        <p class="text-gray-600 mb-8 text-base leading-relaxed">
+          Access exclusive properties in Dubai's premier locations. From
+          luxury penthouses to modern apartments, find your perfect home with
+          verified listings and transparent pricing.
+        </p>
+
+        <!-- Feature Cards -->
+        <div class="grid grid-cols-2 gap-4 mb-8">
+          <div
+            class="border-2 border-dashed dubirent-border-red rounded-xl p-4 flex items-center space-x-3 bg-gradient-to-br from-red-50 to-white modern-card">
+            <div class="w-10 h-10 dubirent-bg-red rounded-lg flex items-center justify-center">
+              <i class="fas fa-star text-white text-sm"></i>
+            </div>
+            <span class="font-semibold text-sm">Quality & Transparency</span>
+          </div>
+          <div
+            class="border-2 border-dashed dubirent-border-red rounded-xl p-4 flex items-center space-x-3 bg-gradient-to-br from-red-50 to-white modern-card">
+            <div class="w-10 h-10 dubirent-bg-red rounded-lg flex items-center justify-center">
+              <i class="fas fa-home text-white text-sm"></i>
+            </div>
+            <span class="font-semibold text-sm">Curated Properties</span>
+          </div>
+        </div>
+
+        <!-- Search Filters -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+          <div class="space-y-4">
+            <div class="grid grid-cols-3 gap-4">
+              <div class="relative">
+                <select
+                  class="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl appearance-none bg-white hover:border-dubirent-red transition-colors">
+                  <option>All Types</option>
+                  <option>Apartment</option>
+                  <option>Penthouse</option>
+                  <option>Villa</option>
+                </select>
+                <i class="fas fa-chevron-down absolute right-4 top-4 text-gray-400 text-xs pointer-events-none"></i>
+              </div>
+              <input type="text" placeholder="Title"
+                class="px-4 py-3 text-sm border border-gray-200 rounded-xl hover:border-dubirent-red transition-colors" />
+              <input type="text" placeholder="Address"
+                class="px-4 py-3 text-sm border border-gray-200 rounded-xl hover:border-dubirent-red transition-colors" />
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+              <div class="relative">
+                <select
+                  class="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl appearance-none bg-white hover:border-dubirent-red transition-colors">
+                  <option>Min</option>
+                  <option>1000</option>
+                  <option>2000</option>
+                  <option>3000</option>
+                </select>
+                <i class="fas fa-chevron-down absolute right-4 top-4 text-gray-400 text-xs pointer-events-none"></i>
+              </div>
+              <div class="relative">
+                <select
+                  class="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl appearance-none bg-white hover:border-dubirent-red transition-colors">
+                  <option>Max</option>
+                  <option>5000</option>
+                  <option>10000</option>
+                  <option>20000</option>
+                </select>
+                <i class="fas fa-chevron-down absolute right-4 top-4 text-gray-400 text-xs pointer-events-none"></i>
+              </div>
+              <button
+                class="btn-primary text-white rounded-xl font-semibold text-sm flex items-center justify-center space-x-2 py-3 shadow-lg">
+                <i class="fas fa-search"></i>
+                <span>Search</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Content - Image Gallery -->
+      <div class="fade-in-up">
+        <!-- Large Card -->
+        <div class="relative mb-4 rounded-2xl overflow-hidden shadow-xl group">
+          <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800" alt="Dubai Skyline"
+            class="w-full h-64 object-cover img-hover" />
+          <div class="absolute top-4 left-4 glass px-3 py-1.5 rounded-full text-xs font-semibold shadow-md">
+            <i class="fas fa-check-circle dubirent-red mr-1"></i>Verified
+          </div>
+          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+            <h3 class="text-white text-2xl font-bold mb-2">Dubai's Finest</h3>
+            <p class="text-white/90 text-sm mb-4">
+              Experience luxury living in the heart of innovation.
+            </p>
+            <div class="flex space-x-2">
+              <button class="glass text-white px-4 py-2 rounded-full text-xs font-medium hover:bg-white/30 transition">
+                Premium Locations
+              </button>
+              <button class="glass text-white px-4 py-2 rounded-full text-xs font-medium hover:bg-white/30 transition">
+                Verified
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Small Cards Grid -->
+        <div class="grid grid-cols-2 gap-4">
+          <div class="rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 img-hover">
+            <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400" alt="Burj Khalifa"
+              class="w-full h-32 object-cover" />
+          </div>
+          <div class="rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 img-hover">
+            <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400" alt="Dubai Marina"
+              class="w-full h-32 object-cover" />
+          </div>
+          <div class="rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 img-hover">
+            <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400" alt="Dubai Night"
+              class="w-full h-32 object-cover" />
+          </div>
+          <div class="rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 img-hover">
+            <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400" alt="Dubai Day"
+              class="w-full h-32 object-cover" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Luxury Properties Section -->
+  <section class="bg-gradient-to-b from-gray-50 to-white py-16">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl font-bold mb-4">
+          Discover <span class="dubirent-red">Luxury</span>
+          <span class="dubirent-red">Properties</span>
+        </h2>
+        <p class="text-gray-600 max-w-2xl mx-auto text-base">
+          Explore our curated collection of premium properties in Dubai's most
+          prestigious neighborhoods
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <!-- Property Card 1 -->
+        <div class="bg-white rounded-2xl overflow-hidden shadow-md modern-card">
+          <div class="relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600" alt="Property 2"
+              class="w-full h-48 object-cover img-hover" />
+            <div
+              class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold dubirent-red">
+              Featured
+            </div>
+          </div>
+          <div class="p-5">
+            <h3 class="text-xl font-bold mb-2 text-gray-900">property 2</h3>
+            <p class="dubirent-red text-xl font-bold mb-2">
+              $301 / Per Month
+            </p>
+            <p class="text-gray-500 text-sm mb-4 flex items-center">
+              <i class="far fa-calendar mr-2 text-xs"></i>5 days ago
+            </p>
+            <div class="gradient-primary text-white rounded-xl p-3 flex justify-between text-sm font-medium shadow-md">
+              <span class="flex items-center"><i class="fas fa-ruler-combined mr-2"></i>200 m²</span>
+              <span class="flex items-center"><i class="fas fa-bed mr-2"></i>13</span>
+              <span class="flex items-center"><i class="fas fa-bath mr-2"></i>131</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Property Card 2 -->
+        <div class="bg-white rounded-2xl overflow-hidden shadow-md modern-card">
+          <div class="relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600" alt="БХХИХН"
+              class="w-full h-48 object-cover img-hover" />
+            <div
+              class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold dubirent-red">
+              New
+            </div>
+          </div>
+          <div class="p-5">
+            <h3 class="text-xl font-bold mb-2 text-gray-900">БХХИХН</h3>
+            <p class="dubirent-red text-xl font-bold mb-2">
+              $301 / Per Month
+            </p>
+            <p class="text-gray-500 text-sm mb-4 flex items-center">
+              <i class="far fa-calendar mr-2 text-xs"></i>5 days ago
+            </p>
+            <div class="gradient-primary text-white rounded-xl p-3 flex justify-between text-sm font-medium shadow-md">
+              <span class="flex items-center"><i class="fas fa-ruler-combined mr-2"></i>200 m²</span>
+              <span class="flex items-center"><i class="fas fa-bed mr-2"></i>2</span>
+              <span class="flex items-center"><i class="fas fa-bath mr-2"></i>1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Property Card 3 -->
+        <div class="bg-white rounded-2xl overflow-hidden shadow-md modern-card">
+          <div class="relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600" alt="28 Hewison Terrace"
+              class="w-full h-48 object-cover img-hover" />
+            <div
+              class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold dubirent-red">
+              Premium
+            </div>
+          </div>
+          <div class="p-5">
+            <h3 class="text-xl font-bold mb-2 text-gray-900">
+              28 Hewison Terrace, CONISTON
+            </h3>
+            <p class="text-gray-700 text-xl font-bold mb-2">Price on call</p>
+            <p class="text-gray-500 text-sm mb-4 flex items-center">
+              <i class="far fa-calendar mr-2 text-xs"></i>5 days ago
+            </p>
+            <div class="gradient-primary text-white rounded-xl p-3 flex justify-between text-sm font-medium shadow-md">
+              <span class="flex items-center"><i class="fas fa-ruler-combined mr-2"></i>200 m²</span>
+              <span class="flex items-center"><i class="fas fa-bed mr-2"></i>2</span>
+              <span class="flex items-center"><i class="fas fa-bath mr-2"></i>2</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-8">
+        <button class="btn-primary text-white px-8 py-3 rounded-xl font-semibold text-base shadow-lg">
+          View all properties
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose DubiRent Section -->
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl font-bold mb-4">Why Choose DubiRent?</h2>
+        <p class="text-gray-600 text-base max-w-2xl mx-auto">
+          We offer the best experience when searching and renting apartments
+          in Dubai
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <!-- Feature Card 1 -->
+        <div class="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 modern-card border border-gray-100">
+          <div class="w-14 h-14 gradient-primary rounded-xl flex items-center justify-center mb-4 shadow-lg">
+            <i class="fas fa-shield-check text-white text-xl"></i>
+          </div>
+          <h3 class="dubirent-red font-bold text-xl mb-3">Trusted Rentals</h3>
+          <p class="text-gray-600 text-sm leading-relaxed">
+            All apartments are thoroughly vetted and listed by our team for
+            long-term rentals.
+          </p>
+        </div>
+
+        <!-- Feature Card 2 -->
+        <div class="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 modern-card border border-gray-100">
+          <div class="w-14 h-14 gradient-primary rounded-xl flex items-center justify-center mb-4 shadow-lg">
+            <i class="fas fa-clock text-white text-xl"></i>
+          </div>
+          <h3 class="dubirent-red font-bold text-xl mb-3">
+            Flexible Viewing
+          </h3>
+          <p class="text-gray-600 text-sm leading-relaxed">
+            Schedule apartment visits at convenient times that suit your
+            lifestyle.
+          </p>
+        </div>
+
+        <!-- Feature Card 3 -->
+        <div class="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 modern-card border border-gray-100">
+          <div class="w-14 h-14 gradient-primary rounded-xl flex items-center justify-center mb-4 shadow-lg">
+            <i class="fas fa-dollar-sign text-white text-xl"></i>
+          </div>
+          <h3 class="dubirent-red font-bold text-xl mb-3">Best Prices</h3>
+          <p class="text-gray-600 text-sm leading-relaxed">
+            Competitive rates with no hidden fees and best offers.
+          </p>
+        </div>
+
+        <!-- Feature Card 4 -->
+        <div class="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 modern-card border border-gray-100">
+          <div class="w-14 h-14 gradient-primary rounded-xl flex items-center justify-center mb-4 shadow-lg">
+            <i class="fas fa-headset text-white text-xl"></i>
+          </div>
+          <h3 class="dubirent-red font-bold text-xl mb-3">
+            Dedicated Assistance
+          </h3>
+          <p class="text-gray-600 text-sm leading-relaxed">
+            Our team is ready to help with rental agreements, questions, and
+            support.
+          </p>
+        </div>
+
+        <!-- Feature Card 5 -->
+        <div class="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 modern-card border border-gray-100">
+          <div class="w-14 h-14 gradient-primary rounded-xl flex items-center justify-center mb-4 shadow-lg">
+            <i class="fas fa-bullhorn text-white text-xl"></i>
+          </div>
+          <h3 class="dubirent-red font-bold text-xl mb-3">
+            Comfortable Living
+          </h3>
+          <p class="text-gray-600 text-sm leading-relaxed">
+            Apartments equipped with modern amenities for a cozy and
+            convenient lifestyle.
+          </p>
+        </div>
+
+        <!-- Feature Card 6 -->
+        <div class="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 modern-card border border-gray-100">
+          <div class="w-14 h-14 gradient-primary rounded-xl flex items-center justify-center mb-4 shadow-lg">
+            <i class="fas fa-key text-white text-xl"></i>
+          </div>
+          <h3 class="dubirent-red font-bold text-xl mb-3">
+            Smooth Move-in Process
+          </h3>
+          <p class="text-gray-600 text-sm leading-relaxed">
+            Simple and efficient move-in procedures to get you settled
+            quickly.
+          </p>
+        </div>
+      </div>
+
+      <!-- Statistics -->
+      <div class="gradient-pink rounded-2xl p-12 shadow-lg border border-red-100">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div>
+            <h3 class="text-5xl font-bold dubirent-red mb-2">100%</h3>
+            <p class="text-gray-700 font-semibold text-base">Transparency</p>
+          </div>
+          <div>
+            <h3 class="text-5xl font-bold dubirent-red mb-2">9.5/10</h3>
+            <p class="text-gray-700 font-semibold text-base">
+              Listing Quality Score
+            </p>
+          </div>
+          <div>
+            <h3 class="text-5xl font-bold dubirent-red mb-2">100%</h3>
+            <p class="text-gray-700 font-semibold text-base">Real Shots</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Popular Locations Section -->
+  <section class="bg-gradient-to-b from-white to-gray-50 py-16">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl font-bold mb-4">
+          <span class="text-gray-800">Popular</span>
+          <span class="dubirent-red">Locations</span>
+        </h2>
+        <p class="text-gray-600 text-base">
+          Discover the most sought-after neighborhoods in Dubai
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Location Card 1 -->
+        <div
+          class="relative rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300">
+          <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800" alt="Dubai Marina"
+            class="w-full h-64 object-cover img-hover" />
+          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-6">
+            <h3 class="text-white text-2xl font-bold mb-2">Dubai Marina</h3>
+            <p class="text-white/90 text-sm mb-4">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            </p>
+          </div>
+          <div class="absolute top-1/2 right-6 transform -translate-y-1/2">
+            <button
+              class="w-12 h-12 gradient-primary rounded-full flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform duration-300">
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Location Card 2 -->
+        <div
+          class="relative rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300">
+          <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800" alt="Dubai Marina"
+            class="w-full h-64 object-cover img-hover" />
+          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-6">
+            <h3 class="text-white text-2xl font-bold mb-2">Dubai Marina</h3>
+            <p class="text-white/90 text-sm mb-4">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            </p>
+          </div>
+          <div class="absolute top-1/2 right-6 transform -translate-y-1/2">
+            <button
+              class="w-12 h-12 gradient-primary rounded-full flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform duration-300">
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Location Card 3 -->
+        <div
+          class="relative rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300">
+          <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800" alt="Dubai Marina"
+            class="w-full h-64 object-cover img-hover" />
+          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-6">
+            <h3 class="text-white text-2xl font-bold mb-2">Dubai Marina</h3>
+            <p class="text-white/90 text-sm mb-4">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            </p>
+          </div>
+          <div class="absolute top-1/2 right-6 transform -translate-y-1/2">
+            <button
+              class="w-12 h-12 gradient-primary rounded-full flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform duration-300">
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Location Card 4 -->
+        <div
+          class="relative rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300">
+          <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800" alt="Dubai Marina"
+            class="w-full h-64 object-cover img-hover" />
+          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-6">
+            <h3 class="text-white text-2xl font-bold mb-2">Dubai Marina</h3>
+            <p class="text-white/90 text-sm mb-4">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            </p>
+          </div>
+          <div class="absolute top-1/2 right-6 transform -translate-y-1/2">
+            <button
+              class="w-12 h-12 gradient-primary rounded-full flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform duration-300">
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl font-bold mb-4">
+          <span class="text-gray-800">How It</span>
+          <span class="dubirent-red">Works</span>
+        </h2>
+        <p class="text-gray-600 text-base">Simple Steps to Your New Home</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Step 1 -->
+        <div class="how-it-works-card text-center">
+          <div class="inline-block p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl mb-4 shadow-md"
+            style="margin-bottom: 15px">
+            <i class="fas fa-search dubirent-red text-3xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">
+            Browse Properties
+          </h3>
+          <p class="text-gray-600 text-sm leading-relaxed">
+            Find verified long-term rentals across Dubai's top neighborhoods.
+          </p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="how-it-works-card text-center">
+          <div class="inline-block p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl mb-4 shadow-md"
+            style="margin-bottom: 15px">
+            <i class="fas fa-calendar-check dubirent-red text-3xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">
+            Schedule a Viewing
+          </h3>
+          <p class="text-gray-600 text-sm leading-relaxed">
+            Choose a convenient date and time for an apartment tour.
+          </p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="how-it-works-card text-center">
+          <div class="inline-block p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl mb-4 shadow-md"
+            style="margin-bottom: 15px">
+            <i class="fas fa-file-contract dubirent-red text-3xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">
+            Secure Your Lease
+          </h3>
+          <p class="text-gray-600 text-sm leading-relaxed">
+            We prepare the rental agreement and guide you through a smooth
+            move-in process.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Find Your Perfect Long-Term Home Section -->
+  <section class="bg-gradient-to-b from-gray-50 to-white py-16">
+    <div class="container mx-auto px-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <!-- Left Content -->
+        <div>
+          <h2 class="text-4xl font-bold mb-6 leading-tight">
+            Find Your Perfect <span class="dubirent-red">Long-Term Home</span>
+          </h2>
+          <p class="text-gray-600 mb-8 leading-relaxed text-base">
+            Discover luxury apartments for long-term rent in Dubai's most
+            prestigious locations. Flexible lease terms, premium amenities,
+            and dedicated support for your comfort.
+          </p>
+
+          <!-- Feature Tags -->
+          <div class="flex flex-wrap gap-4 mb-8">
+            <div
+              class="gradient-primary text-white px-5 py-2.5 rounded-xl flex items-center space-x-2 text-sm font-semibold shadow-lg">
+              <i class="fas fa-home"></i>
+              <span>10+ Properties</span>
+            </div>
+            <div
+              class="gradient-primary text-white px-5 py-2.5 rounded-xl flex items-center space-x-2 text-sm font-semibold shadow-lg">
+              <i class="fas fa-shield-check"></i>
+              <span>Verified Listings</span>
+            </div>
+          </div>
+
+          <!-- Additional Feature Cards -->
+          <div class="grid grid-cols-2 gap-4 mb-8">
+            <div
+              class="bg-white rounded-xl p-4 flex items-center space-x-3 shadow-md modern-card border border-gray-100">
+              <div class="w-12 h-12 dubirent-bg-red rounded-lg flex items-center justify-center">
+                <i class="fas fa-key text-white"></i>
+              </div>
+              <span class="font-semibold text-sm">Long-Term Leases</span>
+            </div>
+            <div
+              class="bg-white rounded-xl p-4 flex items-center space-x-3 shadow-md modern-card border border-gray-100">
+              <div class="w-12 h-12 dubirent-bg-red rounded-lg flex items-center justify-center">
+                <i class="far fa-star text-white"></i>
+              </div>
+              <span class="font-semibold text-sm">5-Star Services</span>
+            </div>
+          </div>
+
+          <!-- Statistics -->
+          <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="gradient-primary text-white rounded-xl p-6 text-center shadow-lg">
+              <h3 class="text-3xl font-bold mb-2">10+</h3>
+              <p class="text-sm font-medium">Properties</p>
+            </div>
+            <div class="bg-white rounded-xl p-6 text-center shadow-md modern-card border border-gray-100">
+              <h3 class="text-3xl font-bold mb-2 dubirent-red">83+</h3>
+              <p class="text-gray-600 text-sm font-medium">Happy Clients</p>
+            </div>
+          </div>
+
+          <!-- CTA Buttons -->
+          <div class="flex space-x-4">
+            <button class="btn-primary text-white px-8 py-3 rounded-xl font-semibold text-base shadow-lg">
+              Browse properties
+            </button>
+            <button
+              class="border-2 dubirent-border-red text-gray-800 px-8 py-3 rounded-xl font-semibold text-base hover:gradient-primary hover:text-white hover:border-transparent transition-all duration-300 shadow-md">
+              Contact US
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Content - Image -->
+        <div>
+          <div class="rounded-2xl overflow-hidden shadow-xl">
+            <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800" alt="Dubai Night Skyline"
+              class="w-full h-96 object-cover img-hover" />
+          </div>
+          <div class="bg-white rounded-xl p-4 mt-4 shadow-lg flex items-center justify-between border border-gray-100">
+            <span class="font-semibold text-gray-800">Ratings</span>
+            <div class="flex space-x-1">
+              <i class="fas fa-star dubirent-red"></i>
+              <i class="fas fa-star dubirent-red"></i>
+              <i class="fas fa-star dubirent-red"></i>
+              <i class="fas fa-star dubirent-red"></i>
+              <i class="fas fa-star dubirent-red"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gradient-to-b from-gray-900 to-black text-white py-10">
+    <div class="container mx-auto px-6">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 gradient-primary rounded-xl shadow-lg flex items-center justify-center">
+            <i class="fas fa-home text-white text-sm"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold">
+              <span class="dubirent-red">DUBI</span><span>Rent</span>
+            </h3>
+          </div>
+        </div>
+        <p class="text-gray-400 text-sm">
+          Copyright © 2025 - WordPress Theme by
+          <span class="text-blue-400 hover:text-blue-300 transition">CreativeThemes</span>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

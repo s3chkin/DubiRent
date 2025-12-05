@@ -1,0 +1,555 @@
+﻿@model IEnumerable<DubiRent.Data.Models.Property>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<section class="container py-4">
+    <div class="row align-items-center">
+        <!-- Left Content -->
+        <div class="col-lg-6 mb-4 mb-lg-0 fade-in-up">
+            <h2 class="display-5 fw-bold mb-3">
+                Discover Your Dream Space in <span class="dubirent-red">Dubai</span>
+            </h2>
+            <p class="text-muted mb-4 fs-6">
+                Access exclusive properties in Dubai's premier locations. From luxury penthouses to modern apartments, find your perfect home with verified listings and transparent pricing.
+            </p>
+
+            <!-- Feature Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-6">
+                    <div class="card modern-card h-100 border-2 border-dashed dubirent-border-red p-3" style="background: linear-gradient(135deg, #ffe5e6 0%, #ffffff 100%); border-radius: 10px;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="dubirent-bg-red p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; border-radius: 10px;">
+                                <i class="fas fa-star text-white small"></i>
+                            </div>
+                            <span class="fw-semibold small">Quality & Transparency</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card modern-card h-100 border-2 border-dashed dubirent-border-red p-3" style="background: linear-gradient(135deg, #ffe5e6 0%, #ffffff 100%); border-radius: 10px;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="dubirent-bg-red p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; border-radius: 10px;">
+                                <i class="fas fa-home text-white small"></i>
+                            </div>
+                            <span class="fw-semibold small">Curated Properties</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Filters -->
+            <form asp-action="Properties" asp-controller="Property" method="get">
+                <div class="card border-0 p-4 shadow-lg" style="background: #ffffff; border-radius: 10px;">
+                    <div class="row g-3 mb-3">
+                        <div class="col-4">
+                            <select name="LocationId" class="form-select py-2" style="border: 1px solid #e5e7eb; border-radius: 10px;">
+                                <option value="">All Locations</option>
+                                @if (ViewBag.Locations != null)
+                                {
+                                    @foreach (var location in ViewBag.Locations)
+                                    {
+                                        <option value="@location.Value">@location.Text</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <input type="text" name="Title" class="form-control py-2" placeholder="Title" style="border: 1px solid #e5e7eb; border-radius: 10px;" />
+                        </div>
+                        <div class="col-4">
+                            <input type="text" name="Address" class="form-control py-2" placeholder="Address" style="border: 1px solid #e5e7eb; border-radius: 10px;" />
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-4">
+                            <input type="number" name="MinPrice" class="form-control py-2" placeholder="Min Price ($)" min="0" step="100" style="border: 1px solid #e5e7eb; border-radius: 10px;" />
+                        </div>
+                        <div class="col-4">
+                            <input type="number" name="MaxPrice" class="form-control py-2" placeholder="Max Price ($)" min="0" step="100" style="border: 1px solid #e5e7eb; border-radius: 10px;" />
+                        </div>
+                        <div class="col-4">
+                            <button type="submit" class="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2 text-white" style="border: none; border-radius: 10px;">
+                                <i class="fas fa-search"></i>
+                                <span>Search</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right Content - Image Gallery -->
+        <div class="col-lg-6 fade-in-up">
+            <!-- Large Card -->
+            <div class="card border-0 overflow-hidden shadow-lg mb-3 position-relative" style="border-radius: 10px;">
+                <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800"
+                     alt="Dubai Skyline"
+                     class="card-img-top img-hover" style="height: 240px; object-fit: cover;" />
+
+                <!-- Verified Tag -->
+                <div class="position-absolute top-0 start-0 m-2 glass rounded-pill px-2 py-1 small fw-semibold" style="border-radius: 10px;">
+                    <i class="fas fa-check-circle dubirent-red me-1"></i>Verified
+                </div>
+
+                <!-- Text Overlay -->
+                <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent);">
+                    <h3 class="text-white fw-bold mb-1 fs-5">Dubai's Finest</h3>
+                    <p class="text-white-50 mb-2 small">
+                        Experience luxury living in the heart of innovation.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <button class="glass rounded-pill px-2 py-1 text-white border-0 small fw-medium" style="border-radius: 10px;">
+                            Premium Locations
+                        </button>
+                        <button class="glass rounded-pill px-2 py-1 text-white border-0 small fw-medium" style="border-radius: 10px;">
+                            Verified
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Small Cards Grid -->
+            <div class="row g-2">
+                <div class="col-6">
+                    <div class="card border-0 overflow-hidden shadow-md img-hover" style="border-radius: 10px;">
+                        <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400"
+                             alt="Burj Khalifa"
+                             class="card-img-top" style="height: 100px; object-fit: cover;" />
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card border-0 overflow-hidden shadow-md img-hover" style="border-radius: 10px;">
+                        <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400"
+                             alt="Dubai Marina"
+                             class="card-img-top" style="height: 100px; object-fit: cover;" />
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card border-0 overflow-hidden shadow-md img-hover" style="border-radius: 10px;">
+                        <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400"
+                             alt="Dubai Night"
+                             class="card-img-top" style="height: 100px; object-fit: cover;" />
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card border-0 overflow-hidden shadow-md img-hover" style="border-radius: 10px;">
+                        <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400"
+                             alt="Dubai Day"
+                             class="card-img-top" style="height: 100px; object-fit: cover;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Luxury Properties Section -->
+<section class="py-4" style="background: linear-gradient(to bottom, #f9fafb 0%, #ffffff 100%);">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="display-6 fw-bold mb-2">
+                Discover <span class="dubirent-red">Luxury Properties</span>
+            </h2>
+            <p class="text-muted fs-6">
+                Explore our curated collection of premium properties in Dubai's most prestigious neighborhoods
+            </p>
+        </div>
+
+        <div class="row g-4">
+            @if (Model != null && Model.Any())
+            {
+                <div class="row g-4">
+                    @foreach (var property in Model)
+                    {
+                        var mainImage = property.Images?.FirstOrDefault(img => img.IsMain) ?? property.Images?.FirstOrDefault();
+                        var imageUrl = mainImage != null ? mainImage.ImageUrl : "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600";
+
+                        <div class="col-md-4">
+                            <a asp-action="Details" asp-route-id="@property.Id" class="text-decoration-none text-dark" style="display: block; height: 100%;">
+                                <div class="card border-0 overflow-hidden modern-card h-100 bg-white" style="border-radius: 20px; cursor: pointer; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);">
+                                    <div class="position-relative">
+                                        <img src="@imageUrl"
+                                             alt="@property.Title"
+                                        @* class="property-image" *@
+                                             class="card-img-top img-hover" style="height: 220px; object-fit: cover;" />
+
+                                        <!-- Verified Badge -->
+                                        <div class="position-absolute top-0 start-0 m-3 bg-white rounded-pill px-3 py-1 small fw-semibold" style="border: 1px solid rgba(254, 86, 88, 0.3); color: var(--primary-color);">
+                                            <i class="fas fa-check-circle me-1"></i>@property.Status.ToString().ToLower()
+                                        </div>
+
+                                        <!-- Premium Badge -->
+                                        <div class="position-absolute top-0 end-0 m-3 rounded-pill px-3 py-1 small fw-semibold text-white" style="background-color: #3b82f6;">
+                                            <i class="fas fa-crown me-1"></i>Premium
+                                        </div>
+                                    </div>
+
+                                    <div class="card-body p-4">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h5 class="card-title fw-bold mb-0" style="flex: 1;">@property.Title</h5>
+                                            <button class="btn btn-link p-0 border-0 text-muted" style="font-size: 1.2rem; line-height: 1;">
+                                                <i class="far fa-heart"></i>
+                                            </button>
+                                        </div>
+
+                                        <p class="text-muted small mb-2 d-flex align-items-center">
+                                            <i class="fas fa-map-marker-alt me-2"></i>@property.Location?.Name
+                                        </p>
+
+                                        <p class="dubirent-red fs-5 fw-bold mb-3">
+                                            $@property.PricePerMonth.ToString("N0") <span class="text-muted small fw-normal">/month</span>
+                                        </p>
+
+                                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3" style="border-top: 1px solid #f3f4f6; border-bottom: 1px solid #f3f4f6; padding-top: 0.75rem;">
+                                            <span class="text-muted small d-flex align-items-center">
+                                                <i class="fas fa-ruler-combined me-2 dubirent-red"></i>@property.SquareMeters m²
+                                            </span>
+                                            <span class="text-muted small d-flex align-items-center">
+                                                <i class="fas fa-bed me-2 dubirent-red"></i>@property.Bedrooms Bedrooms
+                                            </span>
+                                            <span class="text-muted small d-flex align-items-center">
+                                                <i class="fas fa-bath me-2 dubirent-red"></i>@property.Bathrooms Bathrooms
+                                            </span>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <p class="text-muted small mb-0 d-flex align-items-center">
+                                                <i class="far fa-calendar me-2"></i>@property.CreatedAt.ToString("MMM dd, yyyy")
+                                            </p>
+                                            <span class="btn btn-primary rounded-4 px-4 py-2 text-white small" style="border: none;">
+                                                View Details
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="card empty-state border-0 shadow-sm p-5 text-center">
+                    <div class="mb-4">
+                        <div class="dubirent-bg-red d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-home fa-3x text-white"></i>
+                        </div>
+                    </div>
+                    <h4 class="fw-bold mb-2">No Properties Yet</h4>
+                    <p class="text-muted mb-4">Start by adding your first property to the system and begin managing your listings.</p>
+                    <a asp-action="Create" class="btn btn-primary px-5 py-3" style="border: none; border-radius: 10px; background: var(--primary-color); font-weight: 600;">
+                        <i class="fas fa-plus me-2"></i>Add Your First Property
+                    </a>
+                </div>
+            }
+        </div>
+
+        <div class="text-center mt-4">
+            <button class="btn btn-primary px-4 py-2 text-white" style="border: none; border-radius: 10px;">
+                View all properties
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose DubiRent Section -->
+<section class="py-4 bg-white">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="display-6 fw-bold mb-2">Why Choose DubiRent?</h2>
+            <p class="text-muted fs-6">
+                We offer the best experience when searching and renting apartments in Dubai
+            </p>
+        </div>
+
+        <div class="row g-3">
+            <!-- Feature Card 1 - Trusted Rentals -->
+            <div class="col-md-4">
+                <div class="card border p-3 h-100 modern-card" style="background: linear-gradient(to bottom right, #f9fafb 0%, #ffffff 100%); border-radius: 10px;">
+                    <div class="dubirent-bg-red p-2 d-inline-flex align-items-center justify-content-center mb-2 shadow-lg" style="width: 48px; height: 48px; border-radius: 10px;">
+                        <i class="fas fa-shield-check text-white fs-5"></i>
+                    </div>
+                    <h3 class="dubirent-red fw-bold fs-6 mb-2">Trusted Rentals</h3>
+                    <p class="text-muted small mb-0" style="line-height: 1.5;">
+                        All apartments are thoroughly vetted and listed by our team for long-term rentals.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature Card 2 - Flexible Viewing -->
+            <div class="col-md-4">
+                <div class="card border p-3 h-100 modern-card" style="background: linear-gradient(to bottom right, #f9fafb 0%, #ffffff 100%); border-radius: 10px;">
+                    <div class="dubirent-bg-red p-2 d-inline-flex align-items-center justify-content-center mb-2 shadow-lg" style="width: 48px; height: 48px; border-radius: 10px;">
+                        <i class="fas fa-clock text-white fs-5"></i>
+                    </div>
+                    <h3 class="dubirent-red fw-bold fs-6 mb-2">Flexible Viewing</h3>
+                    <p class="text-muted small mb-0" style="line-height: 1.5;">
+                        Schedule apartment visits at convenient times that suit your lifestyle.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature Card 3 - Best Prices -->
+            <div class="col-md-4">
+                <div class="card border p-3 h-100 modern-card" style="background: linear-gradient(to bottom right, #f9fafb 0%, #ffffff 100%); border-radius: 10px;">
+                    <div class="dubirent-bg-red p-2 d-inline-flex align-items-center justify-content-center mb-2 shadow-lg" style="width: 48px; height: 48px; border-radius: 10px;">
+                        <i class="fas fa-dollar-sign text-white fs-5"></i>
+                    </div>
+                    <h3 class="dubirent-red fw-bold fs-6 mb-2">Best Prices</h3>
+                    <p class="text-muted small mb-0" style="line-height: 1.5;">
+                        Competitive rates with no hidden fees and best offers.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature Card 4 - Dedicated Assistance -->
+            <div class="col-md-4">
+                <div class="card border p-3 h-100 modern-card" style="background: linear-gradient(to bottom right, #f9fafb 0%, #ffffff 100%); border-radius: 10px;">
+                    <div class="dubirent-bg-red p-2 d-inline-flex align-items-center justify-content-center mb-2 shadow-lg" style="width: 48px; height: 48px; border-radius: 10px;">
+                        <i class="fas fa-headset text-white fs-5"></i>
+                    </div>
+                    <h3 class="dubirent-red fw-bold fs-6 mb-2">Dedicated Assistance</h3>
+                    <p class="text-muted small mb-0" style="line-height: 1.5;">
+                        Our team is ready to help with rental agreements, questions, and support.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature Card 5 - Comfortable Living -->
+            <div class="col-md-4">
+                <div class="card border p-3 h-100 modern-card" style="background: linear-gradient(to bottom right, #f9fafb 0%, #ffffff 100%); border-radius: 10px;">
+                    <div class="dubirent-bg-red p-2 d-inline-flex align-items-center justify-content-center mb-2 shadow-lg" style="width: 48px; height: 48px; border-radius: 10px;">
+                        <i class="fas fa-bullhorn text-white fs-5"></i>
+                    </div>
+                    <h3 class="dubirent-red fw-bold fs-6 mb-2">Comfortable Living</h3>
+                    <p class="text-muted small mb-0" style="line-height: 1.5;">
+                        Apartments equipped with modern amenities for a cozy and convenient lifestyle.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature Card 6 - Smooth Move-in Process -->
+            <div class="col-md-4">
+                <div class="card border p-3 h-100 modern-card" style="background: linear-gradient(to bottom right, #f9fafb 0%, #ffffff 100%); border-radius: 10px;">
+                    <div class="dubirent-bg-red p-2 d-inline-flex align-items-center justify-content-center mb-2 shadow-lg" style="width: 48px; height: 48px; border-radius: 10px;">
+                        <i class="fas fa-key text-white fs-5"></i>
+                    </div>
+                    <h3 class="dubirent-red fw-bold fs-6 mb-2">Smooth Move-in Process</h3>
+                    <p class="text-muted small mb-0" style="line-height: 1.5;">
+                        Simple and efficient move-in procedures to get you settled quickly.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Box -->
+        <div class="gradient-pink p-4 shadow-lg border mt-4" style="border-radius: 10px;">
+            <div class="row g-3 text-center">
+                <div class="col-md-4">
+                    <h3 class="display-5 fw-bold dubirent-red mb-1">100%</h3>
+                    <p class="text-dark fw-semibold fs-6 mb-0">Transparency</p>
+                </div>
+                <div class="col-md-4">
+                    <h3 class="display-5 fw-bold dubirent-red mb-1">9.5/10</h3>
+                    <p class="text-dark fw-semibold fs-6 mb-0">Listing Quality Score</p>
+                </div>
+                <div class="col-md-4">
+                    <h3 class="display-5 fw-bold dubirent-red mb-1">100%</h3>
+                    <p class="text-dark fw-semibold fs-6 mb-0">Real Shots</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Popular Locations Section -->
+<section class="py-4" style="background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="display-6 fw-bold mb-2">
+                <span class="text-dark">Popular</span> <span class="dubirent-red">Locations</span>
+            </h2>
+            <p class="text-muted fs-6">
+                Discover the most sought-after neighborhoods in Dubai
+            </p>
+        </div>
+
+        <div class="row g-3">
+            <!-- Location Card 1 -->
+            <div class="col-md-6">
+                <div class="card border-0 overflow-hidden shadow-lg position-relative" style="border-radius: 10px;">
+                    <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800"
+                         alt="Dubai Marina"
+                         class="card-img-top img-hover" style="height: 200px; object-fit: cover;" />
+                    <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.6), transparent);">
+                        <h3 class="text-white fw-bold fs-5 mb-1">Dubai Marina</h3>
+                        <p class="text-white-50 mb-0 small">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        </p>
+                    </div>
+                    <button class="position-absolute top-50 end-0 translate-middle-y me-3 gradient-primary border-0 d-flex align-items-center justify-content-center shadow-lg" style="width: 40px; height: 40px; z-index: 10; border: none !important; border-radius: 10px;">
+                        <i class="fas fa-arrow-right text-white small"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Location Card 2 -->
+            <div class="col-md-6">
+                <div class="card border-0 overflow-hidden shadow-lg position-relative" style="border-radius: 10px;">
+                    <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800"
+                         alt="Dubai Marina"
+                         class="card-img-top img-hover" style="height: 200px; object-fit: cover;" />
+                    <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.6), transparent);">
+                        <h3 class="text-white fw-bold fs-5 mb-1">Dubai Marina</h3>
+                        <p class="text-white-50 mb-0 small">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        </p>
+                    </div>
+                    <button class="position-absolute top-50 end-0 translate-middle-y me-3 gradient-primary border-0 d-flex align-items-center justify-content-center shadow-lg" style="width: 40px; height: 40px; z-index: 10; border: none !important; border-radius: 10px;">
+                        <i class="fas fa-arrow-right text-white small"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Location Card 3 -->
+            <div class="col-md-6">
+                <div class="card border-0 overflow-hidden shadow-lg position-relative" style="border-radius: 10px;">
+                    <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800"
+                         alt="Dubai Marina"
+                         class="card-img-top img-hover" style="height: 200px; object-fit: cover;" />
+                    <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.6), transparent);">
+                        <h3 class="text-white fw-bold fs-5 mb-1">Dubai Marina</h3>
+                        <p class="text-white-50 mb-0 small">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        </p>
+                    </div>
+                    <button class="position-absolute top-50 end-0 translate-middle-y me-3 gradient-primary border-0 d-flex align-items-center justify-content-center shadow-lg" style="width: 40px; height: 40px; z-index: 10; border: none !important; border-radius: 10px;">
+                        <i class="fas fa-arrow-right text-white small"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Location Card 4 -->
+            <div class="col-md-6">
+                <div class="card border-0 overflow-hidden shadow-lg position-relative" style="border-radius: 10px;">
+                    <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800"
+                         alt="Dubai Marina"
+                         class="card-img-top img-hover" style="height: 200px; object-fit: cover;" />
+                    <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.6), transparent);">
+                        <h3 class="text-white fw-bold fs-5 mb-1">Dubai Marina</h3>
+                        <p class="text-white-50 mb-0 small">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        </p>
+                    </div>
+                    <button class="position-absolute top-50 end-0 translate-middle-y me-3 gradient-primary border-0 d-flex align-items-center justify-content-center shadow-lg" style="width: 40px; height: 40px; z-index: 10; border: none !important; border-radius: 10px;">
+                        <i class="fas fa-arrow-right text-white small"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-4 bg-white">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="display-6 fw-bold mb-2">
+                <span class="text-dark">How It</span> <span class="dubirent-red">Works</span>
+            </h2>
+            <p class="text-muted fs-6">Simple Steps to Your New Home</p>
+        </div>
+
+        <div class="row g-3">
+            <!-- Step 1 - Browse Properties -->
+            <div class="col-md-4">
+                <div class="card border-0 p-3 text-center h-100 how-it-works-card d-flex flex-column">
+                    <div class="how-it-works-image-wrapper mb-2">
+                        <div class="how-it-works-svgs">
+                           <img src="~/site-svgs/house searching-bro.svg" class="img-fluid" />
+                        </div>
+                    </div>
+                    <h3 class="fw-bold text-dark mb-2 how-it-works-title">Browse Properties</h3>
+                    <p class="text-muted mb-0 how-it-works-text">
+                        Find verified long-term rentals across Dubai's top neighborhoods.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Step 2 - Schedule a Viewing -->
+            <div class="col-md-4">
+                <div class="card border-0 p-3 text-center h-100 how-it-works-card d-flex flex-column">
+                    <div class="how-it-works-image-wrapper mb-2">
+                        <div class="how-it-works-svgs">
+                            <img src="~/site-svgs/schedule-pana.svg" class="img-fluid" />
+                        </div>
+                    </div>
+                    <h3 class="fw-bold text-dark mb-2 how-it-works-title">Schedule a Viewing</h3>
+                    <p class="text-muted mb-0 how-it-works-text">
+                        Choose a convenient date and time for an apartment tour.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Step 3 - Secure Your Lease -->
+            <div class="col-md-4">
+                <div class="card border-0 p-3 text-center h-100 how-it-works-card d-flex flex-column">
+                    <div class="how-it-works-image-wrapper mb-2">
+                        <div class="how-it-works-svgs">
+                            <img src="~/site-svgs/apartment rent-pana.svg" class="img-fluid" />
+                        </div>
+                    </div>
+                    <h3 class="fw-bold text-dark mb-2 how-it-works-title">Secure Your Lease</h3>
+                    <p class="text-muted mb-0 how-it-works-text">
+                        We prepare the rental agreement and guide you through a smooth move-in process.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .how-it-works-image-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 120px;
+    }
+
+    .how-it-works-svgs {
+        width: 100%;
+        max-width: 140px;
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .how-it-works-svgs img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .how-it-works-title {
+        font-size: 0.9375rem;
+        min-height: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .how-it-works-text {
+        font-size: 0.8125rem;
+        line-height: 1.5;
+        min-height: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+</style>

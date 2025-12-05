@@ -1,0 +1,484 @@
+@model DubiRent.Models.InputPropertyModel
+@{
+    ViewData["Title"] = "Add New Property";
+}
+
+<style>
+    .form-card {
+        border-radius: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .form-control, .form-select {
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 0.625rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(254, 86, 88, 0.1);
+    }
+    
+    .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    /* Image Upload Styles */
+    .image-upload-container {
+        position: relative;
+    }
+
+    .upload-zone {
+        border: 2px dashed #d1d5db;
+        border-radius: 10px;
+        padding: 2.5rem;
+        text-align: center;
+        background: #f9fafb;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .upload-zone:hover {
+        border-color: var(--primary-color);
+        background: #fef2f2;
+    }
+
+    .upload-zone.drag-over {
+        border-color: var(--primary-color);
+        background: #fee2e2;
+        border-width: 3px;
+    }
+
+    .upload-zone-icon {
+        font-size: 3rem;
+        color: #9ca3af;
+        margin-bottom: 1rem;
+    }
+
+    .upload-zone-text {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .upload-zone-hint {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .hidden-file-input {
+        display: none;
+    }
+
+    .image-preview-container {
+        margin-top: 1.5rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+
+    .image-preview-item {
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 3px solid transparent;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .image-preview-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .image-preview-item.selected {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(254, 86, 88, 0.2);
+    }
+
+    .image-preview-item img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .image-preview-actions {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .image-preview-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+    }
+
+    .image-remove-btn {
+        background: rgba(220, 38, 38, 0.9);
+        color: white;
+    }
+
+    .image-remove-btn:hover {
+        background: rgba(220, 38, 38, 1);
+        transform: scale(1.1);
+    }
+
+    .image-main-badge {
+        position: absolute;
+        bottom: 8px;
+        left: 8px;
+        background: rgba(34, 197, 94, 0.95);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: none;
+    }
+
+    .image-preview-item.selected .image-main-badge {
+        display: block;
+    }
+
+    .image-preview-item.selected::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(254, 86, 88, 0.05);
+        pointer-events: none;
+    }
+</style>
+
+<div class="container py-5">
+    <!-- Header -->
+    <div class="mb-4">
+        <a asp-action="Admin" class="text-decoration-none text-muted mb-3 d-inline-flex align-items-center gap-2">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to Admin Panel</span>
+        </a>
+        <h1 class="display-5 fw-bold mb-2 mt-3">
+            Add New <span class="dubirent-red">Property</span>
+        </h1>
+        <p class="text-muted">Fill in the details to add a new property to the system</p>
+    </div>
+
+    <!-- Form -->
+    <div class="card form-card border-0 shadow-sm">
+        <div class="card-body p-4 p-md-5">
+            <form asp-action="Create" method="post" enctype="multipart/form-data" id="propertyForm">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="border-radius: 10px;" role="alert"></div>
+
+                <div class="row g-4">
+                    <!-- Title -->
+                    <div class="col-md-12">
+                        <label asp-for="Title" class="form-label">
+                            <i class="fas fa-heading dubirent-red me-2"></i>Property Title
+                        </label>
+                        <input asp-for="Title" class="form-control" placeholder="Enter property title" />
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="col-md-12">
+                        <label asp-for="Description" class="form-label">
+                            <i class="fas fa-align-left dubirent-red me-2"></i>Description
+                        </label>
+                        <textarea asp-for="Description" rows="20" class="form-control form-textarea" placeholder="Enter property description"></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="col-md-6">
+                        <label asp-for="LocationId" class="form-label">
+                            <i class="fas fa-map-marker-alt dubirent-red me-2"></i>Location
+                        </label>
+                        <select asp-for="LocationId" asp-items="ViewBag.Locations" class="form-select">
+                            <option value="">-- Select Location --</option>
+                        </select>
+                        <span asp-validation-for="LocationId" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="col-md-6">
+                        <label asp-for="Address" class="form-label">
+                            <i class="fas fa-location-dot dubirent-red me-2"></i>Address
+                        </label>
+                        <input asp-for="Address" class="form-control" placeholder="Enter full address" />
+                        <span asp-validation-for="Address" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="col-md-4">
+                        <label asp-for="PricePerMonth" class="form-label">
+                            <i class="fas fa-dollar-sign dubirent-red me-2"></i>Price Per Month ($)
+                        </label>
+                        <input asp-for="PricePerMonth" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                        <span asp-validation-for="PricePerMonth" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Bedrooms -->
+                    <div class="col-md-4">
+                        <label asp-for="Bedrooms" class="form-label">
+                            <i class="fas fa-bed dubirent-red me-2"></i>Bedrooms
+                        </label>
+                        <input asp-for="Bedrooms" type="number" min="0" class="form-control" placeholder="0" />
+                        <span asp-validation-for="Bedrooms" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Bathrooms -->
+                    <div class="col-md-4">
+                        <label asp-for="Bathrooms" class="form-label">
+                            <i class="fas fa-bath dubirent-red me-2"></i>Bathrooms
+                        </label>
+                        <input asp-for="Bathrooms" type="number" min="0" class="form-control" placeholder="0" />
+                        <span asp-validation-for="Bathrooms" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Square Meters -->
+                    <div class="col-md-6">
+                        <label asp-for="SquareMeters" class="form-label">
+                            <i class="fas fa-ruler-combined dubirent-red me-2"></i>Square Meters
+                        </label>
+                        <input asp-for="SquareMeters" type="number" min="0" class="form-control" placeholder="0" />
+                        <span asp-validation-for="SquareMeters" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="col-md-6">
+                        <label asp-for="Status" class="form-label">
+                            <i class="fas fa-info-circle dubirent-red me-2"></i>Status
+                        </label>
+                        <select asp-for="Status" asp-items="ViewBag.Statuses" class="form-select"></select>
+                        <span asp-validation-for="Status" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Images Upload -->
+                    <div class="col-md-12 image-upload-container">
+                        <label class="form-label">
+                            <i class="fas fa-images dubirent-red me-2"></i>Property Images
+                        </label>
+                        
+                        <!-- Drag & Drop Zone -->
+                        <div class="upload-zone" id="uploadZone">
+                            <div class="upload-zone-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="upload-zone-text">Drag & drop images here</div>
+                            <div class="upload-zone-hint">or click to browse</div>
+                            <small class="form-text text-muted d-block mt-3">Allowed formats: PNG, JPG, JPEG. Max file size: 5MB per image.</small>
+                        </div>
+
+                        <!-- Hidden File Input -->
+                        <input asp-for="Images" type="file" class="hidden-file-input" id="fileInput" multiple accept="image/png,image/jpeg,image/jpg" />
+                        <span asp-validation-for="Images" class="text-danger small"></span>
+
+                        <!-- Image Preview Container -->
+                        <div class="image-preview-container" id="imagePreviewContainer"></div>
+
+                        <!-- Hidden input for main image index -->
+                        <input type="hidden" name="MainImageIndex" id="mainImageIndex" value="0" />
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-end gap-3 mt-5 pt-4 border-top">
+                    <a asp-action="Admin" class="btn btn-outline-secondary px-4" style="border-radius: 10px;">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary px-5" style="border: none; border-radius: 10px; background: var(--primary-color);">
+                        <i class="fas fa-save me-2"></i>Add Property
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        let selectedImages = [];
+        let mainImageIndex = 0;
+
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const mainImageIndexInput = document.getElementById('mainImageIndex');
+
+        // Click on upload zone
+        uploadZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        // Drag and drop events
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('drag-over');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('drag-over');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        function handleFiles(files) {
+            Array.from(files).forEach((file, index) => {
+                if (file.type.startsWith('image/')) {
+                    // Check file size (5MB limit)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert(`File "${file.name}" exceeds the maximum file size of 5MB.`);
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const imageData = {
+                            file: file,
+                            preview: e.target.result,
+                            index: selectedImages.length
+                        };
+                        selectedImages.push(imageData);
+                        renderImagePreview(imageData);
+                        updateFileInput();
+                        
+                        // Set first image as main by default
+                        if (selectedImages.length === 1) {
+                            setMainImage(0);
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function renderImagePreview(imageData) {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'image-preview-item';
+            previewItem.dataset.index = imageData.index;
+            
+            previewItem.innerHTML = `
+                <img src="${imageData.preview}" alt="Preview" />
+                <div class="image-preview-actions">
+                    <button type="button" class="image-preview-btn image-remove-btn" onclick="removeImage(${imageData.index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="image-main-badge">Main</div>
+            `;
+
+            previewItem.addEventListener('click', (e) => {
+                if (!e.target.closest('.image-remove-btn')) {
+                    setMainImage(imageData.index);
+                }
+            });
+
+            imagePreviewContainer.appendChild(previewItem);
+        }
+
+        function setMainImage(index) {
+            mainImageIndex = index;
+            mainImageIndexInput.value = index;
+            
+            // Update visual selection
+            document.querySelectorAll('.image-preview-item').forEach((item, i) => {
+                if (i === index) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+
+        function removeImage(index) {
+            // Remove from array
+            selectedImages = selectedImages.filter((img, i) => i !== index);
+
+            // Re-render all previews with updated indices
+            imagePreviewContainer.innerHTML = '';
+            selectedImages.forEach((img, i) => {
+                img.index = i;
+                renderImagePreview(img);
+            });
+
+            // Update main image if needed
+            if (selectedImages.length > 0) {
+                if (index === mainImageIndex) {
+                    // Main image was removed, set first as main
+                    setMainImage(0);
+                } else if (index < mainImageIndex) {
+                    // Adjust main image index
+                    mainImageIndex--;
+                    setMainImage(mainImageIndex);
+                } else {
+                    // Update visual selection for remaining items
+                    setMainImage(mainImageIndex);
+                }
+            } else {
+                mainImageIndex = 0;
+                mainImageIndexInput.value = 0;
+            }
+
+            // Update file input
+            updateFileInput();
+        }
+
+        function updateFileInput() {
+            const dt = new DataTransfer();
+            selectedImages.forEach(img => {
+                dt.items.add(img.file);
+            });
+            fileInput.files = dt.files;
+        }
+
+        // Update file input before form submit
+        document.getElementById('propertyForm').addEventListener('submit', (e) => {
+            updateFileInput();
+            
+            // Validate that at least one image is selected if images are required
+            if (selectedImages.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one image for the property.');
+                return false;
+            }
+        });
+    </script>
+}
