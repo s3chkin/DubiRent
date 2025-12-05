@@ -2,18 +2,20 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY DubiRent.csproj .
+# Copy the csproj from the actual folder
+COPY DubiRent-Asp.net/DubiRent/DubiRent.csproj DubiRent.csproj
+
+# Restore
 RUN dotnet restore DubiRent.csproj
 
-COPY . .
-RUN dotnet publish DubiRent.csproj -c Release -o /app/out
+# Copy the entire project
+COPY DubiRent-Asp.net/DubiRent/ .
+
+# Build
+RUN dotnet publish DubiRent.csproj -c Release -o /app/publish
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build /app/out .
-
-EXPOSE 8080
-ENV ASPNETCORE_URLS=http://+:8080
-
+COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "DubiRent.dll"]
