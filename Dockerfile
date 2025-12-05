@@ -3,17 +3,17 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 
 WORKDIR /src
 
-# Copy everything from repository
+# Copy everything
 COPY . .
 
-# Go to the correct project folder
-WORKDIR /src/DubiRent-Asp.net/DubiRent
+# Go to folder where the .csproj is located
+WORKDIR /src/DubiRent-Asp.net/DubiRent/DubiRent
 
 # Restore dependencies
-RUN dotnet restore DubiRent.csproj
+RUN dotnet restore
 
-# Publish the application
-RUN dotnet publish DubiRent.csproj -c Release -o /app/publish
+# Publish app
+RUN dotnet publish -c Release -o /app/publish
 
 
 # --- Runtime stage ---
