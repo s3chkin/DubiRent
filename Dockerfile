@@ -2,11 +2,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY DubiRent/DubiRent.csproj DubiRent/
-RUN dotnet restore DubiRent/DubiRent.csproj
+COPY DubiRent.csproj .
+RUN dotnet restore DubiRent.csproj
 
 COPY . .
-RUN dotnet publish DubiRent/DubiRent.csproj -c Release -o /app/out
+RUN dotnet publish DubiRent.csproj -c Release -o /app/out
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
