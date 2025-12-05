@@ -1,21 +1,29 @@
-# Build stage
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# --- Build stage ---
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+
 WORKDIR /src
 
-# Copy the csproj from the actual folder
-COPY DubiRent-Asp.net/DubiRent/DubiRent.csproj DubiRent.csproj
+# Copy everything
+COPY . .
 
-# Restore
-RUN dotnet restore DubiRent.csproj
+# Go into project folder
+WORKDIR /src/DubiRent
 
-# Copy the entire project
-COPY DubiRent-Asp.net/DubiRent/ .
+# Restore dependencies
+RUN dotnet restore
 
-# Build
-RUN dotnet publish DubiRent.csproj -c Release -o /app/publish
+# Build project
+RUN dotnet publish -c Release -o /app/publish
 
-# Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# --- Runtime stage ---
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+
 WORKDIR /app
+
 COPY --from=build /app/publish .
+
+# Expose default ASP.NET port
+EXPOSE 8080
+
+# Run the app
 ENTRYPOINT ["dotnet", "DubiRent.dll"]
