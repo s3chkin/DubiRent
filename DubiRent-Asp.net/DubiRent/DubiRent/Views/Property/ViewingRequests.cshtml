@@ -263,6 +263,7 @@
 </style>
 
 <div class="container-fluid py-3" style="max-width: 1400px;">
+    <partial name="_Breadcrumb" />
     <!-- Page Header -->
     <div class="page-header">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -409,7 +410,7 @@
                                 </a>
                                 @if (request.Status == ViewingRequestStatus.Pending)
                                 {
-                                    <form asp-action="UpdateRequestStatus" method="post" style="display: inline;">
+                                    <form asp-action="UpdateRequestStatus" method="post" style="display: inline;" novalidate>
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="id" value="@request.Id" />
                                         <input type="hidden" name="status" value="@((int)ViewingRequestStatus.Approved)" />
@@ -417,18 +418,13 @@
                                             <i class="fas fa-check"></i>
                                         </button>
                                     </form>
-                                    <form asp-action="UpdateRequestStatus" method="post" style="display: inline;">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="id" value="@request.Id" />
-                                        <input type="hidden" name="status" value="@((int)ViewingRequestStatus.Cancelled)" />
-                                        <button type="submit" class="action-btn btn-cancel" title="Cancel" onclick="return confirm('Cancel this request?');">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" class="action-btn btn-cancel" title="Cancel" data-bs-toggle="modal" data-bs-target="#cancelRequestModal" data-request-id="@request.Id" data-property-title="@request.Property?.Title" data-request-date="@request.PreferredDate.ToString("MMM dd, yyyy")">
+                                        <i class="fas fa-times"></i>
+                                    </button>
                                 }
                                 else if (request.Status == ViewingRequestStatus.Approved)
                                 {
-                                    <form asp-action="UpdateRequestStatus" method="post" style="display: inline;">
+                                    <form asp-action="UpdateRequestStatus" method="post" style="display: inline;" novalidate>
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="id" value="@request.Id" />
                                         <input type="hidden" name="status" value="@((int)ViewingRequestStatus.Completed)" />
@@ -436,14 +432,9 @@
                                             <i class="fas fa-check-double"></i>
                                         </button>
                                     </form>
-                                    <form asp-action="UpdateRequestStatus" method="post" style="display: inline;">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="id" value="@request.Id" />
-                                        <input type="hidden" name="status" value="@((int)ViewingRequestStatus.Cancelled)" />
-                                        <button type="submit" class="action-btn btn-cancel" title="Cancel" onclick="return confirm('Cancel this request?');">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" class="action-btn btn-cancel" title="Cancel" data-bs-toggle="modal" data-bs-target="#cancelRequestModal" data-request-id="@request.Id" data-property-title="@request.Property?.Title" data-request-date="@request.PreferredDate.ToString("MMM dd, yyyy")">
+                                        <i class="fas fa-times"></i>
+                                    </button>
                                 }
                             </div>
                         </div>
@@ -463,3 +454,112 @@
         </div>
     }
 </div>
+
+<!-- Cancel Request Confirmation Modal -->
+<div class="modal fade" id="cancelRequestModal" tabindex="-1" aria-labelledby="cancelRequestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 20px; border: none; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
+            <div class="modal-header border-0 pb-0" style="padding: 2rem 2rem 1rem;">
+                <div class="modal-icon-wrapper d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px; background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-radius: 50%;">
+                    <i class="fas fa-exclamation-triangle text-danger" style="font-size: 2.5rem;"></i>
+                </div>
+            </div>
+            <div class="modal-body text-center px-4 pb-0" style="padding: 0 2rem 1.5rem;">
+                <h5 class="modal-title fw-bold mb-3" id="cancelRequestModalLabel" style="font-size: 1.5rem; color: #1f2937;">
+                    Cancel Viewing Request?
+                </h5>
+                <p class="text-muted mb-4" style="font-size: 0.9375rem; line-height: 1.6;">
+                    Are you sure you want to cancel the viewing request for <strong class="text-dark" id="requestPropertyTitle"></strong> scheduled on <strong class="text-dark" id="requestDate"></strong>?
+                </p>
+                <div class="alert alert-warning d-flex align-items-start mb-4" style="border-radius: 10px; background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412;">
+                    <i class="fas fa-info-circle me-2 mt-1"></i>
+                    <div class="text-start" style="font-size: 0.875rem;">
+                        <strong>Warning:</strong> This action will mark the viewing request as cancelled. The status change can be seen by all parties.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0 justify-content-center gap-3" style="padding: 0 2rem 2rem;">
+                <button type="button" class="btn btn-light px-4 py-2" data-bs-dismiss="modal" style="border-radius: 10px; border: 1px solid #e5e7eb; font-weight: 600;">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <form id="cancelRequestForm" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="status" value="@((int)ViewingRequestStatus.Cancelled)" />
+                    <button type="submit" class="btn btn-danger px-4 py-2" style="border-radius: 10px; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); border: none; font-weight: 600; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);">
+                        <i class="fas fa-times-circle me-2"></i><span class="btn-text">Cancel Request</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+        animation: fadeInUp 0.3s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4) !important;
+    }
+
+    .btn-light:hover {
+        background-color: #f3f4f6;
+        border-color: #d1d5db;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        var cancelRequestModal = document.getElementById('cancelRequestModal');
+        if (cancelRequestModal) {
+            cancelRequestModal.addEventListener('show.bs.modal', function (event) {
+                // Button that triggered the modal
+                var button = event.relatedTarget;
+                
+                // Extract info from data-bs-* attributes
+                var requestId = button.getAttribute('data-request-id');
+                var propertyTitle = button.getAttribute('data-property-title');
+                var requestDate = button.getAttribute('data-request-date');
+                
+                // Update the modal's content
+                var modalPropertyTitle = cancelRequestModal.querySelector('#requestPropertyTitle');
+                var modalRequestDate = cancelRequestModal.querySelector('#requestDate');
+                var cancelForm = cancelRequestModal.querySelector('#cancelRequestForm');
+                
+                modalPropertyTitle.textContent = '"' + propertyTitle + '"';
+                modalRequestDate.textContent = requestDate;
+                cancelForm.action = '@Url.Action("UpdateRequestStatus", "Property")';
+                
+                // Update the hidden input for request ID
+                var existingIdInput = cancelForm.querySelector('input[name="id"]');
+                if (existingIdInput) {
+                    existingIdInput.value = requestId;
+                } else {
+                    var idInput = document.createElement('input');
+                    idInput.type = 'hidden';
+                    idInput.name = 'id';
+                    idInput.value = requestId;
+                    cancelForm.appendChild(idInput);
+                }
+            });
+        }
+    </script>
+}

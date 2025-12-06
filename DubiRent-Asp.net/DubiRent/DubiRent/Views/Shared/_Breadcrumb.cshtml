@@ -1,0 +1,107 @@
+@* Breadcrumb partial view - auto-generates breadcrumbs based on route, works without model *@
+@{
+    List<DubiRent.Models.BreadcrumbItem> breadcrumbItems = null;
+    
+    // Check if breadcrumb items were explicitly passed via ViewData
+    if (ViewData["BreadcrumbItems"] is List<DubiRent.Models.BreadcrumbItem> explicitBreadcrumbs && explicitBreadcrumbs != null && explicitBreadcrumbs.Any())
+    {
+        breadcrumbItems = explicitBreadcrumbs;
+    }
+    else
+    {
+        // Auto-generate breadcrumbs based on current route
+        var controller = ViewContext.RouteData.Values["Controller"]?.ToString();
+        var action = ViewContext.RouteData.Values["Action"]?.ToString();
+        breadcrumbItems = new List<DubiRent.Models.BreadcrumbItem>
+        {
+            new DubiRent.Models.BreadcrumbItem { Text = "Home", Action = "Index", Controller = "Home", IsActive = false }
+        };
+
+        if (controller == "Property")
+        {
+            if (action == "Properties")
+            {
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Properties", IsActive = true });
+            }
+            else if (action == "Details")
+            {
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Properties", Action = "Properties", Controller = "Property" });
+                string propertyTitle = ViewBag.PropertyTitle as string ?? ViewData["PropertyTitle"] as string ?? "Property Details";
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = propertyTitle, IsActive = true });
+            }
+            else if (action == "Admin")
+            {
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Admin Panel", IsActive = true });
+            }
+            else if (action == "Create")
+            {
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Admin Panel", Action = "Admin", Controller = "Property" });
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Add Property", IsActive = true });
+            }
+            else if (action == "Edit")
+            {
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Admin Panel", Action = "Admin", Controller = "Property" });
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Edit Property", IsActive = true });
+            }
+            else if (action == "ViewingRequests")
+            {
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Admin Panel", Action = "Admin", Controller = "Property" });
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Viewing Requests", IsActive = true });
+            }
+            else if (action == "MyFavourites")
+            {
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "My Favourites", IsActive = true });
+            }
+        }
+        else if (controller == "Home" && action == "Privacy")
+        {
+            breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Privacy Policy", IsActive = true });
+        }
+    }
+}
+
+@if (breadcrumbItems != null && breadcrumbItems.Any())
+{
+    <nav aria-label="breadcrumb" class="custom-breadcrumb mb-4">
+        <ol class="breadcrumb-list">
+            @for (int i = 0; i < breadcrumbItems.Count; i++)
+            {
+                var item = breadcrumbItems[i];
+                if (item.IsActive || i == breadcrumbItems.Count - 1)
+                {
+                    <li class="breadcrumb-item active">
+                        <span class="breadcrumb-text">@item.Text</span>
+                    </li>
+                }
+                else
+                {
+                    <li class="breadcrumb-item">
+                        @if (!string.IsNullOrEmpty(item.Action) && !string.IsNullOrEmpty(item.Controller))
+                        {
+                            <a asp-controller="@item.Controller" asp-action="@item.Action" class="breadcrumb-link">
+                                @item.Text
+                            </a>
+                        }
+                        else if (!string.IsNullOrEmpty(item.Url))
+                        {
+                            <a href="@item.Url" class="breadcrumb-link">
+                                @item.Text
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="breadcrumb-text">@item.Text</span>
+                        }
+                    </li>
+                }
+                
+                @if (i < breadcrumbItems.Count - 1)
+                {
+                    <li class="breadcrumb-separator">
+                        <i class="fas fa-chevron-right"></i>
+                    </li>
+                }
+            }
+        </ol>
+    </nav>
+}

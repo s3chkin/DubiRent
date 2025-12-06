@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Threading.Tasks;
 using DubiRent.Data.Models;
 using DubiRent.Data;
 using DubiRent.Models;
@@ -24,7 +25,7 @@ namespace DubiRent.Controllers
             this._userManager = userManager;
         }
 
-        public IActionResult Index(PropertySearchModel search)
+        public async Task<IActionResult> Index(PropertySearchModel search)
         {
             var query = db.Properties
                 .Include(p => p.Location)
@@ -82,10 +83,25 @@ namespace DubiRent.Controllers
                 hasSearch = true;
             }
 
-            var properties = query
+            var properties = await query
                 .OrderByDescending(p => p.CreatedAt)
                 .Take(3)
-                .ToList();
+                .ToListAsync();
+
+            // Check which properties are in user's favourites
+            var userId = _userManager.GetUserId(User);
+            HashSet<int> favouritePropertyIds = new HashSet<int>();
+            if (!string.IsNullOrEmpty(userId) && properties.Any())
+            {
+                var propertyIds = properties.Select(p => p.Id).ToList();
+                var favourites = await db.Favourites
+                    .Where(f => f.UserId == userId && propertyIds.Contains(f.PropertyId))
+                    .Select(f => f.PropertyId)
+                    .ToListAsync();
+                favouritePropertyIds = favourites.ToHashSet();
+            }
+
+            ViewBag.FavouritePropertyIds = favouritePropertyIds;
 
             // Populate ViewBag for dropdowns
             ViewBag.Locations = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(

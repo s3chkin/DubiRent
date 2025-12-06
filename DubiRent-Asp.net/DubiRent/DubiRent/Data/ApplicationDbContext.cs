@@ -12,7 +12,7 @@ namespace DubiRent.Data
             this.Database.Migrate();
             UpdateDescriptionColumn();
             UpdateUserIdColumn();
-            UpdateIpAddressColumn();
+            RemoveIpAddressColumn();
         }
         
         private void UpdateDescriptionColumn()
@@ -65,20 +65,20 @@ namespace DubiRent.Data
             }
         }
 
-        private void UpdateIpAddressColumn()
+        private void RemoveIpAddressColumn()
         {
             try
             {
-                // Add IpAddress column to ViewingRequests table if it doesn't exist
+                // Remove IpAddress column from ViewingRequests table if it exists
                 var sql = @"
-                    IF NOT EXISTS (
+                    IF EXISTS (
                         SELECT * FROM INFORMATION_SCHEMA.COLUMNS 
                         WHERE TABLE_NAME = 'ViewingRequests' 
                         AND COLUMN_NAME = 'IpAddress'
                     )
                     BEGIN
                         ALTER TABLE [ViewingRequests]
-                        ADD [IpAddress] nvarchar(45) NULL;
+                        DROP COLUMN [IpAddress];
                     END";
                 
                 this.Database.ExecuteSqlRaw(sql);
@@ -88,6 +88,7 @@ namespace DubiRent.Data
                 // Silently fail - migration might already be applied or table doesn't exist yet
             }
         }
+        
         
         public DbSet<Property> Properties { get; set; }
         public DbSet<PropertyImage> PropertyImages { get; set; }

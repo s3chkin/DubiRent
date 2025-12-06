@@ -8,6 +8,81 @@ html {
   }
 }
 
+/* Breadcrumb Styles */
+.custom-breadcrumb {
+  padding: 0;
+  margin-bottom: 1.5rem;
+}
+
+.breadcrumb-list {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumb-item.active .breadcrumb-text {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.breadcrumb-link {
+  color: #6b7280;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.breadcrumb-link:hover {
+  color: #fe5658;
+  text-decoration: none;
+}
+
+.breadcrumb-text {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.breadcrumb-separator {
+  display: flex;
+  align-items: center;
+  color: #d1d5db;
+  font-size: 0.75rem;
+  margin: 0 0.25rem;
+}
+
+.breadcrumb-separator i {
+  opacity: 0.6;
+}
+
+/* Mobile adjustments */
+@media (max-width: 576px) {
+  .breadcrumb-list {
+    gap: 0.25rem;
+  }
+  
+  .breadcrumb-link,
+  .breadcrumb-text {
+    font-size: 0.8125rem;
+  }
+  
+  .breadcrumb-separator {
+    font-size: 0.625rem;
+    margin: 0 0.125rem;
+  }
+}
+
 .btn:focus,
 .btn:active:focus,
 .btn-link.nav-link:focus,
@@ -69,4 +144,60 @@ body {
   .footer {
     margin-top: 2rem;
   }
+}
+
+/* Loading Indicator Styles */
+.form-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  border-radius: inherit;
+}
+
+.form-loading-overlay .spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.25em;
+}
+
+/* Disable pointer events when loading */
+.form-loading,
+.form-loading * {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* Button loading state */
+button:disabled,
+button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.15em;
+}
+
+/* Favourite Button Styles */
+.favourite-btn {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.favourite-btn:hover {
+  transform: scale(1.1);
+}
+
+.favourite-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }

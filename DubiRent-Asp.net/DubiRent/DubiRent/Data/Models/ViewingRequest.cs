@@ -42,9 +42,6 @@ namespace DubiRent.Data.Models
 
         public ViewingRequestStatus Status { get; set; } = ViewingRequestStatus.Pending;
 
-        [StringLength(45)] // IPv6 max length
-        public string? IpAddress { get; set; } // Store IP for spam protection
-
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
     }

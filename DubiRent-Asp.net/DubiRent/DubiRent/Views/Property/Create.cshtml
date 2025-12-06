@@ -3,6 +3,8 @@
     ViewData["Title"] = "Add New Property";
 }
 
+<partial name="_Breadcrumb" />
+
 <style>
     .form-card {
         border-radius: 10px;
@@ -179,10 +181,6 @@
 <div class="container py-5">
     <!-- Header -->
     <div class="mb-4">
-        <a asp-action="Admin" class="text-decoration-none text-muted mb-3 d-inline-flex align-items-center gap-2">
-            <i class="fas fa-arrow-left"></i>
-            <span>Back to Admin Panel</span>
-        </a>
         <h1 class="display-5 fw-bold mb-2 mt-3">
             Add New <span class="dubirent-red">Property</span>
         </h1>
@@ -470,15 +468,20 @@
         }
 
         // Update file input before form submit
-        document.getElementById('propertyForm').addEventListener('submit', (e) => {
-            updateFileInput();
-            
-            // Validate that at least one image is selected if images are required
-            if (selectedImages.length === 0) {
-                e.preventDefault();
-                alert('Please select at least one image for the property.');
-                return false;
-            }
-        });
+        const propertyForm = document.getElementById('propertyForm');
+        if (propertyForm) {
+            propertyForm.addEventListener('submit', (e) => {
+                updateFileInput();
+                
+                // Validate that at least one image is selected if images are required
+                if (selectedImages.length === 0) {
+                    e.preventDefault();
+                    alert('Please select at least one image for the property.');
+                    return false;
+                }
+                
+                // Loading indicator is handled by site.js
+            });
+        }
     </script>
 }

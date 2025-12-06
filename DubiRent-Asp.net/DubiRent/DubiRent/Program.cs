@@ -22,6 +22,9 @@ namespace DubiRent
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
 
+            // Register Email Service
+            builder.Services.AddScoped<DubiRent.Services.IEmailService, DubiRent.Services.EmailService>();
+
             // Google Authentication
             builder.Services.AddAuthentication()
                 .AddGoogle(options =>

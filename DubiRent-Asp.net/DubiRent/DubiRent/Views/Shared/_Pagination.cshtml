@@ -1,0 +1,211 @@
+@{
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int totalCount = ViewBag.TotalCount ?? 0;
+    int pageSize = ViewBag.PageSize ?? 12;
+    string? currentFilter = ViewBag.CurrentFilter;
+    var searchModel = ViewBag.SearchModel as DubiRent.Models.PropertySearchModel;
+    
+    // Build query string parameters
+    var queryParams = new Dictionary<string, string>();
+    
+    if (searchModel != null)
+    {
+        if (!string.IsNullOrWhiteSpace(searchModel.Title))
+            queryParams["Title"] = searchModel.Title;
+        if (!string.IsNullOrWhiteSpace(searchModel.Address))
+            queryParams["Address"] = searchModel.Address;
+        if (!string.IsNullOrWhiteSpace(searchModel.LocationName))
+            queryParams["LocationName"] = searchModel.LocationName;
+        if (searchModel.LocationId.HasValue)
+            queryParams["LocationId"] = searchModel.LocationId.Value.ToString();
+        if (searchModel.MinPrice.HasValue)
+            queryParams["MinPrice"] = searchModel.MinPrice.Value.ToString();
+        if (searchModel.MaxPrice.HasValue)
+            queryParams["MaxPrice"] = searchModel.MaxPrice.Value.ToString();
+        if (searchModel.MinSquareMeters.HasValue)
+            queryParams["MinSquareMeters"] = searchModel.MinSquareMeters.Value.ToString();
+        if (searchModel.MaxSquareMeters.HasValue)
+            queryParams["MaxSquareMeters"] = searchModel.MaxSquareMeters.Value.ToString();
+        if (!string.IsNullOrWhiteSpace(searchModel.SortBy))
+            queryParams["SortBy"] = searchModel.SortBy;
+        if (searchModel.Bedrooms.HasValue)
+            queryParams["Bedrooms"] = searchModel.Bedrooms.Value.ToString();
+        if (searchModel.Bathrooms.HasValue)
+            queryParams["Bathrooms"] = searchModel.Bathrooms.Value.ToString();
+    }
+    
+    if (!string.IsNullOrWhiteSpace(currentFilter))
+        queryParams["statusFilter"] = currentFilter;
+}
+
+<style>
+    .custom-pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 2rem 0;
+        flex-wrap: wrap;
+    }
+
+    .pagination-btn {
+        min-width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        border: 2px solid #e5e7eb;
+        background: white;
+        color: #374151;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .pagination-btn:hover:not(.disabled):not(.active) {
+        border-color: #fe5658;
+        color: #fe5658;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(254, 86, 88, 0.2);
+    }
+
+    .pagination-btn.active {
+        background: linear-gradient(135deg, #fe5658 0%, #ff6b6d 50%, #ff787b 100%);
+        border-color: #fe5658;
+        color: white;
+        box-shadow: 0 4px 16px rgba(254, 86, 88, 0.3);
+    }
+
+    .pagination-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: #f3f4f6;
+        border-color: #e5e7eb;
+        color: #9ca3af;
+    }
+
+    .pagination-ellipsis {
+        min-width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280;
+        font-weight: 600;
+    }
+
+    .pagination-info {
+        text-align: center;
+        color: #6b7280;
+        margin-top: 1rem;
+        font-size: 0.875rem;
+    }
+
+    .pagination-info .dubirent-red {
+        color: #fe5658;
+        font-weight: 700;
+    }
+</style>
+
+<style>
+    @@media (max-width: 576px) {
+        .pagination-btn {
+            min-width: 36px;
+            height: 36px;
+            font-size: 0.875rem;
+        }
+
+        .custom-pagination {
+            gap: 0.25rem;
+        }
+    }
+</style>
+
+@if (totalPages > 1)
+{
+    <nav aria-label="Page navigation" class="custom-pagination">
+        <!-- Previous Button -->
+        @if (currentPage > 1)
+        {
+            queryParams["Page"] = (currentPage - 1).ToString();
+            var prevUrl = Url.Action(ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["controller"].ToString(), queryParams);
+            <a href="@prevUrl" class="pagination-btn" aria-label="Previous">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        }
+        else
+        {
+            <span class="pagination-btn disabled" aria-label="Previous">
+                <i class="fas fa-chevron-left"></i>
+            </span>
+        }
+
+        <!-- Page Numbers -->
+        @{
+            int startPage = Math.Max(1, currentPage - 2);
+            int endPage = Math.Min(totalPages, currentPage + 2);
+        }
+
+        @if (startPage > 1)
+        {
+            queryParams["Page"] = "1";
+            var firstUrl = Url.Action(ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["controller"].ToString(), queryParams);
+            <a href="@firstUrl" class="pagination-btn @(1 == currentPage ? "active" : "")">1</a>
+            @if (startPage > 2)
+            {
+                <span class="pagination-ellipsis">...</span>
+            }
+        }
+
+        @for (int i = startPage; i <= endPage; i++)
+        {
+            var pageNum = i;
+            if (pageNum == currentPage)
+            {
+                <span class="pagination-btn active">@pageNum</span>
+            }
+            else
+            {
+                queryParams["Page"] = pageNum.ToString();
+                var pageUrl = Url.Action(ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["controller"].ToString(), queryParams);
+                <a href="@pageUrl" class="pagination-btn">@pageNum</a>
+            }
+        }
+
+        @if (endPage < totalPages)
+        {
+            @if (endPage < totalPages - 1)
+            {
+                <span class="pagination-ellipsis">...</span>
+            }
+            queryParams["Page"] = totalPages.ToString();
+            var lastUrl = Url.Action(ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["controller"].ToString(), queryParams);
+            <a href="@lastUrl" class="pagination-btn @(totalPages == currentPage ? "active" : "")">@totalPages</a>
+        }
+
+        <!-- Next Button -->
+        @if (currentPage < totalPages)
+        {
+            queryParams["Page"] = (currentPage + 1).ToString();
+            var nextUrl = Url.Action(ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["controller"].ToString(), queryParams);
+            <a href="@nextUrl" class="pagination-btn" aria-label="Next">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        }
+        else
+        {
+            <span class="pagination-btn disabled" aria-label="Next">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+        }
+    </nav>
+    
+    <div class="pagination-info">
+        Showing <span class="dubirent-red">@((currentPage - 1) * pageSize + 1)</span> - <span class="dubirent-red">@(Math.Min(currentPage * pageSize, totalCount))</span> of <span class="dubirent-red">@totalCount</span> properties
+    </div>
+}
+

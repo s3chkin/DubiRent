@@ -5,6 +5,7 @@ using DubiRent.Data;
 using DubiRent.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using DubiRent.Models;
+using DubiRent.Services;
 
 namespace DubiRent.Controllers
 {
@@ -13,11 +14,13 @@ namespace DubiRent.Controllers
         private readonly ApplicationDbContext db;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly UserManager<AppUser> _userManager;
+        private readonly IEmailService _emailService;
         private string[] allowedExtention = new[] { "png", "jpg", "jpeg" };
-        public PropertyController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment, UserManager<AppUser> userManager)
+        public PropertyController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment, UserManager<AppUser> userManager, IEmailService emailService)
         {
             this.db = db;
             this.webHostEnvironment = webHostEnvironment;
+            _emailService = emailService;
             this._userManager = userManager;
         }
 
@@ -26,7 +29,7 @@ namespace DubiRent.Controllers
             return View();
         }
 
-        public IActionResult Properties(PropertySearchModel search)
+        public async Task<IActionResult> Properties(PropertySearchModel search)
         {
             // Seed initial locations if none exist
             if (!db.Locations.Any())
@@ -80,6 +83,32 @@ namespace DubiRent.Controllers
                 query = query.Where(p => p.SquareMeters <= search.MaxSquareMeters.Value);
             }
 
+            if (search.Bedrooms.HasValue)
+            {
+                if (search.Bedrooms.Value >= 5)
+                {
+                    // For 5+, search for properties with 5 or more bedrooms
+                    query = query.Where(p => p.Bedrooms >= 5);
+                }
+                else
+                {
+                    query = query.Where(p => p.Bedrooms == search.Bedrooms.Value);
+                }
+            }
+
+            if (search.Bathrooms.HasValue)
+            {
+                if (search.Bathrooms.Value >= 5)
+                {
+                    // For 5+, search for properties with 5 or more bathrooms
+                    query = query.Where(p => p.Bathrooms >= 5);
+                }
+                else
+                {
+                    query = query.Where(p => p.Bathrooms == search.Bathrooms.Value);
+                }
+            }
+
             // Apply sorting
             switch (search.SortBy)
             {
@@ -98,17 +127,44 @@ namespace DubiRent.Controllers
                     break;
             }
 
-            var properties = query.ToList();
+            // Get total count before pagination
+            var totalCount = query.Count();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)search.PageSize);
+            
+            // Apply pagination
+            var properties = query
+                .Skip((search.Page - 1) * search.PageSize)
+                .Take(search.PageSize)
+                .ToList();
 
+            // Check which properties are in user's favourites
+            var userId = _userManager.GetUserId(User);
+            HashSet<int> favouritePropertyIds = new HashSet<int>();
+            if (!string.IsNullOrEmpty(userId) && properties.Any())
+            {
+                var propertyIds = properties.Select(p => p.Id).ToList();
+                var favourites = await db.Favourites
+                    .Where(f => f.UserId == userId && propertyIds.Contains(f.PropertyId))
+                    .Select(f => f.PropertyId)
+                    .ToListAsync();
+                favouritePropertyIds = favourites.ToHashSet();
+            }
+
+            ViewBag.FavouritePropertyIds = favouritePropertyIds;
+            
             // Populate ViewBag for dropdowns
             ViewBag.Locations = new SelectList(db.Locations.OrderBy(l => l.Name).ToList(), "Id", "Name", search.LocationId);
             ViewBag.SearchModel = search;
+            ViewBag.TotalCount = totalCount;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.CurrentPage = search.Page;
+            ViewBag.PageSize = search.PageSize;
 
             return View(properties);
         }
 
         // Admin Panel
-        public IActionResult Admin(string statusFilter = null)
+        public IActionResult Admin(string statusFilter = null, int page = 1, int pageSize = 12)
         {
             // Seed initial locations if none exist
             if (!db.Locations.Any())
@@ -116,26 +172,41 @@ namespace DubiRent.Controllers
                 SeedLocations();
             }
 
-            // Get all properties for statistics
-            var allProperties = db.Properties
+            // Get all properties query with includes
+            IQueryable<Property> allPropertiesQuery = db.Properties
+                .Include(p => p.Location)
+                .Include(p => p.Images);
+
+            // Apply status filter if provided
+            if (!string.IsNullOrEmpty(statusFilter) && Enum.TryParse<PropertyStatus>(statusFilter, out var status))
+            {
+                allPropertiesQuery = allPropertiesQuery.Where(p => p.Status == status);
+            }
+
+            // Get total count before pagination
+            var totalCount = allPropertiesQuery.Count();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            // Apply sorting and pagination
+            var properties = allPropertiesQuery
+                .OrderByDescending(p => p.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // Get all properties for statistics (without filter)
+            var allPropertiesForStats = db.Properties
                 .Include(p => p.Location)
                 .Include(p => p.Images)
                 .ToList();
 
-            // Apply status filter if provided
-            var query = allProperties.AsQueryable();
-            if (!string.IsNullOrEmpty(statusFilter) && Enum.TryParse<PropertyStatus>(statusFilter, out var status))
-            {
-                query = query.Where(p => p.Status == status);
-            }
-
-            var properties = query
-                .OrderByDescending(p => p.CreatedAt)
-                .ToList();
-
             // Pass all properties to ViewBag for statistics
-            ViewBag.AllProperties = allProperties;
+            ViewBag.AllProperties = allPropertiesForStats;
             ViewBag.CurrentFilter = statusFilter;
+            ViewBag.TotalCount = totalCount;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
 
             return View(properties);
         }
@@ -225,50 +296,107 @@ namespace DubiRent.Controllers
                 if (uploadedImages.Any())
                 {
                     var imagesFolder = Path.Combine(webHostEnvironment.WebRootPath, "images", "properties");
+                    var uploadedFilePaths = new List<string>(); // Track uploaded files for rollback
                     
-                    // Create directory if it doesn't exist
-                    if (!Directory.Exists(imagesFolder))
+                    try
                     {
-                        Directory.CreateDirectory(imagesFolder);
-                    }
-
-                    // Get main image index from form
-                    int mainImageIndex = 0;
-                    if (Request.Form.TryGetValue("MainImageIndex", out var mainImageIndexValue) && 
-                        int.TryParse(mainImageIndexValue, out var parsedIndex) && 
-                        parsedIndex >= 0 && parsedIndex < uploadedImages.Count)
-                    {
-                        mainImageIndex = parsedIndex;
-                    }
-
-                    int imageIndex = 0;
-                    foreach (var imageFile in uploadedImages)
-                    {
-                        if (imageFile != null && imageFile.Length > 0)
+                        // Create directory if it doesn't exist
+                        if (!Directory.Exists(imagesFolder))
                         {
-                            var extension = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
-                            var uniqueFileName = $"{property.Id}_{imageIndex}_{Guid.NewGuid()}{extension}";
-                            var filePath = Path.Combine(imagesFolder, uniqueFileName);
-
-                            using (var stream = new FileStream(filePath, FileMode.Create))
-                            {
-                                await imageFile.CopyToAsync(stream);
-                            }
-
-                            var propertyImage = new PropertyImage
-                            {
-                                PropertyId = property.Id,
-                                ImageUrl = $"/images/properties/{uniqueFileName}",
-                                IsMain = imageIndex == mainImageIndex,
-                                CreatedAt = DateTime.Now
-                            };
-
-                            db.PropertyImages.Add(propertyImage);
+                            Directory.CreateDirectory(imagesFolder);
                         }
-                        imageIndex++;
-                    }
 
-                    await db.SaveChangesAsync();
+                        // Get main image index from form
+                        int mainImageIndex = 0;
+                        if (Request.Form.TryGetValue("MainImageIndex", out var mainImageIndexValue) && 
+                            int.TryParse(mainImageIndexValue, out var parsedIndex) && 
+                            parsedIndex >= 0 && parsedIndex < uploadedImages.Count)
+                        {
+                            mainImageIndex = parsedIndex;
+                        }
+
+                        int imageIndex = 0;
+                        foreach (var imageFile in uploadedImages)
+                        {
+                            if (imageFile != null && imageFile.Length > 0)
+                            {
+                                var extension = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+                                var uniqueFileName = $"{property.Id}_{imageIndex}_{Guid.NewGuid()}{extension}";
+                                var filePath = Path.Combine(imagesFolder, uniqueFileName);
+
+                                try
+                                {
+                                    using (var stream = new FileStream(filePath, FileMode.Create))
+                                    {
+                                        await imageFile.CopyToAsync(stream);
+                                    }
+                                    
+                                    uploadedFilePaths.Add(filePath); // Track successful uploads
+
+                                    var propertyImage = new PropertyImage
+                                    {
+                                        PropertyId = property.Id,
+                                        ImageUrl = $"/images/properties/{uniqueFileName}",
+                                        IsMain = imageIndex == mainImageIndex,
+                                        CreatedAt = DateTime.Now
+                                    };
+
+                                    db.PropertyImages.Add(propertyImage);
+                                }
+                                catch (Exception ex)
+                                {
+                                    // Delete any uploaded files if error occurs
+                                    foreach (var uploadedPath in uploadedFilePaths)
+                                    {
+                                        try
+                                        {
+                                            if (System.IO.File.Exists(uploadedPath))
+                                            {
+                                                System.IO.File.Delete(uploadedPath);
+                                            }
+                                        }
+                                        catch { }
+                                    }
+                                    
+                                    TempData["Error"] = $"Error uploading image '{imageFile.FileName}': {ex.Message}";
+                                    ViewBag.Locations = new SelectList(db.Locations.ToList(), "Id", "Name", model.LocationId);
+                                    ViewBag.Statuses = new SelectList(Enum.GetValues(typeof(PropertyStatus)), model.Status);
+                                    return View(model);
+                                }
+                            }
+                            imageIndex++;
+                        }
+
+                        await db.SaveChangesAsync();
+                        
+                        // Verify that images were saved correctly
+                        await db.Entry(property).Collection(p => p.Images).LoadAsync();
+                        if (!property.Images.Any())
+                        {
+                            // Images were not saved - this should not happen, but handle it gracefully
+                            TempData["Warning"] = "Property was created, but images may not have been saved. Please edit the property to add images.";
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Rollback: Delete any uploaded files if database save fails
+                        foreach (var uploadedPath in uploadedFilePaths)
+                        {
+                            try
+                            {
+                                if (System.IO.File.Exists(uploadedPath))
+                                {
+                                    System.IO.File.Delete(uploadedPath);
+                                }
+                            }
+                            catch { }
+                        }
+                        
+                        TempData["Error"] = $"Error saving property images: {ex.Message}";
+                        ViewBag.Locations = new SelectList(db.Locations.ToList(), "Id", "Name", model.LocationId);
+                        ViewBag.Statuses = new SelectList(Enum.GetValues(typeof(PropertyStatus)), model.Status);
+                        return View(model);
+                    }
                 }
 
                 TempData["Success"] = "Property added successfully!";
@@ -305,6 +433,16 @@ namespace DubiRent.Controllers
 
             ViewBag.HasExistingRequest = existingRequest != null;
             ViewBag.ExistingRequest = existingRequest;
+            ViewBag.PropertyTitle = property.Title;
+
+            // Check if property is in user's favorites
+            bool isFavourite = false;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                isFavourite = await db.Favourites
+                    .AnyAsync(f => f.PropertyId == id && f.UserId == userId);
+            }
+            ViewBag.IsFavourite = isFavourite;
 
             return View(property);
         }
@@ -655,14 +793,6 @@ namespace DubiRent.Controllers
                 return RedirectToAction(nameof(Details), new { id = model.PropertyId });
             }
 
-            // Get client IP address for spam protection
-            var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
-            if (string.IsNullOrEmpty(clientIp))
-            {
-                // Try to get IP from forwarded headers (for proxies/load balancers)
-                clientIp = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()?.Split(',').FirstOrDefault()?.Trim();
-            }
-
             var viewingRequest = new ViewingRequest
             {
                 PropertyId = model.PropertyId,
@@ -673,7 +803,6 @@ namespace DubiRent.Controllers
                 PreferredDate = model.PreferredDate,
                 PreferredTime = model.PreferredTime,
                 Status = ViewingRequestStatus.Pending,
-                IpAddress = clientIp, // Store IP for spam protection
                 CreatedAt = DateTime.Now
             };
 
@@ -703,7 +832,10 @@ namespace DubiRent.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateRequestStatus(int id, int status)
         {
-            var request = await db.ViewingRequests.FindAsync(id);
+            var request = await db.ViewingRequests
+                .Include(vr => vr.Property)
+                .FirstOrDefaultAsync(vr => vr.Id == id);
+            
             if (request == null)
             {
                 TempData["Error"] = "Viewing request not found.";
@@ -716,12 +848,102 @@ namespace DubiRent.Controllers
                 return RedirectToAction(nameof(ViewingRequests));
             }
 
+            var oldStatus = request.Status;
             request.Status = (ViewingRequestStatus)status;
             request.UpdatedAt = DateTime.Now;
             await db.SaveChangesAsync();
 
+            // Send email notification if status changed to Approved
+            if (status == (int)ViewingRequestStatus.Approved && oldStatus != ViewingRequestStatus.Approved)
+            {
+                try
+                {
+                    await _emailService.SendViewingRequestApprovedEmailAsync(
+                        request.Email,
+                        request.FullName,
+                        request.Property?.Title ?? "Property",
+                        request.PreferredDate,
+                        request.PreferredTime
+                    );
+                }
+                catch (Exception ex)
+                {
+                    // Log error but don't break the flow
+                    // Email failure shouldn't prevent status update
+                    TempData["Warning"] = "Viewing request approved, but email notification could not be sent.";
+                }
+            }
+
             TempData["Success"] = "Viewing request status updated successfully!";
             return RedirectToAction(nameof(ViewingRequests));
+        }
+
+        // POST: Toggle Favourite
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleFavourite(int propertyId)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Json(new { success = false, message = "Please log in to add favorites." });
+            }
+
+            var property = await db.Properties.FindAsync(propertyId);
+            if (property == null)
+            {
+                return Json(new { success = false, message = "Property not found." });
+            }
+
+            var existingFavourite = await db.Favourites
+                .FirstOrDefaultAsync(f => f.PropertyId == propertyId && f.UserId == userId);
+
+            if (existingFavourite != null)
+            {
+                // Remove from favourites
+                db.Favourites.Remove(existingFavourite);
+                await db.SaveChangesAsync();
+                return Json(new { success = true, isFavourite = false, message = "Removed from favourites" });
+            }
+            else
+            {
+                // Add to favourites
+                var favourite = new Favourite
+                {
+                    UserId = userId,
+                    PropertyId = propertyId,
+                    CreatedAt = DateTime.Now
+                };
+                db.Favourites.Add(favourite);
+                await db.SaveChangesAsync();
+                return Json(new { success = true, isFavourite = true, message = "Added to favourites" });
+            }
+        }
+
+        // GET: My Favourites
+        public async Task<IActionResult> MyFavourites()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["Error"] = "Please log in to view your favourites.";
+                return RedirectToAction(nameof(Properties));
+            }
+
+            var favouriteProperties = await db.Favourites
+                .Include(f => f.Property)
+                    .ThenInclude(p => p.Location)
+                .Include(f => f.Property)
+                    .ThenInclude(p => p.Images)
+                .Where(f => f.UserId == userId)
+                .Select(f => f.Property)
+                .Where(p => p != null && p.IsActive)
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync();
+
+            ViewBag.TotalCount = favouriteProperties.Count;
+
+            return View(favouriteProperties);
         }
     }
 }

@@ -519,40 +519,35 @@
     <div class="row">
         <!-- Main Content - 60% -->
         <div class="col-lg-7 main-content">
-            <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-2">
-                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li class="breadcrumb-item"><a asp-action="Properties">Properties</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">@Model?.Title</li>
-                </ol>
-            </nav>
+            <partial name="_Breadcrumb" />
 
             <!-- Property Header -->
             <div class="property-info-card">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div style="flex: 1;">
-                        <h1 class="property-header-title">@Model?.Title</h1>
-                        <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
-                            <span class="status-badge status-@Model?.Status.ToString().ToLower()">
-                                @Model?.Status
-                            </span>
-                            @if (Model?.IsActive == true)
-                            {
-                                <span class="text-success" style="font-size: 0.75rem;">
-                                    <i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>Active
-                                </span>
-                            }
-                        </div>
-                        <p class="text-muted mb-0 d-flex align-items-center" style="font-size: 0.875rem;">
-                            <i class="fas fa-map-marker-alt dubirent-red me-2"></i>
-                            <span>@Model?.Location?.Name, @Model?.Address</span>
-                        </p>
-                    </div>
-                    <button class="btn btn-outline-danger border-0 ms-3" style="width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;">
-                        <i class="far fa-heart"></i>
-                    </button>
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h1 class="property-header-title mb-0" style="flex: 1;">@Model?.Title</h1>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <button id="favouriteBtn" class="btn btn-link p-0 border-0 favourite-btn ms-3" style="font-size: 1.2rem; line-height: 1; @(ViewBag.IsFavourite == true ? "color: #fe5658;" : "color: #6b7280;")" data-property-id="@Model?.Id">
+                            <i class="@(ViewBag.IsFavourite == true ? "fas" : "far") fa-heart"></i>
+                        </button>
+                    }
+                    @Html.AntiForgeryToken()
                 </div>
+                <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+                    <span class="status-badge status-@Model?.Status.ToString().ToLower()">
+                        @Model?.Status
+                    </span>
+                    @if (Model?.IsActive == true)
+                    {
+                        <span class="text-success" style="font-size: 0.75rem;">
+                            <i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>Active
+                        </span>
+                    }
+                </div>
+                <p class="text-muted mb-0 d-flex align-items-center" style="font-size: 0.875rem;">
+                    <i class="fas fa-map-marker-alt dubirent-red me-2"></i>
+                    <span>@Model?.Location?.Name, @Model?.Address</span>
+                </p>
             </div>
 
             <!-- Image Gallery -->
@@ -769,7 +764,7 @@
                             </div>
 
                             <button type="submit" class="btn btn-primary w-100">
-                                <i class="fas fa-calendar-check me-2"></i>Request Viewing
+                                <i class="fas fa-calendar-check me-2"></i><span class="btn-text">Request Viewing</span>
                             </button>
                             <p class="text-muted small text-center mt-2 mb-0" style="font-size: 0.7rem;">
                                 <i class="fas fa-info-circle me-1"></i>We'll confirm your viewing time shortly
@@ -938,6 +933,86 @@
             } else if (counter) {
                 counter.style.display = 'none';
             }
+        }
+        
+        // Add loading indicator to viewing request form
+        const viewingForm = document.getElementById('viewingForm');
+        if (viewingForm) {
+            viewingForm.addEventListener('submit', function(e) {
+                if (this.checkValidity()) {
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        const btnText = submitBtn.querySelector('.btn-text');
+                        if (btnText) {
+                            btnText.textContent = 'Submitting...';
+                        } else {
+                            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
+                        }
+                        submitBtn.disabled = true;
+                    }
+                }
+            });
+        }
+
+        // Favourite button functionality
+        const favouriteBtn = document.getElementById('favouriteBtn');
+        if (favouriteBtn) {
+            favouriteBtn.addEventListener('click', async function() {
+                const propertyId = this.getAttribute('data-property-id');
+                if (!propertyId) return;
+
+                const icon = this.querySelector('i');
+                
+                // Disable button during request
+                this.disabled = true;
+
+                try {
+                    const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                    if (!tokenInput) {
+                        alert('Security token not found. Please refresh the page.');
+                        this.disabled = false;
+                        return;
+                    }
+
+                    const token = tokenInput.value;
+                    const formData = new URLSearchParams();
+                    formData.append('propertyId', propertyId);
+                    formData.append('__RequestVerificationToken', token);
+
+                    const response = await fetch('@Url.Action("ToggleFavourite", "Property")', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'RequestVerificationToken': token
+                        },
+                        body: formData.toString()
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Update button appearance
+                        if (result.isFavourite) {
+                            icon.classList.remove('far');
+                            icon.classList.add('fas');
+                            this.style.color = '#fe5658';
+                            this.style.background = 'rgba(254, 86, 88, 0.1)';
+                        } else {
+                            icon.classList.remove('fas');
+                            icon.classList.add('far');
+                            this.style.color = '#6b7280';
+                            this.style.background = 'transparent';
+                        }
+                    } else {
+                        alert(result.message || 'An error occurred. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error toggling favourite:', error);
+                    alert('An error occurred. Please try again.');
+                } finally {
+                    this.disabled = false;
+                }
+            });
         }
     </script>
 }
