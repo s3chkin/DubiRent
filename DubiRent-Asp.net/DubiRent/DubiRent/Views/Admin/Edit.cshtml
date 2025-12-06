@@ -145,13 +145,12 @@
 
                     <!-- Location -->
                     <div class="col-md-6">
-                        <label asp-for="LocationId" class="form-label">
+                        <label asp-for="LocationName" class="form-label">
                             <i class="fas fa-map-marker-alt dubirent-red me-2"></i>Location
                         </label>
-                        <select asp-for="LocationId" asp-items="ViewBag.Locations" class="form-select">
-                            <option value="">-- Select Location --</option>
-                        </select>
-                        <span asp-validation-for="LocationId" class="text-danger small"></span>
+                        <input asp-for="LocationName" class="form-control" placeholder="e.g., Dubai Marina, Downtown Dubai, Palm Jumeirah" />
+                        <small class="form-text text-muted">Enter the location name (e.g., Dubai Marina, Downtown Dubai)</small>
+                        <span asp-validation-for="LocationName" class="text-danger small"></span>
                     </div>
 
                     <!-- Address -->

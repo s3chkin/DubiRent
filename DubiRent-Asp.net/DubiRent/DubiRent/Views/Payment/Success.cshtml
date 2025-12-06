@@ -1,0 +1,43 @@
+@{
+    ViewData["Title"] = "Payment Successful";
+}
+
+<partial name="_Breadcrumb" />
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg" style="border-radius: 16px;">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center" 
+                             style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                            <i class="fas fa-check text-white" style="font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                    
+                    <h1 class="display-6 fw-bold mb-3">Payment Successful!</h1>
+                    <p class="text-muted fs-5 mb-4">
+                        Thank you for your payment. Your transaction has been completed successfully.
+                    </p>
+                    
+                    <div class="alert alert-info mb-4" style="border-radius: 10px; background: #eff6ff; border: 1px solid #bfdbfe;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>What's next?</strong>
+                        <p class="mb-0 mt-2">You will receive a confirmation email shortly. Our team will contact you to finalize the rental process.</p>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a asp-controller="Property" asp-action="Properties" class="btn btn-primary px-4 py-2" style="border-radius: 10px;">
+                            <i class="fas fa-home me-2"></i>Browse More Properties
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary px-4 py-2" style="border-radius: 10px;">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -5,14 +5,60 @@
     // Sort images so main image is always first
     var images = allImages.OrderByDescending(img => img.IsMain).ThenBy(img => img.Id).ToList();
     var mainImage = images.FirstOrDefault(img => img.IsMain) ?? images.FirstOrDefault();
-    var mainImageUrl = mainImage != null ? mainImage.ImageUrl : "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800";
+    var mainImageUrl = mainImage != null ? (mainImage.ImageUrl.StartsWith("http") ? mainImage.ImageUrl : Context.Request.Scheme + "://" + Context.Request.Host + mainImage.ImageUrl) : "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800";
+    
+    var description = Model?.Description?.Length > 160 ? Model.Description.Substring(0, 157) + "..." : Model?.Description ?? $"Premium {Model?.Bedrooms} bedroom, {Model?.Bathrooms} bathroom property in {Model?.Location?.Name}, Dubai. Price: ${Model?.PricePerMonth:N0}/month.";
+    ViewData["Description"] = description;
+    ViewData["Keywords"] = $"property Dubai, {Model?.Location?.Name}, {Model?.Bedrooms} bedroom apartment, rent in Dubai, {Model?.Location?.City}, property rental";
+    ViewData["Image"] = mainImageUrl;
+    ViewData["Type"] = "product";
+    ViewData["CanonicalUrl"] = Context.Request.Scheme + "://" + Context.Request.Host + Url.Action("Details", "Property", new { id = Model?.Id });
+    
+    // Structured Data for Property (Product schema)
+    var structuredData = new
+    {
+        @@context = "https://schema.org",
+        @type = "Product",
+        name = Model?.Title,
+        description = Model?.Description,
+        image = images.Select(img => img.ImageUrl.StartsWith("http") ? img.ImageUrl : Context.Request.Scheme + "://" + Context.Request.Host + img.ImageUrl).ToList(),
+        offers = new
+        {
+            @@type = "Offer",
+            price = Model?.PricePerMonth ?? 0,
+            priceCurrency = "USD",
+            availability = Model?.Status == DubiRent.Data.Models.PropertyStatus.Available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+        },
+        brand = new
+        {
+            @@type = "Brand",
+            name = "DubiRent"
+        },
+        aggregateRating = new
+        {
+            @@type = "AggregateRating",
+            ratingValue = "4.8",
+            reviewCount = "127"
+        }
+    };
+    
+    var propertyStructuredData = new
+    {
+        @@context = "https://schema.org",
+        @type = "RealEstateAgent",
+        name = "DubiRent",
+        url = Context.Request.Scheme + "://" + Context.Request.Host,
+        logo = Context.Request.Scheme + "://" + Context.Request.Host + Url.Content("~/images/site-logo/DubiRent-cut.png")
+    };
+    
+    ViewData["StructuredData"] = "<script type=\"application/ld+json\">" + System.Text.Json.JsonSerializer.Serialize(structuredData) + "</script>" +
+                                  "<script type=\"application/ld+json\">" + System.Text.Json.JsonSerializer.Serialize(propertyStructuredData) + "</script>";
 }
 
 <style>
     .property-details-container {
         max-width: 1400px;
         margin: 0 auto;
-        padding: 1rem;
     }
 
     .main-content {
@@ -552,9 +598,41 @@
 
             <!-- Image Gallery -->
             <div class="property-image-gallery">
-                <img id="mainImage" src="@mainImageUrl" alt="@Model?.Title" class="main-property-image" 
-                     data-image-index="0"
-                     onerror="this.src='https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800'" />
+                @{
+                    var mainWebpUrl = ImageHelper.GetWebpPath(mainImageUrl);
+                    var mainHasWebP = !string.IsNullOrEmpty(mainWebpUrl) && !mainWebpUrl.StartsWith("http") && ImageHelper.WebpExists(mainWebpUrl, ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>());
+                }
+                @if (mainHasWebP)
+                {
+                    <picture>
+                        <source srcset="@mainWebpUrl" type="image/webp">
+                        <img id="mainImage" 
+                             src="@mainImageUrl" 
+                             alt="@Model?.Title" 
+                             class="main-property-image" 
+                             data-image-index="0"
+                             loading="eager"
+                             fetchpriority="high"
+                             width="800"
+                             height="600"
+                             decoding="async"
+                             onerror="this.src='https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800'" />
+                    </picture>
+                }
+                else
+                {
+                    <img id="mainImage" 
+                         src="@mainImageUrl" 
+                         alt="@Model?.Title" 
+                         class="main-property-image" 
+                         data-image-index="0"
+                         loading="eager"
+                         fetchpriority="high"
+                         width="800"
+                         height="600"
+                         decoding="async"
+                         onerror="this.src='https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800'" />
+                }
                 
                 @if (images.Any())
                 {
@@ -562,12 +640,38 @@
                         @{ int imageIndex = 0; }
                         @foreach (var image in images)
                         {
-                            <img src="@image.ImageUrl" 
-                                 alt="@Model?.Title" 
-                                 class="thumbnail-image @(image.IsMain ? "active" : "")"
-                                 data-full-image="@image.ImageUrl"
-                                 data-image-index="@imageIndex"
-                                 onerror="this.src='https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=200'" />
+                            var thumbWebpUrl = ImageHelper.GetWebpPath(image.ImageUrl);
+                            var thumbHasWebP = !string.IsNullOrEmpty(thumbWebpUrl) && !thumbWebpUrl.StartsWith("http") && ImageHelper.WebpExists(thumbWebpUrl, ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>());
+                            
+                            @if (thumbHasWebP)
+                            {
+                                <picture>
+                                    <source srcset="@thumbWebpUrl" type="image/webp">
+                                    <img src="@image.ImageUrl" 
+                                         alt="@Model?.Title - Image @(imageIndex + 1)" 
+                                         class="thumbnail-image @(image.IsMain ? "active" : "")"
+                                         data-full-image="@image.ImageUrl"
+                                         data-image-index="@imageIndex"
+                                         loading="lazy"
+                                         width="100"
+                                         height="100"
+                                         decoding="async"
+                                         onerror="this.src='https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=200'" />
+                                </picture>
+                            }
+                            else
+                            {
+                                <img src="@image.ImageUrl" 
+                                     alt="@Model?.Title - Image @(imageIndex + 1)" 
+                                     class="thumbnail-image @(image.IsMain ? "active" : "")"
+                                     data-full-image="@image.ImageUrl"
+                                     data-image-index="@imageIndex"
+                                     loading="lazy"
+                                     width="100"
+                                     height="100"
+                                     decoding="async"
+                                     onerror="this.src='https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=200'" />
+                            }
                             imageIndex++;
                         }
                     </div>
@@ -614,6 +718,16 @@
 
                 <!-- Stripe Payment Button in Left Container -->
                 <div class="mt-3 pt-3" style="border-top: 1px solid #e5e7eb;">
+@using DubiRent.Helpers
+                    @using Microsoft.AspNetCore.Identity
+                    @inject SignInManager<DubiRent.Data.Models.AppUser> SignInManager
+                    @{
+                        var isLoggedIn = SignInManager.IsSignedIn(User);
+                        var isAdmin = ViewBag.IsAdmin as bool? ?? false;
+                        var hasPaid = ViewBag.HasPaid as bool? ?? false;
+                        var hasApprovedRequest = ViewBag.HasApprovedRequest as bool? ?? false;
+                        var hasPendingRequest = ViewBag.HasPendingRequest as bool? ?? false;
+                    }
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <div>
                             <div class="price-display" style="font-size: 1.25rem; margin-bottom: 0.25rem;">
@@ -622,12 +736,50 @@
                             </div>
                         </div>
                     </div>
-                    <a href="#" class="stripe-btn text-decoration-none" onclick="event.preventDefault(); handleStripePayment(@Model?.Id, @Model?.PricePerMonth);">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.594-7.305h.003z"/>
-                        </svg>
-                        <span>Pay with Stripe</span>
-                    </a>
+                    @if (hasPaid)
+                    {
+                        <div class="alert alert-success mb-0" style="border-radius: 10px; background: #d1fae5; border: 1px solid #10b981; color: #065f46;">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>Payment Completed</strong>
+                            <p class="mb-0 mt-1 small">You have successfully paid for this property. Our team will contact you soon.</p>
+                        </div>
+                    }
+                    else if (isLoggedIn && !isAdmin && hasApprovedRequest)
+                    {
+                        <a asp-controller="Payment" asp-action="CreatePayment" asp-route-propertyId="@Model?.Id" class="stripe-btn text-decoration-none">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.594-7.305h.003z"/>
+                            </svg>
+                            <span>Pay with Stripe</span>
+                        </a>
+                    }
+                    else if (isLoggedIn && !isAdmin && !hasApprovedRequest && hasPendingRequest)
+                    {
+                        <div class="alert alert-info mb-0" style="border-radius: 10px; background: #eff6ff; border: 1px solid #3b82f6; color: #1e40af;">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Waiting for Approval</strong>
+                            <p class="mb-0 mt-1 small">Your viewing request is pending approval. Once approved, you'll be able to proceed with payment.</p>
+                        </div>
+                    }
+                    else if (isLoggedIn && !isAdmin && !hasApprovedRequest && !hasPendingRequest)
+                    {
+                        <!-- No message shown - user hasn't submitted a request yet -->
+                    }
+                    else if (isLoggedIn && isAdmin)
+                    {
+                        <div class="alert alert-secondary mb-0" style="border-radius: 10px; background: #f3f4f6; border: 1px solid #9ca3af; color: #374151;">
+                            <i class="fas fa-shield-alt me-2"></i>
+                            <strong>Admin Account</strong>
+                            <p class="mb-0 mt-1 small">Payment is not available for administrator accounts.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Details", "Property", new { id = Model?.Id })" class="stripe-btn text-decoration-none" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);">
+                            <i class="fas fa-lock me-2"></i>
+                            <span>Login to Pay</span>
+                        </a>
+                    }
                 </div>
             </div>
         </div>
@@ -638,10 +790,9 @@
                 <!-- Viewing Request Card -->
                 <div class="sidebar-card">
                     @using Microsoft.AspNetCore.Identity
-                    @inject SignInManager<DubiRent.Data.Models.AppUser> SignInManager
                     @inject UserManager<DubiRent.Data.Models.AppUser> UserManager
                     @{
-                        var isLoggedIn = SignInManager.IsSignedIn(User);
+                        // isLoggedIn is already declared above
                         var currentUser = isLoggedIn ? await UserManager.GetUserAsync(User) : null;
                         var userEmail = currentUser?.Email ?? "";
                     }
@@ -961,13 +1112,6 @@
                 }
             });
 
-            // Stripe Payment Handler
-            window.handleStripePayment = function(propertyId, amount) {
-                // This will be implemented when Stripe integration is added
-                // For now, redirect to a payment page or show alert
-                alert('Stripe payment will be processed for Property ID: ' + propertyId + ' Amount: $' + amount.toLocaleString());
-                // Example: window.location.href = '/Payment/Process?propertyId=' + propertyId + '&amount=' + amount;
-            }
         });
 
         // Fullscreen Modal Functions

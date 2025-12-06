@@ -26,6 +26,12 @@ namespace DubiRent
 
             // Register Email Service
             builder.Services.AddScoped<DubiRent.Services.IEmailService, DubiRent.Services.EmailService>();
+            
+            // Register Image Optimization Service
+            builder.Services.AddScoped<DubiRent.Services.IImageOptimizationService, DubiRent.Services.ImageOptimizationService>();
+            
+            // Register Stripe Service
+            builder.Services.AddScoped<DubiRent.Services.IStripeService, DubiRent.Services.StripeService>();
 
             // External Authentication
             var authBuilder = builder.Services.AddAuthentication();

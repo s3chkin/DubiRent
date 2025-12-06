@@ -1,14 +1,50 @@
 ﻿@model IEnumerable<DubiRent.Data.Models.Property>
 @{
     ViewData["Title"] = "Properties";
+    ViewData["Description"] = "Browse our extensive collection of premium rental properties in Dubai. Find luxury apartments, modern penthouses, and exclusive homes in Dubai's most prestigious neighborhoods.";
+    ViewData["Keywords"] = "Dubai properties for rent, luxury apartments Dubai, rental properties Dubai, Dubai real estate listings, properties Dubai, rent in Dubai";
+    ViewData["Image"] = Context.Request.Scheme + "://" + Context.Request.Host + Url.Content("~/images/site-logo/DubiRent-cut.png");
+    ViewData["Type"] = "website";
+    ViewData["CanonicalUrl"] = Context.Request.Scheme + "://" + Context.Request.Host + Url.Action("Properties", "Property");
     var searchModel = ViewBag.SearchModel as DubiRent.Models.PropertySearchModel ?? new DubiRent.Models.PropertySearchModel();
+    
+    // Structured Data for ItemList
+    var itemListStructuredData = new
+    {
+        @@context = "https://schema.org",
+        @type = "ItemList",
+        name = "Dubai Properties",
+        description = "Premium rental properties in Dubai",
+        numberOfItems = Model?.Count() ?? 0,
+        itemListElement = Model?.Select((p, index) => new
+        {
+            @@type = "ListItem",
+            position = index + 1,
+            item = new
+            {
+                @@type = "Product",
+                name = p.Title,
+                description = p.Description?.Length > 160 ? p.Description.Substring(0, 157) + "..." : p.Description,
+                image = p.Images?.FirstOrDefault(img => img.IsMain)?.ImageUrl != null 
+                    ? (p.Images.FirstOrDefault(img => img.IsMain).ImageUrl.StartsWith("http") 
+                        ? p.Images.FirstOrDefault(img => img.IsMain).ImageUrl 
+                        : Context.Request.Scheme + "://" + Context.Request.Host + p.Images.FirstOrDefault(img => img.IsMain).ImageUrl)
+                    : "",
+                offers = new
+                {
+                    @@type = "Offer",
+                    price = p.PricePerMonth,
+                    priceCurrency = "USD"
+                }
+            }
+        }).ToList()
+    };
+    ViewData["StructuredData"] = "<script type=\"application/ld+json\">" + System.Text.Json.JsonSerializer.Serialize(itemListStructuredData) + "</script>";
 }
 
 <!-- Hero Section -->
-<section class="py-5" >
-    <div class="container">
-        <partial name="_Breadcrumb" />
-        <div class="text-center mb-5">
+<partial name="_Breadcrumb" />
+<div class="text-center mb-5">
             <h1 class="display-4 fw-bold mb-3">
                 Discover <span class="dubirent-red">Luxury Properties</span>
             </h1>
@@ -211,9 +247,35 @@
                         <div class="card border-0 overflow-hidden modern-card h-100 bg-white property-card-homepage" style="border-radius: 20px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);">
                             <div class="position-relative">
                                 <a asp-action="Details" asp-route-id="@property.Id" class="text-decoration-none">
-                                    <img src="@imageUrl"
-                                         alt="@property.Title"
-                                         class="card-img-top img-hover" style="height: 220px; object-fit: cover; width: 100%;" />
+                                    @{
+                                        var webpUrl = ImageHelper.GetWebpPath(imageUrl);
+                                        var hasWebP = !string.IsNullOrEmpty(webpUrl) && !webpUrl.StartsWith("http") && ImageHelper.WebpExists(webpUrl, ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>());
+                                    }
+                                    @if (hasWebP)
+                                    {
+                                        <picture>
+                                            <source srcset="@webpUrl" type="image/webp">
+                                            <img src="@imageUrl"
+                                                 alt="@property.Title"
+                                                 class="card-img-top img-hover" 
+                                                 style="height: 220px; object-fit: cover; width: 100%;"
+                                                 loading="lazy"
+                                                 width="400"
+                                                 height="220"
+                                                 decoding="async" />
+                                        </picture>
+                                    }
+                                    else
+                                    {
+                                        <img src="@imageUrl"
+                                             alt="@property.Title"
+                                             class="card-img-top img-hover" 
+                                             style="height: 220px; object-fit: cover; width: 100%;"
+                                             loading="lazy"
+                                             width="400"
+                                             height="220"
+                                             decoding="async" />
+                                    }
                                 </a>
                                 
                                 <!-- Verified Badge -->
@@ -303,8 +365,6 @@
         
         <!-- Pagination -->
         @await Html.PartialAsync("_Pagination")
-    </div>
-</section>
 
 @if (User.Identity.IsAuthenticated)
 {

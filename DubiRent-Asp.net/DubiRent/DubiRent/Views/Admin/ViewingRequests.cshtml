@@ -637,7 +637,7 @@
                 
                 modalPropertyTitle.textContent = '"' + propertyTitle + '"';
                 modalRequestDate.textContent = requestDate;
-                cancelForm.action = '@Url.Action("UpdateRequestStatus", "Property")';
+                cancelForm.action = '@Url.Action("UpdateRequestStatus", "Admin")';
                 
                 // Update the hidden input for request ID
                 var existingIdInput = cancelForm.querySelector('input[name="id"]');

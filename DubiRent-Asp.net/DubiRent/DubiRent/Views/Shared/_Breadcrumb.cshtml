@@ -77,41 +77,72 @@
                 breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Privacy Policy", IsActive = true });
             }
         }
+        else if (controller == "Payment")
+        {
+            if (action == "Success")
+            {
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Payment Success", IsActive = true });
+            }
+        }
     }
 }
 
 @if (breadcrumbItems != null && breadcrumbItems.Any())
 {
+    // Structured Data for BreadcrumbList
+    var breadcrumbStructuredData = new
+    {
+        @@context = "https://schema.org",
+        @type = "BreadcrumbList",
+        itemListElement = breadcrumbItems.Select((item, index) => new
+        {
+            @@type = "ListItem",
+            position = index + 1,
+            name = item.Text,
+            item = !string.IsNullOrEmpty(item.Action) && !string.IsNullOrEmpty(item.Controller)
+                ? ViewContext.HttpContext.Request.Scheme + "://" + ViewContext.HttpContext.Request.Host + Url.Action(item.Action, item.Controller)
+                : item.IsActive
+                    ? ViewContext.HttpContext.Request.Scheme + "://" + ViewContext.HttpContext.Request.Host + ViewContext.HttpContext.Request.Path
+                    : ViewContext.HttpContext.Request.Scheme + "://" + ViewContext.HttpContext.Request.Host
+        }).ToList()
+    };
+    
+    <script type="application/ld+json">
+        @Html.Raw(System.Text.Json.JsonSerializer.Serialize(breadcrumbStructuredData))
+    </script>
+    
     <nav aria-label="breadcrumb" class="custom-breadcrumb mb-4">
-        <ol class="breadcrumb-list">
+        <ol class="breadcrumb-list" itemscope itemtype="https://schema.org/BreadcrumbList">
             @for (int i = 0; i < breadcrumbItems.Count; i++)
             {
                 var item = breadcrumbItems[i];
                 if (item.IsActive || i == breadcrumbItems.Count - 1)
                 {
-                    <li class="breadcrumb-item active">
-                        <span class="breadcrumb-text">@item.Text</span>
+                    <li class="breadcrumb-item active" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                        <span class="breadcrumb-text" itemprop="name">@item.Text</span>
+                        <meta itemprop="position" content="@(i + 1)" />
                     </li>
                 }
                 else
                 {
-                    <li class="breadcrumb-item">
+                    <li class="breadcrumb-item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
                         @if (!string.IsNullOrEmpty(item.Action) && !string.IsNullOrEmpty(item.Controller))
                         {
-                            <a asp-controller="@item.Controller" asp-action="@item.Action" class="breadcrumb-link">
-                                @item.Text
+                            <a asp-controller="@item.Controller" asp-action="@item.Action" class="breadcrumb-link" itemprop="item">
+                                <span itemprop="name">@item.Text</span>
                             </a>
                         }
                         else if (!string.IsNullOrEmpty(item.Url))
                         {
-                            <a href="@item.Url" class="breadcrumb-link">
-                                @item.Text
+                            <a href="@item.Url" class="breadcrumb-link" itemprop="item">
+                                <span itemprop="name">@item.Text</span>
                             </a>
                         }
                         else
                         {
-                            <span class="breadcrumb-text">@item.Text</span>
+                            <span class="breadcrumb-text" itemprop="name">@item.Text</span>
                         }
+                        <meta itemprop="position" content="@(i + 1)" />
                     </li>
                 }
                 

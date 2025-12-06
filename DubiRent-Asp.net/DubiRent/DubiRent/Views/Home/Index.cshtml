@@ -1,10 +1,46 @@
 ﻿@model IEnumerable<DubiRent.Data.Models.Property>
 @{
     ViewData["Title"] = "Home Page";
+    ViewData["Description"] = "Discover your dream space in Dubai. Access exclusive properties in Dubai's premier locations. From luxury penthouses to modern apartments, find your perfect home with verified listings and transparent pricing.";
+    ViewData["Keywords"] = "Dubai properties, luxury rentals, apartments Dubai, property rental Dubai, Dubai real estate, rent in Dubai, premium properties, Dubai Marina, Downtown Dubai, Palm Jumeirah";
+    ViewData["Image"] = Url.Content("~/images/site-logo/DubiRent-cut.png");
+    ViewData["Type"] = "website";
+    
+    // Structured Data for Organization
+    var structuredData = new
+    {
+        @@context = "https://schema.org",
+        @type = "Organization",
+        name = "DubiRent",
+        url = Context.Request.Scheme + "://" + Context.Request.Host,
+        logo = Context.Request.Scheme + "://" + Context.Request.Host + Url.Content("~/images/site-logo/DubiRent-cut.png"),
+        description = "Premium property rental service in Dubai offering verified listings and transparent pricing.",
+        address = new
+        {
+            @@type = "PostalAddress",
+            addressLocality = "Dubai",
+            addressCountry = "AE"
+        },
+        contactPoint = new
+        {
+            @@type = "ContactPoint",
+            contactType = "Customer Service",
+            email = "info@dubirent.com",
+            areaServed = "AE",
+            availableLanguage = new[] { "English" }
+        },
+        sameAs = new[]
+        {
+            "https://www.facebook.com/dubirent",
+            "https://www.instagram.com/dubirent",
+            "https://www.twitter.com/dubirent",
+            "https://www.linkedin.com/company/dubirent"
+        }
+    };
+    ViewData["StructuredData"] = "<script type=\"application/ld+json\">" + System.Text.Json.JsonSerializer.Serialize(structuredData) + "</script>";
 }
 
-<section class="container py-4">
-    <div class="row align-items-center">
+<div class="row align-items-center">
         <!-- Left Content -->
         <div class="col-lg-6 mb-4 mb-lg-0 fade-in-up">
             <h2 class="display-5 fw-bold mb-3">
@@ -17,7 +53,7 @@
             <!-- Feature Cards -->
             <div class="row g-3 mb-4">
                 <div class="col-6">
-                    <div class="card modern-card h-100 border-2 border-dashed dubirent-border-red p-3" style="background: linear-gradient(135deg, #ffe5e6 0%, #ffffff 100%); border-radius: 10px;">
+                    <div class="card modern-card h-100 p-3" style="background: linear-gradient(135deg, #ffe5e6 0%, #ffffff 100%); border-radius: 10px; border: 1px solid rgba(254, 86, 88, 0.15);">
                         <div class="d-flex align-items-center gap-2">
                             <div class="dubirent-bg-red p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; border-radius: 10px;">
                                 <i class="fas fa-star text-white small"></i>
@@ -27,7 +63,7 @@
                     </div>
                 </div>
                 <div class="col-6">
-                    <div class="card modern-card h-100 border-2 border-dashed dubirent-border-red p-3" style="background: linear-gradient(135deg, #ffe5e6 0%, #ffffff 100%); border-radius: 10px;">
+                    <div class="card modern-card h-100 p-3" style="background: linear-gradient(135deg, #ffe5e6 0%, #ffffff 100%); border-radius: 10px; border: 1px solid rgba(254, 86, 88, 0.15);">
                         <div class="d-flex align-items-center gap-2">
                             <div class="dubirent-bg-red p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; border-radius: 10px;">
                                 <i class="fas fa-home text-white small"></i>
@@ -83,9 +119,18 @@
         <div class="col-lg-6 fade-in-up">
             <!-- Large Card -->
             <div class="card border-0 overflow-hidden shadow-lg mb-3 position-relative" style="border-radius: 10px;">
-                <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800"
-                     alt="Dubai Skyline"
-                     class="card-img-top img-hover" style="height: 240px; object-fit: cover;" />
+                <div style="position: relative;">
+                    <img src="https://images.unsplash.com/photo-1540541338287-41700207dee6?w=1200&auto=format&fit=crop&q=80"
+                         alt="Dubai Luxury"
+                         class="card-img-top img-hover" 
+                         style="height: 240px; object-fit: cover;"
+                         loading="eager"
+                         fetchpriority="high"
+                         width="600"
+                         height="240"
+                         decoding="async" />
+                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(254, 86, 88, 0.15); pointer-events: none;"></div>
+                </div>
 
                 <!-- Verified Tag -->
                 <div class="position-absolute top-0 start-0 m-2 glass rounded-pill px-2 py-1 small fw-semibold" style="border-radius: 10px;">
@@ -111,35 +156,75 @@
 
             <!-- Small Cards Grid -->
             <div class="row g-2">
+                <!-- Left Column - Dubai Luxury with Warm tones -->
                 <div class="col-6">
-                    <div class="card border-0 overflow-hidden shadow-md img-hover" style="border-radius: 10px;">
-                        <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400"
-                             alt="Burj Khalifa"
-                             class="card-img-top" style="height: 100px; object-fit: cover;" />
+                    <div class="card border-0 overflow-hidden shadow-md image-card-container" style="border-radius: 10px; height: 100px; position: relative;">
+                        <img src="https://images.unsplash.com/photo-1518684079-3c830dcef090?q=80&w=800&h=400&auto=format&fit=crop&ixlib=rb-4.1.0"
+                             alt="Dubai Luxury"
+                             class="card-img-top image-card-img" 
+                             style="height: 200px; object-fit: cover; object-position: top; transition: transform 0.5s ease;"
+                             loading="lazy"
+                             width="400"
+                             height="200"
+                             decoding="async" />
+                        <div class="hero-image-overlay"></div>
                     </div>
                 </div>
+                <!-- Right Column - Dubai Sunset Sky with Pink tones -->
                 <div class="col-6">
-                    <div class="card border-0 overflow-hidden shadow-md img-hover" style="border-radius: 10px;">
-                        <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400"
-                             alt="Dubai Marina"
-                             class="card-img-top" style="height: 100px; object-fit: cover;" />
+                    <div class="card border-0 overflow-hidden shadow-md image-card-container" style="border-radius: 10px; height: 100px; position: relative;">
+                        <img src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=800&h=400&auto=format&fit=crop&q=80"
+                             alt="Dubai Sunset Sky"
+                             class="card-img-top image-card-img" 
+                             style="height: 200px; object-fit: cover; object-position: top; transition: transform 0.5s ease;"
+                             loading="lazy"
+                             width="400"
+                             height="200"
+                             decoding="async" />
+                        <div class="hero-image-overlay"></div>
                     </div>
                 </div>
+                <!-- Left Column - Dubai Luxury (Bottom Part) -->
                 <div class="col-6">
-                    <div class="card border-0 overflow-hidden shadow-md img-hover" style="border-radius: 10px;">
-                        <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400"
-                             alt="Dubai Night"
-                             class="card-img-top" style="height: 100px; object-fit: cover;" />
+                    <div class="card border-0 overflow-hidden shadow-md image-card-container" style="border-radius: 10px; height: 100px; position: relative;">
+                        <img src="https://images.unsplash.com/photo-1518684079-3c830dcef090?q=80&w=800&h=400&auto=format&fit=crop&ixlib=rb-4.1.0"
+                             alt="Dubai Luxury"
+                             class="card-img-top image-card-img" 
+                             style="height: 200px; object-fit: cover; object-position: bottom; transition: transform 0.5s ease; margin-top: -100px;"
+                             loading="lazy"
+                             width="400"
+                             height="200"
+                             decoding="async" />
+                        <div class="hero-image-overlay"></div>
                     </div>
                 </div>
+                <!-- Right Column - Dubai Sunset Sky (Bottom Part) -->
                 <div class="col-6">
-                    <div class="card border-0 overflow-hidden shadow-md img-hover" style="border-radius: 10px;">
-                        <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400"
-                             alt="Dubai Day"
-                             class="card-img-top" style="height: 100px; object-fit: cover;" />
+                    <div class="card border-0 overflow-hidden shadow-md image-card-container" style="border-radius: 10px; height: 100px; position: relative;">
+                        <img src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=800&h=400&auto=format&fit=crop&q=80"
+                             alt="Dubai Sunset Sky"
+                             class="card-img-top image-card-img" style="height: 200px; object-fit: cover; object-position: bottom; transition: transform 0.5s ease; margin-top: -100px;" />
+                        <div class="hero-image-overlay"></div>
                     </div>
                 </div>
             </div>
+            
+            <style>
+                .image-card-container:hover .image-card-img {
+                    transform: scale(1.1);
+                }
+                
+                .hero-image-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(254, 86, 88, 0.15);
+                    pointer-events: none;
+                    z-index: 1;
+                }
+            </style>
         </div>
     </div>
 </section>
@@ -168,9 +253,35 @@
                         <div class="card border-0 overflow-hidden modern-card h-100 bg-white property-card-homepage" style="border-radius: 20px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);">
                             <div class="position-relative">
                                 <a asp-controller="Property" asp-action="Details" asp-route-id="@property.Id" class="text-decoration-none" style="display: block;">
-                                    <img src="@imageUrl"
-                                         alt="@property.Title"
-                                         class="card-img-top img-hover" style="height: 220px; object-fit: cover; width: 100%;" />
+                                    @{
+                                        var propWebpUrl = ImageHelper.GetWebpPath(imageUrl);
+                                        var propHasWebP = !string.IsNullOrEmpty(propWebpUrl) && !propWebpUrl.StartsWith("http") && ImageHelper.WebpExists(propWebpUrl, ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>());
+                                    }
+                                    @if (propHasWebP)
+                                    {
+                                        <picture>
+                                            <source srcset="@propWebpUrl" type="image/webp">
+                                            <img src="@imageUrl"
+                                                 alt="@property.Title"
+                                                 class="card-img-top img-hover" 
+                                                 style="height: 220px; object-fit: cover; width: 100%;"
+                                                 loading="lazy"
+                                                 width="400"
+                                                 height="220"
+                                                 decoding="async" />
+                                        </picture>
+                                    }
+                                    else
+                                    {
+                                        <img src="@imageUrl"
+                                             alt="@property.Title"
+                                             class="card-img-top img-hover" 
+                                             style="height: 220px; object-fit: cover; width: 100%;"
+                                             loading="lazy"
+                                             width="400"
+                                             height="220"
+                                             decoding="async" />
+                                    }
                                 </a>
 
                                 <!-- Verified Badge -->
@@ -383,81 +494,65 @@
             </p>
         </div>
 
-        <div class="row g-3">
-            <!-- Location Card 1 -->
-            <div class="col-md-6">
-                <div class="card border-0 overflow-hidden shadow-lg position-relative" style="border-radius: 10px;">
-                    <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800"
-                         alt="Dubai Marina"
-                         class="card-img-top img-hover" style="height: 200px; object-fit: cover;" />
-                    <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.6), transparent);">
-                        <h3 class="text-white fw-bold fs-5 mb-1">Dubai Marina</h3>
-                        <p class="text-white-50 mb-0 small">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        </p>
-                    </div>
-                    <button class="position-absolute top-50 end-0 translate-middle-y me-3 gradient-primary border-0 d-flex align-items-center justify-content-center shadow-lg" style="width: 40px; height: 40px; z-index: 10; border: none !important; border-radius: 10px;">
-                        <i class="fas fa-arrow-right text-white small"></i>
-                    </button>
-                </div>
-            </div>
+        @{
+            var popularLocations = ViewBag.PopularLocations as IEnumerable<dynamic>;
+        }
 
-            <!-- Location Card 2 -->
-            <div class="col-md-6">
-                <div class="card border-0 overflow-hidden shadow-lg position-relative" style="border-radius: 10px;">
-                    <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800"
-                         alt="Dubai Marina"
-                         class="card-img-top img-hover" style="height: 200px; object-fit: cover;" />
-                    <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.6), transparent);">
-                        <h3 class="text-white fw-bold fs-5 mb-1">Dubai Marina</h3>
-                        <p class="text-white-50 mb-0 small">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        </p>
+        @if (popularLocations != null && popularLocations.Any())
+        {
+            <div class="row g-3">
+                @foreach (var location in popularLocations)
+                {
+                    <div class="col-md-6">
+                        <a asp-controller="Property" asp-action="Properties" asp-route-LocationId="@location.LocationId" class="text-decoration-none" style="display: block;">
+                            <div class="card border-0 overflow-hidden shadow-lg position-relative location-card" style="border-radius: 10px; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+                                 <img src="@location.ImageUrl"
+                                      alt="@location.LocationName - @location.PropertyCount properties"
+                                      class="card-img-top img-hover" 
+                                      style="height: 200px; object-fit: cover;" 
+                                      loading="lazy"
+                                      width="600"
+                                      height="200"
+                                      decoding="async"
+                                      onerror="this.src='https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800'" />
+                                <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.6), transparent);">
+                                    <h3 class="text-white fw-bold fs-5 mb-1">@location.LocationName</h3>
+                                    <p class="text-white-50 mb-0 small">
+                                        @location.PropertyCount @(location.PropertyCount == 1 ? "property" : "properties") available
+                                    </p>
+                                </div>
+                                <div class="position-absolute top-50 end-0 translate-middle-y me-3 gradient-primary border-0 d-flex align-items-center justify-content-center shadow-lg location-arrow" style="width: 40px; height: 40px; z-index: 10; border: none !important; border-radius: 10px; transition: transform 0.3s ease;">
+                                    <i class="fas fa-arrow-right text-white small"></i>
+                                </div>
+                            </div>
+                        </a>
                     </div>
-                    <button class="position-absolute top-50 end-0 translate-middle-y me-3 gradient-primary border-0 d-flex align-items-center justify-content-center shadow-lg" style="width: 40px; height: 40px; z-index: 10; border: none !important; border-radius: 10px;">
-                        <i class="fas fa-arrow-right text-white small"></i>
-                    </button>
-                </div>
+                }
             </div>
-
-            <!-- Location Card 3 -->
-            <div class="col-md-6">
-                <div class="card border-0 overflow-hidden shadow-lg position-relative" style="border-radius: 10px;">
-                    <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800"
-                         alt="Dubai Marina"
-                         class="card-img-top img-hover" style="height: 200px; object-fit: cover;" />
-                    <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.6), transparent);">
-                        <h3 class="text-white fw-bold fs-5 mb-1">Dubai Marina</h3>
-                        <p class="text-white-50 mb-0 small">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        </p>
-                    </div>
-                    <button class="position-absolute top-50 end-0 translate-middle-y me-3 gradient-primary border-0 d-flex align-items-center justify-content-center shadow-lg" style="width: 40px; height: 40px; z-index: 10; border: none !important; border-radius: 10px;">
-                        <i class="fas fa-arrow-right text-white small"></i>
-                    </button>
-                </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <p class="text-muted">No popular locations available at the moment.</p>
             </div>
-
-            <!-- Location Card 4 -->
-            <div class="col-md-6">
-                <div class="card border-0 overflow-hidden shadow-lg position-relative" style="border-radius: 10px;">
-                    <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800"
-                         alt="Dubai Marina"
-                         class="card-img-top img-hover" style="height: 200px; object-fit: cover;" />
-                    <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.6), transparent);">
-                        <h3 class="text-white fw-bold fs-5 mb-1">Dubai Marina</h3>
-                        <p class="text-white-50 mb-0 small">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        </p>
-                    </div>
-                    <button class="position-absolute top-50 end-0 translate-middle-y me-3 gradient-primary border-0 d-flex align-items-center justify-content-center shadow-lg" style="width: 40px; height: 40px; z-index: 10; border: none !important; border-radius: 10px;">
-                        <i class="fas fa-arrow-right text-white small"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
+        }
     </div>
 </section>
+
+<style>
+    .location-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .location-card:hover .location-arrow {
+        transform: translateY(-50%) translateX(5px);
+    }
+
+    .location-card {
+        cursor: pointer;
+    }
+</style>
 
 <!-- How It Works Section -->
 <section class="py-4 bg-white">

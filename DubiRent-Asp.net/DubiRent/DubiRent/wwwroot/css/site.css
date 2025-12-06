@@ -49,6 +49,41 @@ html {
   text-decoration: none;
 }
 
+/* Stripe Payment Button */
+.stripe-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, #635BFF 0%, #0A2540 100%);
+    color: white;
+    padding: 0.875rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    transition: all 0.3s ease;
+    border: none;
+    width: 100%;
+    margin-top: 0.75rem;
+}
+
+.stripe-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 91, 255, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.stripe-btn svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.stripe-btn:active {
+    transform: translateY(0);
+}
+
 .breadcrumb-text {
   color: #6b7280;
   font-size: 0.875rem;

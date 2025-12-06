@@ -1,5 +1,19 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
+    ViewData["Description"] = "Read DubiRent's Privacy Policy and Cookie Policy. Learn how we collect, use, and protect your personal information.";
+    ViewData["Keywords"] = "privacy policy, cookie policy, data protection, GDPR, DubiRent privacy";
+    ViewData["Robots"] = "index, follow";
+    
+    // Structured Data for WebPage
+    var privacyStructuredData = new
+    {
+        @@context = "https://schema.org",
+        @type = "WebPage",
+        name = "Privacy Policy",
+        description = "DubiRent Privacy Policy and Cookie Policy",
+        inLanguage = "en-US"
+    };
+    ViewData["StructuredData"] = "<script type=\"application/ld+json\">" + System.Text.Json.JsonSerializer.Serialize(privacyStructuredData) + "</script>";
 }
 
 <style>

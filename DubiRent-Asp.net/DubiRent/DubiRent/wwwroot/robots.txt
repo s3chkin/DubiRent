@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /Admin/
+Disallow: /Identity/
+Disallow: /Property/MyFavourites
+Disallow: /*?*page=
+Disallow: /*?*search=
+
+# Sitemap (update with your actual domain)
+Sitemap: /Home/Sitemap
+

@@ -1,6 +1,33 @@
 @model DubiRent.Models.ContactModel
 @{
     ViewData["Title"] = "Contact Us";
+    ViewData["Description"] = "Get in touch with DubiRent. We're here to help you find your perfect property in Dubai. Contact us for property inquiries, viewing requests, or general questions.";
+    ViewData["Keywords"] = "contact DubiRent, Dubai property inquiries, property viewing, rental questions, Dubai real estate contact";
+    ViewData["Image"] = Context.Request.Scheme + "://" + Context.Request.Host + Url.Content("~/images/site-logo/DubiRent-cut.png");
+    ViewData["Type"] = "website";
+    ViewData["Robots"] = "noindex, follow";
+    
+    // Structured Data for ContactPage
+    var contactStructuredData = new
+    {
+        @@context = "https://schema.org",
+        @type = "ContactPage",
+        name = "Contact DubiRent",
+        description = "Contact us for property inquiries and viewing requests",
+        mainEntity = new
+        {
+            @@type = "Organization",
+            name = "DubiRent",
+            email = "info@dubirent.com",
+            address = new
+            {
+                @@type = "PostalAddress",
+                addressLocality = "Dubai",
+                addressCountry = "AE"
+            }
+        }
+    };
+    ViewData["StructuredData"] = "<script type=\"application/ld+json\">" + System.Text.Json.JsonSerializer.Serialize(contactStructuredData) + "</script>";
 }
 
 <partial name="_Breadcrumb" />
@@ -9,6 +36,7 @@
     .contact-container {
         max-width: 1200px;
         margin: 0 auto;
+        padding: 0;
     }
 
     .contact-header {

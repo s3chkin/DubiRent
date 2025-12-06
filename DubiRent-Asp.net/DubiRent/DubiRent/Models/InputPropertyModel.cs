@@ -32,7 +32,8 @@ namespace DubiRent.Models
         public int SquareMeters { get; set; }
 
         [Required(ErrorMessage = "Location is required")]
-        public int LocationId { get; set; }
+        [StringLength(100, ErrorMessage = "Location name cannot exceed 100 characters")]
+        public string LocationName { get; set; }
 
         [Required(ErrorMessage = "Address is required")]
         [StringLength(500, ErrorMessage = "Address cannot exceed 500 characters")]

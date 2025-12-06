@@ -1,0 +1,45 @@
+@using DubiRent.Helpers
+@model string
+@inject IWebHostEnvironment WebHostEnvironment
+
+@{
+    var imageUrl = Model ?? "";
+    var webpUrl = ImageHelper.GetWebpPath(imageUrl);
+    var hasWebP = !string.IsNullOrEmpty(webpUrl) && !webpUrl.StartsWith("http") && ImageHelper.WebpExists(webpUrl, WebHostEnvironment);
+    var alt = ViewData["Alt"]?.ToString() ?? "";
+    var cssClass = ViewData["CssClass"]?.ToString() ?? "";
+    var style = ViewData["Style"]?.ToString() ?? "";
+    var loading = ViewData["Loading"]?.ToString() ?? "lazy";
+    var width = ViewData["Width"]?.ToString() ?? "";
+    var height = ViewData["Height"]?.ToString() ?? "";
+    var fetchpriority = ViewData["FetchPriority"]?.ToString() ?? "";
+}
+
+@if (hasWebP && !imageUrl.StartsWith("http"))
+{
+    <picture>
+        <source srcset="@webpUrl" type="image/webp">
+        <img src="@imageUrl"
+             alt="@alt"
+             class="@cssClass"
+             style="@style"
+             loading="@loading"
+             @if (!string.IsNullOrEmpty(width)) { <text>width="@width"</text> }
+             @if (!string.IsNullOrEmpty(height)) { <text>height="@height"</text> }
+             @if (!string.IsNullOrEmpty(fetchpriority)) { <text>fetchpriority="@fetchpriority"</text> }
+             decoding="async" />
+    </picture>
+}
+else
+{
+    <img src="@imageUrl"
+         alt="@alt"
+         class="@cssClass"
+         style="@style"
+         loading="@loading"
+         @if (!string.IsNullOrEmpty(width)) { <text>width="@width"</text> }
+         @if (!string.IsNullOrEmpty(height)) { <text>height="@height"</text> }
+         @if (!string.IsNullOrEmpty(fetchpriority)) { <text>fetchpriority="@fetchpriority"</text> }
+         decoding="async" />
+}
+

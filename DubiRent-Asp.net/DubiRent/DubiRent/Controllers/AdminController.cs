@@ -18,21 +18,27 @@ namespace DubiRent.Controllers
         private readonly ApplicationDbContext db;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IEmailService _emailService;
+        private readonly IImageOptimizationService _imageOptimizationService;
         private string[] allowedExtention = new[] { "png", "jpg", "jpeg" };
         private const string DEFAULT_ADMIN_EMAIL = "admin@dubirent.com";
+        private const int MAX_IMAGE_WIDTH = 1920; // Maximum width for property images
+        private const int MAX_IMAGE_HEIGHT = 1920; // Maximum height for property images
+        private const int IMAGE_QUALITY = 85; // JPEG quality (0-100)
 
         public AdminController(
             UserManager<AppUser> userManager, 
             RoleManager<IdentityRole> roleManager,
             ApplicationDbContext db,
             IWebHostEnvironment webHostEnvironment,
-            IEmailService emailService)
+            IEmailService emailService,
+            IImageOptimizationService imageOptimizationService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             this.db = db;
             this.webHostEnvironment = webHostEnvironment;
             _emailService = emailService;
+            _imageOptimizationService = imageOptimizationService;
         }
 
         // GET: Admin Panel - Properties Management
@@ -102,13 +108,41 @@ namespace DubiRent.Controllers
         {
             var locations = new List<Location>
             {
-                new Location { Name = "Dubai Marina", City = "Dubai" },
-                new Location { Name = "Downtown Dubai", City = "Dubai" },
-                new Location { Name = "Palm Jumeirah", City = "Dubai" },
-                new Location { Name = "Business Bay", City = "Dubai" },
-                new Location { Name = "JBR (Jumeirah Beach Residence)", City = "Dubai" },
-                new Location { Name = "Dubai Hills", City = "Dubai" },
-                new Location { Name = "Dubai Creek Harbour", City = "Dubai" }
+                new Location { 
+                    Name = "Dubai Marina", 
+                    City = "Dubai",
+                    ImageUrl = "https://images.unsplash.com/photo-1539650116574-75c0c6d73b6e?w=1200&auto=format&fit=crop&q=80"
+                },
+                new Location { 
+                    Name = "Downtown Dubai", 
+                    City = "Dubai",
+                    ImageUrl = "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=1200&auto=format&fit=crop&q=80"
+                },
+                new Location { 
+                    Name = "Palm Jumeirah", 
+                    City = "Dubai",
+                    ImageUrl = "https://images.unsplash.com/photo-1601823984263-b87b59798b70?w=1200&auto=format&fit=crop&q=80"
+                },
+                new Location { 
+                    Name = "Business Bay", 
+                    City = "Dubai",
+                    ImageUrl = "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=1200&auto=format&fit=crop&q=80"
+                },
+                new Location { 
+                    Name = "JBR (Jumeirah Beach Residence)", 
+                    City = "Dubai",
+                    ImageUrl = "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=1200&auto=format&fit=crop&q=80"
+                },
+                new Location { 
+                    Name = "Dubai Hills", 
+                    City = "Dubai",
+                    ImageUrl = "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&auto=format&fit=crop&q=80"
+                },
+                new Location { 
+                    Name = "Dubai Creek Harbour", 
+                    City = "Dubai",
+                    ImageUrl = "https://images.unsplash.com/photo-1506898667547-42e22a46e125?w=1200&auto=format&fit=crop&q=80"
+                }
             };
 
             db.Locations.AddRange(locations);
@@ -124,7 +158,6 @@ namespace DubiRent.Controllers
                 SeedLocations();
             }
 
-            ViewBag.Locations = new SelectList(db.Locations.ToList(), "Id", "Name");
             ViewBag.Statuses = new SelectList(Enum.GetValues(typeof(PropertyStatus)), PropertyStatus.Available);
             
             var model = new InputPropertyModel();
@@ -161,6 +194,22 @@ namespace DubiRent.Controllers
 
             if (ModelState.IsValid)
             {
+                // Find or create location by name
+                var location = await db.Locations
+                    .FirstOrDefaultAsync(l => l.Name.ToLower() == model.LocationName.Trim().ToLower());
+                
+                if (location == null)
+                {
+                    // Create new location if it doesn't exist
+                    location = new Location
+                    {
+                        Name = model.LocationName.Trim(),
+                        City = "Dubai" // Default to Dubai for now
+                    };
+                    db.Locations.Add(location);
+                    await db.SaveChangesAsync();
+                }
+
                 var property = new Property
                 {
                     Title = model.Title,
@@ -173,7 +222,7 @@ namespace DubiRent.Controllers
                     PricePerMonth = model.PricePerMonth,
                     SquareMeters = model.SquareMeters,
                     Status = model.Status,
-                    LocationId = model.LocationId,
+                    LocationId = location.Id,
                 };
 
                 db.Properties.Add(property);
@@ -213,22 +262,33 @@ namespace DubiRent.Controllers
 
                                 try
                                 {
-                                    using (var stream = new FileStream(filePath, FileMode.Create))
+                                    // Optimize and save image with WebP support
+                                    using (var stream = imageFile.OpenReadStream())
                                     {
-                                        await imageFile.CopyToAsync(stream);
+                                        var result = await _imageOptimizationService.OptimizeAndSaveImageWithWebPAndFallbackAsync(
+                                            stream,
+                                            uniqueFileName,
+                                            imagesFolder,
+                                            MAX_IMAGE_WIDTH,
+                                            MAX_IMAGE_HEIGHT,
+                                            IMAGE_QUALITY
+                                        );
+                                        
+                                        uploadedFilePaths.Add(Path.Combine(imagesFolder, result.OriginalFileName)); // Track for cleanup
+                                        uploadedFilePaths.Add(Path.Combine(imagesFolder, result.WebpFileName)); // Track WebP too
+
+                                        var propertyImage = new PropertyImage
+                                        {
+                                            PropertyId = property.Id,
+                                            ImageUrl = result.OriginalPath, // Store original path, WebP will be used via <picture> tag
+                                            IsMain = imageIndex == mainImageIndex,
+                                            CreatedAt = DateTime.Now
+                                        };
+
+                                        // Store WebP path in a separate field or use it in view
+                                        // For now, we'll use the original path and add WebP support in views
+                                        db.PropertyImages.Add(propertyImage);
                                     }
-                                    
-                                    uploadedFilePaths.Add(filePath); // Track successful uploads
-
-                                    var propertyImage = new PropertyImage
-                                    {
-                                        PropertyId = property.Id,
-                                        ImageUrl = $"/images/properties/{uniqueFileName}",
-                                        IsMain = imageIndex == mainImageIndex,
-                                        CreatedAt = DateTime.Now
-                                    };
-
-                                    db.PropertyImages.Add(propertyImage);
                                 }
                                 catch (Exception ex)
                                 {
@@ -246,7 +306,6 @@ namespace DubiRent.Controllers
                                     }
                                     
                                     TempData["Error"] = $"Error uploading image '{imageFile.FileName}': {ex.Message}";
-                                    ViewBag.Locations = new SelectList(db.Locations.ToList(), "Id", "Name", model.LocationId);
                                     ViewBag.Statuses = new SelectList(Enum.GetValues(typeof(PropertyStatus)), model.Status);
                                     return View(model);
                                 }
@@ -280,7 +339,6 @@ namespace DubiRent.Controllers
                         }
                         
                         TempData["Error"] = $"Error saving property images: {ex.Message}";
-                        ViewBag.Locations = new SelectList(db.Locations.ToList(), "Id", "Name", model.LocationId);
                         ViewBag.Statuses = new SelectList(Enum.GetValues(typeof(PropertyStatus)), model.Status);
                         return View(model);
                     }
@@ -291,7 +349,6 @@ namespace DubiRent.Controllers
             }
 
             // Reload ViewBag data if model is invalid
-            ViewBag.Locations = new SelectList(db.Locations.ToList(), "Id", "Name", model.LocationId);
             ViewBag.Statuses = new SelectList(Enum.GetValues(typeof(PropertyStatus)), model.Status);
             return View(model);
         }
@@ -324,13 +381,12 @@ namespace DubiRent.Controllers
                 Bedrooms = property.Bedrooms,
                 Bathrooms = property.Bathrooms,
                 SquareMeters = property.SquareMeters,
-                LocationId = property.LocationId,
+                LocationName = property.Location?.Name ?? "",
                 Address = property.Address,
                 Status = property.Status,
                 IsActive = property.IsActive
             };
 
-            ViewBag.Locations = new SelectList(db.Locations.ToList(), "Id", "Name", property.LocationId);
             ViewBag.Statuses = new SelectList(Enum.GetValues(typeof(PropertyStatus)), property.Status);
             ViewBag.ExistingImages = property.Images?.ToList() ?? new List<PropertyImage>();
 
@@ -396,6 +452,22 @@ namespace DubiRent.Controllers
 
             if (ModelState.IsValid)
             {
+                // Find or create location by name
+                var location = await db.Locations
+                    .FirstOrDefaultAsync(l => l.Name.ToLower() == model.LocationName.Trim().ToLower());
+                
+                if (location == null)
+                {
+                    // Create new location if it doesn't exist
+                    location = new Location
+                    {
+                        Name = model.LocationName.Trim(),
+                        City = "Dubai" // Default to Dubai for now
+                    };
+                    db.Locations.Add(location);
+                    await db.SaveChangesAsync();
+                }
+
                 // Update property fields
                 property.Title = model.Title;
                 property.Description = model.Description;
@@ -403,7 +475,7 @@ namespace DubiRent.Controllers
                 property.Bedrooms = model.Bedrooms;
                 property.Bathrooms = model.Bathrooms;
                 property.SquareMeters = model.SquareMeters;
-                property.LocationId = model.LocationId;
+                property.LocationId = location.Id;
                 property.Address = model.Address;
                 property.Status = model.Status;
                 property.IsActive = model.IsActive;
@@ -483,20 +555,28 @@ namespace DubiRent.Controllers
                             var uniqueFileName = $"{property.Id}_{imageIndex}_{Guid.NewGuid()}{extension}";
                             var filePath = Path.Combine(imagesFolder, uniqueFileName);
 
-                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            // Optimize and save image with WebP support
+                            using (var stream = imageFile.OpenReadStream())
                             {
-                                await imageFile.CopyToAsync(stream);
+                                var result = await _imageOptimizationService.OptimizeAndSaveImageWithWebPAndFallbackAsync(
+                                    stream,
+                                    uniqueFileName,
+                                    imagesFolder,
+                                    MAX_IMAGE_WIDTH,
+                                    MAX_IMAGE_HEIGHT,
+                                    IMAGE_QUALITY
+                                );
+
+                                var propertyImage = new PropertyImage
+                                {
+                                    PropertyId = property.Id,
+                                    ImageUrl = result.OriginalPath, // Store original path, WebP will be used via <picture> tag
+                                    IsMain = false, // New images are never main - user must select from existing or newly uploaded
+                                    CreatedAt = DateTime.Now
+                                };
+
+                                db.PropertyImages.Add(propertyImage);
                             }
-
-                            var propertyImage = new PropertyImage
-                            {
-                                PropertyId = property.Id,
-                                ImageUrl = $"/images/properties/{uniqueFileName}",
-                                IsMain = false, // New images are never main - user must select from existing or newly uploaded
-                                CreatedAt = DateTime.Now
-                            };
-
-                            db.PropertyImages.Add(propertyImage);
                             imageIndex++;
                         }
                     }
@@ -524,7 +604,6 @@ namespace DubiRent.Controllers
             }
 
             // Reload ViewBag data if model is invalid
-            ViewBag.Locations = new SelectList(db.Locations.ToList(), "Id", "Name", model.LocationId);
             ViewBag.Statuses = new SelectList(Enum.GetValues(typeof(PropertyStatus)), model.Status);
             ViewBag.ExistingImages = property.Images?.ToList() ?? new List<PropertyImage>();
 
@@ -633,28 +712,66 @@ namespace DubiRent.Controllers
             }
 
             var oldStatus = request.Status;
-            request.Status = (ViewingRequestStatus)status;
+            var newStatus = (ViewingRequestStatus)status;
+            
+            // If approving a request, cancel all other pending requests for the same property
+            if (newStatus == ViewingRequestStatus.Approved && oldStatus != ViewingRequestStatus.Approved)
+            {
+                var otherRequests = await db.ViewingRequests
+                    .Where(vr => vr.PropertyId == request.PropertyId 
+                        && vr.Id != request.Id 
+                        && vr.Status == ViewingRequestStatus.Pending)
+                    .ToListAsync();
+                
+                foreach (var otherRequest in otherRequests)
+                {
+                    otherRequest.Status = ViewingRequestStatus.Cancelled;
+                    otherRequest.UpdatedAt = DateTime.Now;
+                    
+                    // Send cancellation email to other users
+                    try
+                    {
+                        await _emailService.SendViewingRequestStatusUpdateEmailAsync(
+                            otherRequest.Email,
+                            otherRequest.FullName,
+                            otherRequest.Property?.Title ?? "Property",
+                            otherRequest.PreferredDate,
+                            otherRequest.PreferredTime,
+                            ViewingRequestStatus.Cancelled.ToString()
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log error but don't break the flow
+                        // Email failure shouldn't prevent cancellation
+                    }
+                }
+            }
+            
+            request.Status = newStatus;
             request.UpdatedAt = DateTime.Now;
             await db.SaveChangesAsync();
 
-            // Send email notification if status changed to Approved
-            if (status == (int)ViewingRequestStatus.Approved && oldStatus != ViewingRequestStatus.Approved)
+            // Send email notification if status changed
+            if (oldStatus != request.Status)
             {
                 try
                 {
-                    await _emailService.SendViewingRequestApprovedEmailAsync(
+                    var statusName = request.Status.ToString();
+                    await _emailService.SendViewingRequestStatusUpdateEmailAsync(
                         request.Email,
                         request.FullName,
                         request.Property?.Title ?? "Property",
                         request.PreferredDate,
-                        request.PreferredTime
+                        request.PreferredTime,
+                        statusName
                     );
                 }
                 catch (Exception ex)
                 {
                     // Log error but don't break the flow
                     // Email failure shouldn't prevent status update
-                    TempData["Warning"] = "Viewing request approved, but email notification could not be sent.";
+                    TempData["Warning"] = $"Viewing request status updated to {request.Status}, but email notification could not be sent.";
                 }
             }
 

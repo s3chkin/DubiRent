@@ -1,16 +1,30 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en" itemscope itemtype="https://schema.org/Organization">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - DubiRent</title>
+    <title>@(ViewData["Title"] != null ? $"{ViewData["Title"]} - DubiRent" : "DubiRent - Premium Property Rentals in Dubai")</title>
     <link rel="icon" type="image/png" href="~/images/site-logo/DubiRent-single_logo-cut.png" />
     <link rel="shortcut icon" type="image/png" href="~/images/site-logo/DubiRent-single_logo-cut.png" />
+    
+    <!-- SEO Meta Tags -->
+    <partial name="_SeoMeta" />
+    
+    <!-- Structured Data (JSON-LD) -->
+    @if (ViewData["StructuredData"] != null)
+    {
+        @Html.Raw(ViewData["StructuredData"])
+    }
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DubiRent.styles.css" asp-append-version="true" />
     <link href="~/css/homepage.css" rel="stylesheet" asp-append-version="true" />
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
 </head>
 <body>
     <header class="fixed-top">
@@ -70,7 +84,7 @@
         </nav>
     </header>
     <div class="container">
-        <main role="main" class="pb-3">
+        <main role="main" class="py-4">
             @RenderBody()
         </main>
     </div>

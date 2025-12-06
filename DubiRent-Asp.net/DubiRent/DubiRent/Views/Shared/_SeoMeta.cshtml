@@ -1,0 +1,50 @@
+@using Microsoft.AspNetCore.Http.Extensions
+@{
+    var title = ViewData["Title"]?.ToString() ?? "DubiRent - Premium Property Rentals in Dubai";
+    var description = ViewData["Description"]?.ToString() ?? "Discover your dream space in Dubai. Access exclusive properties in Dubai's premier locations. From luxury penthouses to modern apartments, find your perfect home with verified listings and transparent pricing.";
+    var keywords = ViewData["Keywords"]?.ToString() ?? "Dubai properties, luxury rentals, apartments Dubai, property rental Dubai, Dubai real estate, rent in Dubai, premium properties";
+    var author = ViewData["Author"]?.ToString() ?? "DubiRent";
+    var image = ViewData["Image"]?.ToString() ?? Url.Content("~/images/site-logo/DubiRent-cut.png");
+    var url = ViewData["Url"]?.ToString() ?? (Context.Request.Scheme + "://" + Context.Request.Host + Context.Request.Path + Context.Request.QueryString);
+    var type = ViewData["Type"]?.ToString() ?? "website";
+    var siteName = "DubiRent";
+    var locale = ViewData["Locale"]?.ToString() ?? "en_US";
+    var canonicalUrl = ViewData["CanonicalUrl"]?.ToString() ?? url;
+}
+
+<!-- Primary Meta Tags -->
+<meta name="title" content="@title" />
+<meta name="description" content="@description" />
+<meta name="keywords" content="@keywords" />
+<meta name="author" content="@author" />
+<meta name="robots" content="@(ViewData["Robots"]?.ToString() ?? "index, follow")" />
+<meta name="language" content="English" />
+<meta name="revisit-after" content="7 days" />
+<meta name="theme-color" content="#fe5658" />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="@type" />
+<meta property="og:url" content="@url" />
+<meta property="og:title" content="@title" />
+<meta property="og:description" content="@description" />
+<meta property="og:image" content="@(ViewData["Image"] != null ? ViewData["Image"] : image)" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="@siteName" />
+<meta property="og:locale" content="@locale" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content="@url" />
+<meta name="twitter:title" content="@title" />
+<meta name="twitter:description" content="@description" />
+<meta name="twitter:image" content="@(ViewData["Image"] != null ? ViewData["Image"] : image)" />
+<meta name="twitter:site" content="@siteName" />
+<meta name="twitter:creator" content="@siteName" />
+
+<!-- Canonical URL -->
+<link rel="canonical" href="@canonicalUrl" />
+
+<!-- Additional SEO -->
+<link rel="alternate" hreflang="en" href="@url" />
+

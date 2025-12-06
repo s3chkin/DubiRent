@@ -189,6 +189,28 @@
     .admin-btn-viewing-requests:active i {
         color: white !important;
     }
+
+    /* Messages Button Hover Effect */
+    .admin-btn-messages {
+        transition: all 0.3s ease;
+        background-color: transparent !important;
+    }
+
+    .admin-btn-messages:hover,
+    .admin-btn-messages:focus,
+    .admin-btn-messages:active {
+        background-color: var(--primary-color) !important;
+        color: white !important;
+        border-color: var(--primary-color) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(254, 86, 88, 0.3);
+    }
+
+    .admin-btn-messages:hover i,
+    .admin-btn-messages:focus i,
+    .admin-btn-messages:active i {
+        color: white !important;
+    }
 </style>
 
 <div class="container py-4">
@@ -207,7 +229,7 @@
                         <i class="fas fa-calendar-check"></i>
                         <span>Viewing Requests</span>
                     </a>
-                    <a asp-action="Messages" class="btn btn-outline-primary d-flex align-items-center gap-2 px-4 py-2" style="border-radius: 10px; font-weight: 600; border-color: var(--primary-color); color: var(--primary-color);">
+                    <a asp-action="Messages" class="btn btn-outline-primary d-flex align-items-center gap-2 px-4 py-2 admin-btn-messages" style="border-radius: 10px; font-weight: 600; border-color: var(--primary-color); color: var(--primary-color);">
                         <i class="fas fa-envelope"></i>
                         <span>Messages</span>
                     </a>
@@ -303,10 +325,37 @@
                     <div class="card border-0 overflow-hidden modern-card h-100 bg-white property-card-homepage" style="border-radius: 20px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);">
                         <div class="position-relative">
                             <a asp-controller="Property" asp-action="Details" asp-route-id="@property.Id" class="text-decoration-none">
-                            <img src="@imageUrl" onerror="this.src='https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600'"
-                                 alt="@property.Title"
-                                 @* class="property-image" *@
-                                 class="card-img-top img-hover" style="height: 220px; object-fit: cover; width: 100%;" />
+                            @{
+                                var adminWebpUrl = ImageHelper.GetWebpPath(imageUrl);
+                                var adminHasWebP = !string.IsNullOrEmpty(adminWebpUrl) && !adminWebpUrl.StartsWith("http") && ImageHelper.WebpExists(adminWebpUrl, ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>());
+                            }
+                            @if (adminHasWebP)
+                            {
+                                <picture>
+                                    <source srcset="@adminWebpUrl" type="image/webp">
+                                    <img src="@imageUrl" 
+                                         onerror="this.src='https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600'"
+                                         alt="@property.Title"
+                                         class="card-img-top img-hover" 
+                                         style="height: 220px; object-fit: cover; width: 100%;"
+                                         loading="lazy"
+                                         width="400"
+                                         height="220"
+                                         decoding="async" />
+                                </picture>
+                            }
+                            else
+                            {
+                                <img src="@imageUrl" 
+                                     onerror="this.src='https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600'"
+                                     alt="@property.Title"
+                                     class="card-img-top img-hover" 
+                                     style="height: 220px; object-fit: cover; width: 100%;"
+                                     loading="lazy"
+                                     width="400"
+                                     height="220"
+                                     decoding="async" />
+                            }
                             </a>
 
                             <!-- Verified Badge -->

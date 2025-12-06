@@ -1,6 +1,8 @@
 @model IEnumerable<DubiRent.Data.Models.Property>
 @{
     ViewData["Title"] = "My Favourites";
+    ViewData["Description"] = "View your favorite properties in Dubai. Save properties you're interested in and access them anytime.";
+    ViewData["Robots"] = "noindex, follow";
 }
 
 <partial name="_Breadcrumb" />
@@ -256,8 +258,35 @@
                     <div class="property-card">
                         <div class="property-image-wrapper">
                             <a asp-action="Details" asp-route-id="@property.Id" style="display: block; height: 100%;">
-                                <img src="@imageUrl" alt="@property.Title" class="property-image" 
-                                     onerror="this.src='https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400'" />
+                                @{
+                                    var favWebpUrl = ImageHelper.GetWebpPath(imageUrl);
+                                    var favHasWebP = !string.IsNullOrEmpty(favWebpUrl) && !favWebpUrl.StartsWith("http") && ImageHelper.WebpExists(favWebpUrl, ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>());
+                                }
+                                @if (favHasWebP)
+                                {
+                                    <picture>
+                                        <source srcset="@favWebpUrl" type="image/webp">
+                                        <img src="@imageUrl" 
+                                             alt="@property.Title" 
+                                             class="property-image" 
+                                             loading="lazy"
+                                             width="400"
+                                             height="300"
+                                             decoding="async"
+                                             onerror="this.src='https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400'" />
+                                    </picture>
+                                }
+                                else
+                                {
+                                    <img src="@imageUrl" 
+                                         alt="@property.Title" 
+                                         class="property-image" 
+                                         loading="lazy"
+                                         width="400"
+                                         height="300"
+                                         decoding="async"
+                                         onerror="this.src='https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400'" />
+                                }
                             </a>
                             <div class="favourite-badge">
                                 <i class="fas fa-heart"></i>

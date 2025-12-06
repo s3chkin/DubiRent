@@ -17,7 +17,7 @@ namespace DubiRent.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IEmailService _emailService;
-        private string[] allowedExtention = new[] { "png", "jpg", "jpeg" };
+        private string[] allowedExtention = new[] { "png", "jpg", "jpeg","webp" };
         public PropertyController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IEmailService emailService)
         {
             this.db = db;
@@ -248,6 +248,33 @@ namespace DubiRent.Controllers
                     .AnyAsync(f => f.PropertyId == id && f.UserId == userId);
             }
             ViewBag.IsFavourite = isFavourite;
+
+            // Check if user has already paid for this property
+            bool hasPaid = false;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                hasPaid = await db.Payments
+                    .AnyAsync(p => p.PropertyId == id && p.UserId == userId && p.PaymentStatus == PaymentStatus.Completed);
+            }
+            ViewBag.HasPaid = hasPaid;
+
+            // Check if user has an approved viewing request for this property (required for payment)
+            bool hasApprovedRequest = false;
+            bool hasPendingRequest = false;
+            if (!string.IsNullOrEmpty(userId) && !isAdmin)
+            {
+                hasApprovedRequest = await db.ViewingRequests
+                    .AnyAsync(vr => vr.PropertyId == id 
+                        && vr.UserId == userId 
+                        && vr.Status == ViewingRequestStatus.Approved);
+                
+                // Check if user has submitted a request (Pending or Cancelled)
+                hasPendingRequest = await db.ViewingRequests
+                    .AnyAsync(vr => vr.PropertyId == id 
+                        && vr.UserId == userId);
+            }
+            ViewBag.HasApprovedRequest = hasApprovedRequest;
+            ViewBag.HasPendingRequest = hasPendingRequest;
 
             return View(property);
         }
