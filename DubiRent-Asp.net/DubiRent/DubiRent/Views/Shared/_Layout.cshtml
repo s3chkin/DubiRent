@@ -13,8 +13,8 @@
     <link href="~/css/homepage.css" rel="stylesheet" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+    <header class="fixed-top">
+        <nav class="navbar navbar-expand-custom navbar-toggleable-custom navbar-light bg-white border-bottom box-shadow">
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
                     <img src="~/images/site-logo/DubiRent-cut.png" alt="DubiRent" style="height: 40px; width: auto;" />
@@ -23,7 +23,7 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="navbar-collapse collapse d-custom-inline-flex justify-content-between">
                     @using Microsoft.AspNetCore.Identity
                     @inject SignInManager<DubiRent.Data.Models.AppUser> SignInManager
                     @inject UserManager<DubiRent.Data.Models.AppUser> UserManager
@@ -70,19 +70,100 @@
         </nav>
     </header>
     <div class="container">
-        <main role="main" class="pb-3 mb-5">
+        <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container d-flex align-items-center justify-content-between flex-wrap">
-            <div class="d-flex align-items-center gap-3">
-                <img src="~/images/site-logo/DubiRent-cut.png" alt="DubiRent" style="height: 30px; width: auto;" />
-                <span>&copy; 2025 - DubiRent</span>
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row g-4 py-5">
+                <!-- Brand Column -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="footer-brand mb-4">
+                        <img src="~/images/site-logo/DubiRent-cut.png" alt="DubiRent" class="footer-logo mb-3" />
+                        <p class="footer-description">
+                            Discover your dream space in Dubai. We offer premium properties with verified listings and transparent pricing.
+                        </p>
+                        <div class="footer-social">
+                            <a href="#" class="social-icon" aria-label="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="social-icon" aria-label="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-icon" aria-label="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="social-icon" aria-label="LinkedIn">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Links Column -->
+                <div class="col-6 col-md-3 col-lg-2">
+                    <h5 class="footer-title mb-3">Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li><a asp-controller="Property" asp-action="Properties">Properties</a></li>
+                        <li><a asp-controller="Home" asp-action="Contact">Contact</a></li>
+                        <li><a asp-controller="Home" asp-action="Privacy">Privacy Policy</a></li>
+                    </ul>
+                </div>
+
+                <!-- Services Column -->
+                <div class="col-6 col-md-3 col-lg-3">
+                    <h5 class="footer-title mb-3">Services</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Long-term Rentals</a></li>
+                        <li><a href="#">Property Management</a></li>
+                        <li><a href="#">Property Viewings</a></li>
+                        <li><a href="#">Rental Agreements</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Column -->
+                <div class="col-12 col-md-12 col-lg-3">
+                    <h5 class="footer-title mb-3">Contact Us</h5>
+                    <ul class="footer-contact">
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Dubai, United Arab Emirates</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-phone"></i>
+                            <span>+971 XX XXX XXXX</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            <span>info@dubirent.com</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-clock"></i>
+                            <span>Monday - Friday: 9:00 AM - 6:00 PM</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div>
-                <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
+            <!-- Copyright Bar -->
+            <div class="footer-bottom">
+                <div class="row align-items-center">
+                    <div class="col-12 col-md-6">
+                        <p class="copyright mb-0">
+                            &copy; @DateTime.Now.Year DubiRent. All rights reserved.
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-6 text-md-end">
+                        <p class="mb-0">
+                            <a asp-controller="Home" asp-action="Privacy" class="footer-link">Privacy Policy</a>
+                            <span class="mx-2">|</span>
+                            <a href="#" class="footer-link">Terms of Service</a>
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </footer>

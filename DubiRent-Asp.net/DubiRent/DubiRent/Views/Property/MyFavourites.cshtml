@@ -46,6 +46,24 @@
         background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
     }
 
+    @@media (max-width: 576px) {
+        .property-image-wrapper {
+            height: 180px;
+        }
+
+        .property-card-body {
+            padding: 1rem !important;
+        }
+
+        .property-title {
+            font-size: 1rem !important;
+        }
+
+        .property-price {
+            font-size: 1.125rem !important;
+        }
+    }
+
     .property-image {
         width: 100%;
         height: 100%;
@@ -234,7 +252,7 @@
                 var imageUrl = mainImage != null ? $"{mainImage.ImageUrl}?t={DateTime.Now.Ticks}" : "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400";
                 var statusClass = property.Status.ToString().ToLower() == "available" ? "status-available" : "status-rented";
 
-                <div class="col-md-6 col-lg-4">
+                <div class="col-12 col-sm-6 col-lg-4">
                     <div class="property-card">
                         <div class="property-image-wrapper">
                             <a asp-action="Details" asp-route-id="@property.Id" style="display: block; height: 100%;">
@@ -245,7 +263,7 @@
                                 <i class="fas fa-heart"></i>
                             </div>
                             <span class="status-badge @statusClass" style="position: absolute; top: 12px; left: 12px;">
-                                @property.Status
+                                <span class="d-none d-sm-inline">@property.Status</span><span class="d-sm-none">@property.Status.ToString().Substring(0, 1)</span>
                             </span>
                         </div>
                         <div class="property-card-body">
@@ -256,30 +274,30 @@
                             </h3>
                             <div class="property-location">
                                 <i class="fas fa-map-marker-alt"></i>
-                                <span>@property.Location?.Name, @property.Address</span>
+                                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">@property.Location?.Name, @property.Address</span>
                             </div>
                             <div class="property-features">
                                 <div class="property-feature">
                                     <i class="fas fa-bed"></i>
-                                    <span>@property.Bedrooms</span>
+                                    <span class="d-none d-sm-inline">@property.Bedrooms Beds</span><span class="d-sm-none">@property.Bedrooms</span>
                                 </div>
                                 <div class="property-feature">
                                     <i class="fas fa-bath"></i>
-                                    <span>@property.Bathrooms</span>
+                                    <span class="d-none d-sm-inline">@property.Bathrooms Baths</span><span class="d-sm-none">@property.Bathrooms</span>
                                 </div>
                                 <div class="property-feature">
                                     <i class="fas fa-ruler-combined"></i>
-                                    <span>@property.SquareMeters m²</span>
+                                    <span><span class="d-none d-sm-inline">@property.SquareMeters m²</span><span class="d-sm-none">@property.SquareMeters m²</span></span>
                                 </div>
                             </div>
-                            <div class="property-price">
+                            <div class="property-price" style="font-size: 1.25rem;">
                                 $@property.PricePerMonth.ToString("N0")
                                 <span class="property-price-unit">/month</span>
                             </div>
                             <div class="property-actions">
                                 <a asp-action="Details" asp-route-id="@property.Id" class="btn-view-details">
                                     <i class="fas fa-eye"></i>
-                                    <span>View Details</span>
+                                    <span class="d-none d-sm-inline">View Details</span><span class="d-sm-none">View</span>
                                 </a>
                             </div>
                         </div>
