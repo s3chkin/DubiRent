@@ -23,9 +23,9 @@
 "EmailSettings": {
   "SmtpHost": "smtp.gmail.com",
   "SmtpPort": "587",
-  "SmtpUsername": "your-email@gmail.com",
-  "SmtpPassword": "your-16-character-app-password",
-  "FromEmail": "your-email@gmail.com",
+  "SmtpUsername": "seckins191@gmail.com",
+  "SmtpPassword": "ijtn domd dczg cdmq",
+  "FromEmail": "seckins191@gmail.com",
   "FromName": "DubiRent"
 }
 ```

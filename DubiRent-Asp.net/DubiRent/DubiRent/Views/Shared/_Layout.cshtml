@@ -26,13 +26,16 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     @using Microsoft.AspNetCore.Identity
                     @inject SignInManager<DubiRent.Data.Models.AppUser> SignInManager
+                    @inject UserManager<DubiRent.Data.Models.AppUser> UserManager
                     @{
                         var controller = ViewContext.RouteData.Values["Controller"]?.ToString();
                         var action = ViewContext.RouteData.Values["Action"]?.ToString();
                         var isHomeActive = controller == "Home" && action == "Index";
                         var isPropertiesActive = controller == "Property" && action == "Properties";
-                        var isAdminActive = controller == "Property" && (action == "Admin" || action == "Create" || action == "Edit" || action == "ViewingRequests");
+                        var isContactActive = controller == "Home" && action == "Contact";
+                        var isAdminActive = controller == "Admin" && (action == "Index" || action == "Create" || action == "Edit" || action == "ViewingRequests" || action == "Users" || action == "Messages");
                         var isFavouritesActive = controller == "Property" && action == "MyFavourites";
+                        var isAdmin = SignInManager.IsSignedIn(User) && User.IsInRole("Admin");
                     }
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
@@ -41,11 +44,15 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark @(isPropertiesActive ? "active" : "")" asp-area="" asp-controller="Property" asp-action="Properties">Properties</a>
                         </li>
-                      
+                        <li class="nav-item">
+                            <a class="nav-link text-dark @(isContactActive ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Contact">Contact</a>
+                        </li>
+                        @if (isAdmin)
+                        {
                             <li class="nav-item">
-                                <a class="nav-link text-dark @(isAdminActive ? "active" : "")" asp-area="" asp-controller="Property" asp-action="Admin">AdminPanel</a>
+                                <a class="nav-link text-dark @(isAdminActive ? "active" : "")" asp-area="" asp-controller="Admin" asp-action="Index">AdminPanel</a>
                             </li>
-                        
+                        }
                     </ul>
                     <ul class="navbar-nav">
                         @if (SignInManager.IsSignedIn(User))
@@ -79,6 +86,10 @@
             </div>
         </div>
     </footer>
+    
+    <!-- Cookie Consent Banner -->
+    <partial name="_CookieConsent" />
+    
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/homepage.js"></script>

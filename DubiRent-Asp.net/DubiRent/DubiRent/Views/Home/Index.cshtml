@@ -574,14 +574,10 @@
             const icon = button.querySelector('i');
             if (!icon) return;
 
-            // Disable button during request
-            button.disabled = true;
-
             try {
                 const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
                 if (!tokenInput) {
                     alert('Security token not found. Please refresh the page.');
-                    button.disabled = false;
                     return;
                 }
 
@@ -618,8 +614,6 @@
             } catch (error) {
                 console.error('Error toggling favourite:', error);
                 alert('An error occurred. Please try again.');
-            } finally {
-                button.disabled = false;
             }
         }
     </script>

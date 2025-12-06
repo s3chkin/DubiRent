@@ -1,0 +1,171 @@
+@model DubiRent.Models.ContactModel
+@{
+    ViewData["Title"] = "Contact Us";
+}
+
+<partial name="_Breadcrumb" />
+
+<style>
+    .contact-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .contact-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .contact-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .form-control, .form-select {
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 0.625rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(254, 86, 88, 0.1);
+        outline: none;
+    }
+
+    .form-textarea {
+        min-height: 150px;
+        resize: vertical;
+    }
+
+
+    .btn-submit {
+        background: var(--primary-color);
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .btn-submit:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(254, 86, 88, 0.3);
+        color: white;
+    }
+
+    .contact-icon-wrapper {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .contact-main-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        box-shadow: 0 8px 20px rgba(254, 86, 88, 0.3);
+    }
+</style>
+
+<div class="contact-container py-4">
+    <!-- Success Message -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert" style="border-left: 4px solid #10b981;">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Header -->
+    <div class="contact-header">
+        <div class="contact-icon-wrapper">
+            <div class="contact-main-icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+        </div>
+        <h1 class="display-5 fw-bold mb-2">
+            Get in <span class="dubirent-red">Touch</span>
+        </h1>
+        <p class="text-muted fs-5">
+            Have a question or need assistance? We're here to help!
+        </p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Contact Form -->
+        <div class="col-lg-12">
+            <div class="contact-card">
+                <h2 class="fw-bold mb-4" style="font-size: 1.5rem;">Send us a Message</h2>
+                
+                <form asp-action="Contact" method="post" id="contactForm">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="border-radius: 10px;" role="alert"></div>
+
+                    <div class="row g-3">
+                        <!-- Name -->
+                        <div class="col-md-6">
+                            <label asp-for="Name" class="form-label">
+                                <i class="fas fa-user dubirent-red me-2"></i>Full Name
+                            </label>
+                            <input asp-for="Name" class="form-control" placeholder="Enter your full name" />
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label">
+                                <i class="fas fa-envelope dubirent-red me-2"></i>Email Address
+                            </label>
+                            <input asp-for="Email" type="email" class="form-control" placeholder="your.email@example.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Message -->
+                        <div class="col-12">
+                            <label asp-for="Message" class="form-label">
+                                <i class="fas fa-comment-alt dubirent-red me-2"></i>Message
+                            </label>
+                            <textarea asp-for="Message" class="form-control form-textarea" placeholder="Tell us how we can help you..."></textarea>
+                            <span asp-validation-for="Message" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="col-12 mt-3">
+                            <button type="submit" class="btn btn-submit">
+                                <i class="fas fa-paper-plane me-2"></i>Send Message
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

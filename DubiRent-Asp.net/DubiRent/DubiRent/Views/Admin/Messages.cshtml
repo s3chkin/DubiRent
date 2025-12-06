@@ -1,0 +1,255 @@
+@using DubiRent.Data.Models
+@model IEnumerable<Message>
+@{
+    ViewData["Title"] = "Messages";
+}
+
+<partial name="_Breadcrumb" />
+
+<style>
+    body {
+        background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+        min-height: 100vh;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #fe5658 0%, #ff6b6d 50%, #ff787b 100%);
+        border-radius: 12px;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.25rem;
+        color: white;
+        box-shadow: 0 4px 16px rgba(254, 86, 88, 0.2);
+    }
+
+    .messages-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .message-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .message-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .message-sender {
+        flex: 1;
+    }
+
+    .message-sender-name {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+    }
+
+    .message-sender-email {
+        font-size: 0.875rem;
+        color: #6b7280;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .message-date {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        text-align: right;
+    }
+
+    .message-content {
+        color: #4b5563;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .message-property {
+        background: linear-gradient(135deg, #ffe5e6 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(254, 86, 88, 0.2);
+    }
+
+    .message-property-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+    }
+
+    .message-property-link {
+        font-size: 0.75rem;
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+
+    .message-property-link:hover {
+        text-decoration: underline;
+    }
+
+    .message-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
+
+    .btn-delete {
+        background: #fee2e2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-delete:hover {
+        background: #dc2626;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .empty-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #ffe5e6 0%, #ffffff 100%);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        color: var(--primary-color);
+        font-size: 2rem;
+    }
+</style>
+
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1 class="display-5 fw-bold mb-2">
+                    <i class="fas fa-envelope me-2"></i>Messages
+                </h1>
+                <p class="mb-0 opacity-90">Manage and review all contact messages</p>
+            </div>
+            <div>
+                <span class="badge bg-white text-dark px-3 py-2" style="font-size: 1rem;">
+                    Total: @Model.Count()
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert" style="border-left: 4px solid #10b981;">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert" style="border-left: 4px solid #ef4444;">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Messages Grid -->
+    @if (Model != null && Model.Any())
+    {
+        <div class="messages-grid">
+            @foreach (var message in Model)
+            {
+                <div class="message-card">
+                    <div class="message-header">
+                        <div class="message-sender">
+                            <div class="message-sender-name">
+                                <i class="fas fa-user dubirent-red me-2"></i>@message.Name
+                            </div>
+                            <div class="message-sender-email">
+                                <i class="fas fa-envelope"></i>
+                                <a href="mailto:@message.Email" class="text-muted text-decoration-none">@message.Email</a>
+                            </div>
+                        </div>
+                        <div class="message-date">
+                            <i class="fas fa-clock me-1"></i>
+                            <div>@message.CreatedAt.ToString("MMM dd, yyyy")</div>
+                            <div>@message.CreatedAt.ToString("hh:mm tt")</div>
+                        </div>
+                    </div>
+
+                    @if (message.PropertyId.HasValue && message.Property != null)
+                    {
+                        <div class="message-property">
+                            <div class="message-property-title">
+                                <i class="fas fa-home dubirent-red me-2"></i>Related Property:
+                            </div>
+                            <a asp-controller="Property" asp-action="Details" asp-route-id="@message.PropertyId" class="message-property-link">
+                                @message.Property.Title
+                            </a>
+                        </div>
+                    }
+
+                    <div class="message-content">
+                        @message.MessageText
+                    </div>
+
+                    <div class="message-actions">
+                        <form asp-action="DeleteMessage" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this message?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@message.Id" />
+                            <button type="submit" class="btn btn-delete">
+                                <i class="fas fa-trash me-1"></i>Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <h3 class="fw-bold mb-2">No Messages Yet</h3>
+            <p class="text-muted mb-0">No contact messages have been received yet.</p>
+        </div>
+    }
+</div>
+

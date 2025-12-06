@@ -1,0 +1,501 @@
+@model List<DubiRent.Controllers.UserRoleViewModel>
+
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<partial name="_Breadcrumb" />
+
+<style>
+    body {
+        background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+        min-height: 100vh;
+    }
+
+    .admin-container {
+        max-width: 1400px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .admin-header {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .admin-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .admin-header p {
+        color: #6b7280;
+        margin-bottom: 0;
+    }
+
+    .search-box {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .users-table {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead {
+        background: linear-gradient(135deg, #fe5658 0%, #ff6b6d 100%);
+        color: white;
+    }
+
+    .table thead th {
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f9fafb;
+    }
+
+    .role-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-right: 0.5rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .role-badge.admin {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        color: #991b1b;
+    }
+
+    .role-badge.user {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        color: #1e40af;
+    }
+
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+
+    .btn-assign {
+        background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        border: none;
+        color: white;
+    }
+
+    .btn-assign:hover {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .btn-remove {
+        background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+        border: none;
+        color: white;
+    }
+
+    .btn-remove:hover {
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .btn-danger-sm {
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        border: none;
+        color: white;
+    }
+
+    .btn-danger-sm:hover {
+        background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+        color: white;
+    }
+
+    .form-control {
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+    }
+
+    .form-control:focus {
+        border-color: #fe5658;
+        box-shadow: 0 0 0 4px rgba(254, 86, 88, 0.1);
+    }
+
+    .badge-verified {
+        color: #10b981;
+        font-size: 0.875rem;
+    }
+
+    .badge-unverified {
+        color: #ef4444;
+        font-size: 0.875rem;
+    }
+</style>
+
+<div class="admin-container">
+    <div class="admin-header">
+        <h1><i class="fas fa-users me-2" style="color: #fe5658;"></i>User Management</h1>
+        <p>Manage users and their roles</p>
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 12px; border-left: 4px solid #10b981;">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 12px; border-left: 4px solid #ef4444;">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Warning"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert" style="border-radius: 12px; border-left: 4px solid #f59e0b;">
+            <i class="fas fa-exclamation-triangle me-2"></i>@TempData["Warning"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Search Box -->
+    <div class="search-box">
+        <form method="get" asp-action="Users" class="row g-3 align-items-center">
+            <div class="col-md-10">
+                <input type="text" 
+                       name="searchTerm" 
+                       class="form-control" 
+                       placeholder="Search by email or username..." 
+                       value="@ViewBag.SearchTerm" />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #fe5658 0%, #ff787b 100%); border: none; border-radius: 10px; height: 38px;">
+                    <i class="fas fa-search me-2"></i>Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Users Table -->
+    <div class="users-table">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Username</th>
+                    <th>Roles</th>
+                    <th>Email Verified</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@user.Email</strong>
+                                @if (user.IsDefaultAdmin)
+                                {
+                                    <span class="badge bg-warning text-dark ms-2" style="font-size: 0.7rem;">
+                                        <i class="fas fa-crown"></i> Default Admin
+                                    </span>
+                                }
+                            </td>
+                            <td>@user.UserName</td>
+                            <td>
+                                @foreach (var role in user.Roles)
+                                {
+                                    <span class="role-badge @role.ToLower()">@role</span>
+                                }
+                                @if (!user.Roles.Any())
+                                {
+                                    <span class="text-muted">No roles</span>
+                                }
+                            </td>
+                            <td>
+                                @if (user.EmailConfirmed)
+                                {
+                                    <span class="badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-unverified"><i class="fas fa-times-circle"></i> Unverified</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <!-- Assign Admin Role -->
+                                    @if (!user.Roles.Contains("Admin") && !user.IsDefaultAdmin)
+                                    {
+                                        <button type="button" 
+                                                class="btn btn-assign btn-sm" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#assignAdminModal"
+                                                data-user-id="@user.UserId"
+                                                data-user-email="@user.Email">
+                                            <i class="fas fa-user-shield"></i> Make Admin
+                                        </button>
+                                    }
+
+                                    <!-- Remove Admin Role -->
+                                    @if (user.Roles.Contains("Admin") && !user.IsDefaultAdmin)
+                                    {
+                                        <button type="button" 
+                                                class="btn btn-remove btn-sm" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#removeAdminModal"
+                                                data-user-id="@user.UserId"
+                                                data-user-email="@user.Email">
+                                            <i class="fas fa-user-minus"></i> Remove Admin
+                                        </button>
+                                    }
+
+                                    @if (user.IsDefaultAdmin)
+                                    {
+                                        <span class="badge bg-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                                            <i class="fas fa-lock"></i> Protected
+                                        </span>
+                                    }
+
+                                    <!-- Delete User -->
+                                    @if (!user.IsDefaultAdmin)
+                                    {
+                                        <button type="button" 
+                                                class="btn btn-danger-sm btn-sm" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#deleteUserModal"
+                                                data-user-id="@user.UserId"
+                                                data-user-email="@user.Email">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-4">
+                            <p class="text-muted mb-0">No users found.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal: Assign Admin Role -->
+<div class="modal fade" id="assignAdminModal" tabindex="-1" aria-labelledby="assignAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%); border-radius: 16px 16px 0 0; border: none; padding: 1.5rem;">
+                <h5 class="modal-title text-white" id="assignAdminModalLabel">
+                    <i class="fas fa-user-shield me-2"></i>Assign Admin Role
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 2rem;">
+                <div class="text-center mb-3">
+                    <div class="mb-3" style="font-size: 3rem; color: #10b981;">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Are you sure?</h5>
+                    <p class="text-muted mb-0">
+                        You are about to assign <strong>Admin</strong> role to:
+                    </p>
+                    <p class="fw-bold text-primary mt-2 mb-3" id="assignAdminEmail"></p>
+                    <p class="text-muted small">
+                        <i class="fas fa-info-circle me-1"></i>
+                        This user will have full access to the admin panel and all administrative functions.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #e5e7eb; padding: 1.5rem;">
+                <form id="assignAdminForm" asp-action="AssignRole" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="userId" id="assignAdminUserId" />
+                    <input type="hidden" name="roleName" value="Admin" />
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px; padding: 0.5rem 1.5rem;">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn" style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%); border: none; color: white; border-radius: 10px; padding: 0.5rem 1.5rem;">
+                        <i class="fas fa-check me-2"></i>Confirm
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Remove Admin Role -->
+<div class="modal fade" id="removeAdminModal" tabindex="-1" aria-labelledby="removeAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #ef4444 0%, #f87171 100%); border-radius: 16px 16px 0 0; border: none; padding: 1.5rem;">
+                <h5 class="modal-title text-white" id="removeAdminModalLabel">
+                    <i class="fas fa-user-minus me-2"></i>Remove Admin Role
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 2rem;">
+                <div class="text-center mb-3">
+                    <div class="mb-3" style="font-size: 3rem; color: #ef4444;">
+                        <i class="fas fa-user-minus"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Are you sure?</h5>
+                    <p class="text-muted mb-0">
+                        You are about to remove <strong>Admin</strong> role from:
+                    </p>
+                    <p class="fw-bold text-danger mt-2 mb-3" id="removeAdminEmail"></p>
+                    <div class="alert alert-warning" style="border-radius: 10px; border-left: 4px solid #f59e0b; background: #fef3c7;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Warning:</strong> This user will lose all administrative privileges.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #e5e7eb; padding: 1.5rem;">
+                <form id="removeAdminForm" asp-action="RemoveRole" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="userId" id="removeAdminUserId" />
+                    <input type="hidden" name="roleName" value="Admin" />
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px; padding: 0.5rem 1.5rem;">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn" style="background: linear-gradient(135deg, #ef4444 0%, #f87171 100%); border: none; color: white; border-radius: 10px; padding: 0.5rem 1.5rem;">
+                        <i class="fas fa-check me-2"></i>Confirm
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Delete User -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); border-radius: 16px 16px 0 0; border: none; padding: 1.5rem;">
+                <h5 class="modal-title text-white" id="deleteUserModalLabel">
+                    <i class="fas fa-trash me-2"></i>Delete User
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 2rem;">
+                <div class="text-center mb-3">
+                    <div class="mb-3" style="font-size: 3rem; color: #dc2626;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Delete User Account?</h5>
+                    <p class="text-muted mb-0">
+                        You are about to permanently delete the account:
+                    </p>
+                    <p class="fw-bold text-danger mt-2 mb-3" id="deleteUserEmail"></p>
+                    <div class="alert alert-danger" style="border-radius: 10px; border-left: 4px solid #dc2626; background: #fee2e2;">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>This action cannot be undone!</strong><br/>
+                        All user data, viewing requests, and favorites will be permanently deleted.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #e5e7eb; padding: 1.5rem;">
+                <form id="deleteUserForm" asp-action="DeleteUser" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="userId" id="deleteUserUserId" />
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px; padding: 0.5rem 1.5rem;">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn" style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); border: none; color: white; border-radius: 10px; padding: 0.5rem 1.5rem;">
+                        <i class="fas fa-trash me-2"></i>Delete User
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Assign Admin Modal
+    document.addEventListener('DOMContentLoaded', function() {
+        const assignAdminModal = document.getElementById('assignAdminModal');
+        if (assignAdminModal) {
+            assignAdminModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const userId = button.getAttribute('data-user-id');
+                const userEmail = button.getAttribute('data-user-email');
+                
+                document.getElementById('assignAdminUserId').value = userId;
+                document.getElementById('assignAdminEmail').textContent = userEmail;
+            });
+        }
+
+        // Remove Admin Modal
+        const removeAdminModal = document.getElementById('removeAdminModal');
+        if (removeAdminModal) {
+            removeAdminModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const userId = button.getAttribute('data-user-id');
+                const userEmail = button.getAttribute('data-user-email');
+                
+                document.getElementById('removeAdminUserId').value = userId;
+                document.getElementById('removeAdminEmail').textContent = userEmail;
+            });
+        }
+
+        // Delete User Modal
+        const deleteUserModal = document.getElementById('deleteUserModal');
+        if (deleteUserModal) {
+            deleteUserModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const userId = button.getAttribute('data-user-id');
+                const userEmail = button.getAttribute('data-user-email');
+                
+                document.getElementById('deleteUserUserId').value = userId;
+                document.getElementById('deleteUserEmail').textContent = userEmail;
+            });
+        }
+    });
+</script>
+

@@ -637,8 +637,6 @@
             <div class="fixed-sidebar">
                 <!-- Viewing Request Card -->
                 <div class="sidebar-card">
-                    <h4 class="sidebar-section-title mb-2">Schedule a Viewing</h4>
-                    
                     @using Microsoft.AspNetCore.Identity
                     @inject SignInManager<DubiRent.Data.Models.AppUser> SignInManager
                     @inject UserManager<DubiRent.Data.Models.AppUser> UserManager
@@ -648,8 +646,101 @@
                         var userEmail = currentUser?.Email ?? "";
                     }
                     
-                    @if (!isLoggedIn)
+                    @if (ViewBag.IsAdmin == true)
                     {
+                        var viewingRequests = ViewBag.ViewingRequestsForProperty as List<DubiRent.Data.Models.ViewingRequest> ?? new List<DubiRent.Data.Models.ViewingRequest>();
+                        
+                        <h4 class="sidebar-section-title mb-3">Viewing Requests</h4>
+                        
+                        @if (viewingRequests.Any())
+                        {
+                            <div style="max-height: 500px; overflow-y: auto;">
+                                @foreach (var request in viewingRequests)
+                                {
+                                    <div class="mb-3 p-3 rounded-4" style="background: #f9fafb; border: 1px solid #e5e7eb;">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div>
+                                                <strong class="d-block mb-1" style="font-size: 0.875rem;">@request.FullName</strong>
+                                                <small class="text-muted d-block">
+                                                    <i class="fas fa-envelope me-1"></i>@request.Email
+                                                </small>
+                                                <small class="text-muted d-block">
+                                                    <i class="fas fa-phone me-1"></i>@request.PhoneNumber
+                                                </small>
+                                            </div>
+                                            @{
+                                                var statusBadgeClass = "";
+                                                var statusBgClass = "";
+                                                switch (request.Status.ToString())
+                                                {
+                                                    case "Pending":
+                                                        statusBadgeClass = "bg-warning";
+                                                        statusBgClass = "#fef3c7";
+                                                        break;
+                                                    case "Approved":
+                                                        statusBadgeClass = "bg-success";
+                                                        statusBgClass = "#d1fae5";
+                                                        break;
+                                                    case "Completed":
+                                                        statusBadgeClass = "bg-info";
+                                                        statusBgClass = "#dbeafe";
+                                                        break;
+                                                    case "Cancelled":
+                                                        statusBadgeClass = "bg-danger";
+                                                        statusBgClass = "#fee2e2";
+                                                        break;
+                                                }
+                                            }
+                                            <span class="badge @statusBadgeClass" style="font-size: 0.7rem;">@request.Status</span>
+                                        </div>
+                                        <div class="mt-2 pt-2" style="border-top: 1px solid #e5e7eb;">
+                                            <small class="text-muted d-block mb-1">
+                                                <i class="fas fa-calendar me-1"></i>
+                                                Preferred: @request.PreferredDate.ToString("MMM dd, yyyy")
+                                            </small>
+                                            <small class="text-muted d-block mb-1">
+                                                <i class="fas fa-clock me-1"></i>
+                                                Time: @{
+                                                    var timeHour = request.PreferredTime.Hours;
+                                                    var timeMinute = request.PreferredTime.Minutes;
+                                                    var period = timeHour >= 12 ? "PM" : "AM";
+                                                    var displayHour = timeHour > 12 ? timeHour - 12 : (timeHour == 0 ? 12 : timeHour);
+                                                }
+                                                @displayHour.ToString("00"):@timeMinute.ToString("00") @period
+                                            </small>
+                                            <small class="text-muted d-block">
+                                                <i class="fas fa-clock me-1"></i>
+                                                Requested: @request.CreatedAt.ToString("MMM dd, yyyy")
+                                            </small>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="mt-3 text-center">
+                                <a asp-controller="Admin" asp-action="ViewingRequests" class="btn btn-outline-primary btn-sm w-100" style="border-radius: 10px;">
+                                    <i class="fas fa-list me-2"></i>Manage All Requests
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info rounded-4 mb-0" style="border-left: 4px solid #3b82f6; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-info-circle me-2 mt-1" style="color: #3b82f6;"></i>
+                                    <div style="flex: 1;">
+                                        <strong class="d-block mb-1">No viewing requests yet</strong>
+                                        <small class="d-block text-muted">No one has requested a viewing for this property.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <h4 class="sidebar-section-title mb-2">Schedule a Viewing</h4>
+                        
+                        @if (!isLoggedIn)
+                        {
                         <div class="alert alert-warning rounded-4" style="border-left: 4px solid #f59e0b; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);">
                             <div class="d-flex align-items-start">
                                 <i class="fas fa-exclamation-triangle me-2 mt-1" style="color: #f59e0b;"></i>
@@ -675,9 +766,9 @@
                                 </div>
                             </div>
                         </div>
-                    }
-                    else if (ViewBag.HasExistingRequest == true && ViewBag.ExistingRequest != null)
-                    {
+                        }
+                        else if (ViewBag.HasExistingRequest == true && ViewBag.ExistingRequest != null)
+                        {
                         var existingRequest = ViewBag.ExistingRequest as DubiRent.Data.Models.ViewingRequest;
                         <div class="alert alert-info rounded-4" style="border-left: 4px solid #3b82f6; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);">
                             <div class="d-flex align-items-start">
@@ -701,10 +792,10 @@
                                 </div>
                             </div>
                         </div>
-                    }
-                    else
-                    {
-                        <form asp-action="RequestViewing" method="post" id="viewingForm">
+                        }
+                        else
+                        {
+                            <form asp-action="RequestViewing" method="post" id="viewingForm">
                             @Html.AntiForgeryToken()
                             <input type="hidden" asp-for="Id" name="PropertyId" />
                             
@@ -770,6 +861,7 @@
                                 <i class="fas fa-info-circle me-1"></i>We'll confirm your viewing time shortly
                             </p>
                         </form>
+                        }
                     }
                 </div>
             </div>
@@ -935,24 +1027,6 @@
             }
         }
         
-        // Add loading indicator to viewing request form
-        const viewingForm = document.getElementById('viewingForm');
-        if (viewingForm) {
-            viewingForm.addEventListener('submit', function(e) {
-                if (this.checkValidity()) {
-                    const submitBtn = this.querySelector('button[type="submit"]');
-                    if (submitBtn) {
-                        const btnText = submitBtn.querySelector('.btn-text');
-                        if (btnText) {
-                            btnText.textContent = 'Submitting...';
-                        } else {
-                            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
-                        }
-                        submitBtn.disabled = true;
-                    }
-                }
-            });
-        }
 
         // Favourite button functionality
         const favouriteBtn = document.getElementById('favouriteBtn');
@@ -962,15 +1036,11 @@
                 if (!propertyId) return;
 
                 const icon = this.querySelector('i');
-                
-                // Disable button during request
-                this.disabled = true;
 
                 try {
                     const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
                     if (!tokenInput) {
                         alert('Security token not found. Please refresh the page.');
-                        this.disabled = false;
                         return;
                     }
 
@@ -1009,8 +1079,6 @@
                 } catch (error) {
                     console.error('Error toggling favourite:', error);
                     alert('An error occurred. Please try again.');
-                } finally {
-                    this.disabled = false;
                 }
             });
         }

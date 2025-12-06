@@ -8,7 +8,7 @@ namespace DubiRent
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -19,28 +19,56 @@ namespace DubiRent
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = false)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
             builder.Services.AddControllersWithViews();
 
             // Register Email Service
             builder.Services.AddScoped<DubiRent.Services.IEmailService, DubiRent.Services.EmailService>();
 
-            // Google Authentication
-            builder.Services.AddAuthentication()
-                .AddGoogle(options =>
+            // External Authentication
+            var authBuilder = builder.Services.AddAuthentication();
+            
+            // Configure Google Authentication
+            IConfigurationSection googleAuthSection = builder.Configuration.GetSection("Authentication:Google");
+            var googleClientId = googleAuthSection["ClientId"];
+            var googleClientSecret = googleAuthSection["ClientSecret"];
+            
+            if (!string.IsNullOrEmpty(googleClientId) && !string.IsNullOrEmpty(googleClientSecret))
+            {
+                authBuilder.AddGoogle(options =>
                 {
-                    IConfigurationSection googleAuthSection = builder.Configuration.GetSection("Authentication:Google");
-                    options.ClientId = googleAuthSection["ClientId"] ?? "";
-                    options.ClientSecret = googleAuthSection["ClientSecret"] ?? "";
-                })
-                .AddFacebook(options =>
-                {
-                    IConfigurationSection facebookAuthSection = builder.Configuration.GetSection("Authentication:Facebook");
-                    options.AppId = facebookAuthSection["AppId"] ?? "";
-                    options.AppSecret = facebookAuthSection["AppSecret"] ?? "";
+                    options.ClientId = googleClientId;
+                    options.ClientSecret = googleClientSecret;
+                    // Configure callback path explicitly
+                    options.CallbackPath = "/Identity/Account/ExternalLogin/Callback";
                 });
+            }
+            
+            // Configure Facebook Authentication (only if credentials are provided)
+            IConfigurationSection facebookAuthSection = builder.Configuration.GetSection("Authentication:Facebook");
+            var facebookAppId = facebookAuthSection["AppId"];
+            var facebookAppSecret = facebookAuthSection["AppSecret"];
+            
+            if (!string.IsNullOrEmpty(facebookAppId) && !string.IsNullOrEmpty(facebookAppSecret) && 
+                facebookAppId != "YOUR_FACEBOOK_APP_ID" && facebookAppSecret != "YOUR_FACEBOOK_APP_SECRET")
+            {
+                authBuilder.AddFacebook(options =>
+                {
+                    options.AppId = facebookAppId;
+                    options.AppSecret = facebookAppSecret;
+                    options.CallbackPath = "/Identity/Account/ExternalLogin/Callback";
+                });
+            }
 
             var app = builder.Build();
+
+            // Seed roles and admin user
+            using (var scope = app.Services.CreateScope())
+            {
+                await SeedRoles.SeedAsync(scope.ServiceProvider);
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

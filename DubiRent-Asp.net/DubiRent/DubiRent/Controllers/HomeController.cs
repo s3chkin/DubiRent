@@ -125,6 +125,55 @@ namespace DubiRent.Controllers
             return View();
         }
 
+        // GET: Contact
+        public IActionResult Contact()
+        {
+            var userId = _userManager.GetUserId(User);
+            var model = new ContactModel();
+            
+            // Pre-fill email if user is logged in
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var user = _userManager.GetUserAsync(User).Result;
+                if (user != null)
+                {
+                    model.Email = user.Email ?? "";
+                    model.Name = user.UserName ?? "";
+                }
+            }
+            
+            return View(model);
+        }
+
+        // POST: Contact
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Contact(ContactModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var userId = _userManager.GetUserId(User);
+            
+            var message = new Message
+            {
+                UserId = userId,
+                Name = model.Name,
+                Email = model.Email,
+                MessageText = model.Message,
+                PropertyId = model.PropertyId,
+                CreatedAt = DateTime.Now
+            };
+
+            db.Messages.Add(message);
+            await db.SaveChangesAsync();
+
+            TempData["Success"] = "Thank you for contacting us! We will get back to you soon.";
+            return RedirectToAction(nameof(Contact));
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

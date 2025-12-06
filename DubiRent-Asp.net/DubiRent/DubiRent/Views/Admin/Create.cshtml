@@ -176,7 +176,64 @@
         background: rgba(254, 86, 88, 0.05);
         pointer-events: none;
     }
+
+    /* Loading Overlay */
+    .form-loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .form-loading-overlay.active {
+        display: flex;
+    }
+
+    .form-loading-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #f3f4f6;
+        border-top: 4px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .form-loading-text {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0;
+    }
 </style>
+
+<!-- Loading Overlay -->
+<div id="formLoadingOverlay" class="form-loading-overlay">
+    <div class="form-loading-content">
+        <div class="form-loading-spinner"></div>
+        <p class="form-loading-text">Adding Property...</p>
+        <p class="text-muted small mb-0">Please wait while we process your request</p>
+    </div>
+</div>
 
 <div class="container py-5">
     <!-- Header -->
@@ -469,6 +526,13 @@
 
         // Update file input before form submit
         const propertyForm = document.getElementById('propertyForm');
+        const loadingOverlay = document.getElementById('formLoadingOverlay');
+        
+        // Hide loading overlay on page load (in case form was returned with errors)
+        if (loadingOverlay) {
+            loadingOverlay.classList.remove('active');
+        }
+        
         if (propertyForm) {
             propertyForm.addEventListener('submit', (e) => {
                 updateFileInput();
@@ -480,7 +544,10 @@
                     return false;
                 }
                 
-                // Loading indicator is handled by site.js
+                // Show loading overlay
+                if (loadingOverlay) {
+                    loadingOverlay.classList.add('active');
+                }
             });
         }
     </script>

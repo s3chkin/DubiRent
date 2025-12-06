@@ -29,33 +29,53 @@
                 string propertyTitle = ViewBag.PropertyTitle as string ?? ViewData["PropertyTitle"] as string ?? "Property Details";
                 breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = propertyTitle, IsActive = true });
             }
-            else if (action == "Admin")
-            {
-                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Admin Panel", IsActive = true });
-            }
-            else if (action == "Create")
-            {
-                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Admin Panel", Action = "Admin", Controller = "Property" });
-                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Add Property", IsActive = true });
-            }
-            else if (action == "Edit")
-            {
-                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Admin Panel", Action = "Admin", Controller = "Property" });
-                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Edit Property", IsActive = true });
-            }
-            else if (action == "ViewingRequests")
-            {
-                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Admin Panel", Action = "Admin", Controller = "Property" });
-                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Viewing Requests", IsActive = true });
-            }
             else if (action == "MyFavourites")
             {
                 breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "My Favourites", IsActive = true });
             }
         }
-        else if (controller == "Home" && action == "Privacy")
+        else if (controller == "Admin")
         {
-            breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Privacy Policy", IsActive = true });
+            if (action == "Index")
+            {
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Admin Panel", IsActive = true });
+            }
+            else if (action == "Create")
+            {
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Admin Panel", Action = "Index", Controller = "Admin" });
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Add Property", IsActive = true });
+            }
+            else if (action == "Edit")
+            {
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Admin Panel", Action = "Index", Controller = "Admin" });
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Edit Property", IsActive = true });
+            }
+            else if (action == "ViewingRequests")
+            {
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Admin Panel", Action = "Index", Controller = "Admin" });
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Viewing Requests", IsActive = true });
+            }
+            else if (action == "Users")
+            {
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Admin Panel", Action = "Index", Controller = "Admin" });
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "User Management", IsActive = true });
+            }
+            else if (action == "Messages")
+            {
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Admin Panel", Action = "Index", Controller = "Admin" });
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Messages", IsActive = true });
+            }
+        }
+        else if (controller == "Home")
+        {
+            if (action == "Contact")
+            {
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Contact", IsActive = true });
+            }
+            else if (action == "Privacy")
+            {
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "Privacy Policy", IsActive = true });
+            }
         }
     }
 }

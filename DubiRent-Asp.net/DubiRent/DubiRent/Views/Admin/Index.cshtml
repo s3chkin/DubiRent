@@ -207,6 +207,14 @@
                         <i class="fas fa-calendar-check"></i>
                         <span>Viewing Requests</span>
                     </a>
+                    <a asp-action="Messages" class="btn btn-outline-primary d-flex align-items-center gap-2 px-4 py-2" style="border-radius: 10px; font-weight: 600; border-color: var(--primary-color); color: var(--primary-color);">
+                        <i class="fas fa-envelope"></i>
+                        <span>Messages</span>
+                    </a>
+                    <a asp-controller="Admin" asp-action="Users" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-4 py-2" style="border-radius: 10px; font-weight: 600;">
+                        <i class="fas fa-users"></i>
+                        <span>User Management</span>
+                    </a>
                     <a asp-action="Create" class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2" style="border: none; border-radius: 10px; background: var(--primary-color); font-weight: 600;">
                         <i class="fas fa-plus"></i>
                         <span>Add New Property</span>
@@ -231,7 +239,7 @@
     {
         <div class="row g-2 mb-3">
             <div class="col-md-3">
-                <a asp-action="Admin" asp-route-statusFilter="" class="stats-card d-flex align-items-center gap-3 @(string.IsNullOrEmpty(currentFilter) ? "active" : "")">
+                <a asp-action="Index" asp-route-statusFilter="" class="stats-card d-flex align-items-center gap-3 @(string.IsNullOrEmpty(currentFilter) ? "active" : "")">
                     <div class="stats-icon" style="background: linear-gradient(135deg, #ffe5e6 0%, #fff5f5 100%); color: var(--primary-color);">
                         <i class="fas fa-home"></i>
                     </div>
@@ -242,7 +250,7 @@
                 </a>
             </div>
             <div class="col-md-3">
-                <a asp-action="Admin" asp-route-statusFilter="Available" class="stats-card d-flex align-items-center gap-3 @(currentFilter == "Available" ? "active" : "")">
+                <a asp-action="Index" asp-route-statusFilter="Available" class="stats-card d-flex align-items-center gap-3 @(currentFilter == "Available" ? "active" : "")">
                     <div class="stats-icon" style="background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%); color: #059669;">
                         <i class="fas fa-check-circle"></i>
                     </div>
@@ -253,7 +261,7 @@
                 </a>
             </div>
             <div class="col-md-3">
-                <a asp-action="Admin" asp-route-statusFilter="Rented" class="stats-card d-flex align-items-center gap-3 @(currentFilter == "Rented" ? "active" : "")">
+                <a asp-action="Index" asp-route-statusFilter="Rented" class="stats-card d-flex align-items-center gap-3 @(currentFilter == "Rented" ? "active" : "")">
                     <div class="stats-icon" style="background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%); color: #dc2626;">
                         <i class="fas fa-key"></i>
                     </div>
@@ -264,7 +272,7 @@
                 </a>
             </div>
             <div class="col-md-3">
-                <a asp-action="Admin" asp-route-statusFilter="Archived" class="stats-card d-flex align-items-center gap-3 @(currentFilter == "Archived" ? "active" : "")">
+                <a asp-action="Index" asp-route-statusFilter="Archived" class="stats-card d-flex align-items-center gap-3 @(currentFilter == "Archived" ? "active" : "")">
                     <div class="stats-icon" style="background: linear-gradient(135deg, #e5e7eb 0%, #f3f4f6 100%); color: #6b7280;">
                         <i class="fas fa-archive"></i>
                     </div>
@@ -294,7 +302,7 @@
                 <div class="col-md-4">
                     <div class="card border-0 overflow-hidden modern-card h-100 bg-white" style="border-radius: 20px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);">
                         <div class="position-relative">
-                            <a asp-action="Details" asp-route-id="@property.Id" class="text-decoration-none">
+                            <a asp-controller="Property" asp-action="Details" asp-route-id="@property.Id" class="text-decoration-none">
                             <img src="@imageUrl" onerror="this.src='https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600'"
                                  alt="@property.Title"
                                  @* class="property-image" *@
@@ -315,46 +323,54 @@
                         <div class="card-body p-4">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <h5 class="card-title fw-bold mb-0" style="flex: 1;">@property.Title</h5>
-                                <button class="btn btn-link p-0 border-0 text-muted" style="font-size: 1.2rem; line-height: 1;">
-                                    <i class="far fa-heart"></i>
-                                </button>
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    var favouritePropertyIds = ViewBag.FavouritePropertyIds as HashSet<int> ?? new HashSet<int>();
+                                    var isFavourite = property != null && favouritePropertyIds.Contains(property.Id);
+                                    <button class="btn btn-link p-0 border-0 favourite-btn" 
+                                            style="font-size: 1.2rem; line-height: 1; @(isFavourite ? "color: #fe5658;" : "color: #6b7280;")" 
+                                            data-property-id="@(property?.Id ?? 0)"
+                                            onclick="toggleFavouriteAdmin(this, @(property?.Id ?? 0))">
+                                        <i class="@(isFavourite ? "fas" : "far") fa-heart"></i>
+                                    </button>
+                                }
                             </div>
 
                             <p class="text-muted small mb-2 d-flex align-items-center">
-                                <i class="fas fa-map-marker-alt me-2"></i>@property.Location?.Name
+                                <i class="fas fa-map-marker-alt me-2"></i>@(property?.Location?.Name ?? "N/A")
                             </p>
 
                             <p class="dubirent-red fs-5 fw-bold mb-3">
-                                $@property.PricePerMonth.ToString("N0") <span class="text-muted small fw-normal">/month</span>
+                                $@(property?.PricePerMonth.ToString("N0") ?? "0") <span class="text-muted small fw-normal">/month</span>
                             </p>
 
                             <div class="d-flex justify-content-between align-items-center mb-3 pb-3" style="border-top: 1px solid #f3f4f6; border-bottom: 1px solid #f3f4f6; padding-top: 0.75rem;">
                                 <span class="text-muted small d-flex align-items-center">
-                                    <i class="fas fa-ruler-combined me-2 dubirent-red"></i>@property.SquareMeters m²
+                                    <i class="fas fa-ruler-combined me-2 dubirent-red"></i>@(property?.SquareMeters ?? 0) m²
                                 </span>
                                 <span class="text-muted small d-flex align-items-center">
-                                    <i class="fas fa-bed me-2 dubirent-red"></i>@property.Bedrooms Bedrooms
+                                    <i class="fas fa-bed me-2 dubirent-red"></i>@(property?.Bedrooms ?? 0) Bedrooms
                                 </span>
                                 <span class="text-muted small d-flex align-items-center">
-                                    <i class="fas fa-bath me-2 dubirent-red"></i>@property.Bathrooms Bathrooms
+                                    <i class="fas fa-bath me-2 dubirent-red"></i>@(property?.Bathrooms ?? 0) Bathrooms
                                 </span>
                             </div>
 
                             <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
                                 <p class="text-muted small mb-0 d-flex align-items-center">
-                                    <i class="far fa-calendar me-2"></i>@property.CreatedAt.ToString("MMM dd, yyyy")
+                                    <i class="far fa-calendar me-2"></i>@(property?.CreatedAt.ToString("MMM dd, yyyy") ?? "N/A")
                                 </p>
-                                <a asp-action="Details" asp-route-id="@property.Id" class="btn btn-primary rounded-4 px-3 py-2 text-white small text-decoration-none" style="border: none; white-space: nowrap;">
+                                <a asp-controller="Property" asp-action="Details" asp-route-id="@(property?.Id ?? 0)" class="btn btn-primary rounded-4 px-3 py-2 text-white small text-decoration-none" style="border: none; white-space: nowrap;">
                                     <i class="fas fa-eye me-1"></i>View Details
                                 </a>
                             </div>
                             
                             <div class="pt-3" style="border-top: 1px solid #f3f4f6;">
                                 <div class="d-flex gap-2">
-                                    <a asp-action="Edit" asp-route-id="@property.Id" class="btn btn-outline-primary flex-fill rounded-4 px-3 py-2 text-primary small text-decoration-none admin-btn-edit" style="border-color: var(--primary-color);">
+                                    <a asp-action="Edit" asp-route-id="@(property?.Id ?? 0)" class="btn btn-outline-primary flex-fill rounded-4 px-3 py-2 text-primary small text-decoration-none admin-btn-edit" style="border-color: var(--primary-color);">
                                         <i class="fas fa-edit me-1"></i>Edit
                                     </a>
-                                    <button type="button" class="btn btn-outline-danger flex-fill rounded-4 px-3 py-2 text-danger small admin-btn-delete" style="border-color: #dc2626;" data-bs-toggle="modal" data-bs-target="#deleteModal" data-property-id="@property.Id" data-property-title="@property.Title">
+                                    <button type="button" class="btn btn-outline-danger flex-fill rounded-4 px-3 py-2 text-danger small admin-btn-delete" style="border-color: #dc2626;" data-bs-toggle="modal" data-bs-target="#deleteModal" data-property-id="@(property?.Id ?? 0)" data-property-title="@(property?.Title ?? "Property")">
                                         <i class="fas fa-trash me-1"></i>Delete
                                     </button>
                                 </div>
@@ -577,8 +593,62 @@
                 var deleteForm = deleteModal.querySelector('#deleteForm');
                 
                 modalTitle.textContent = '"' + propertyTitle + '"';
-                deleteForm.action = '@Url.Action("Delete", "Property")/' + propertyId;
+                deleteForm.action = '@Url.Action("Delete", "Admin")/' + propertyId;
             });
         }
+
+        // Favourite button functionality for Admin Panel
+        async function toggleFavouriteAdmin(button, propertyId) {
+            if (!button || !propertyId) return;
+
+            const icon = button.querySelector('i');
+            const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+            
+            if (!tokenInput) {
+                alert('Security token not found. Please refresh the page.');
+                return;
+            }
+
+            const token = tokenInput.value;
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append('propertyId', propertyId);
+                formData.append('__RequestVerificationToken', token);
+
+                const response = await fetch('@Url.Action("ToggleFavourite", "Property")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': token
+                    },
+                    body: formData.toString()
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    if (result.isFavourite) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        button.style.color = '#fe5658';
+                    } else {
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                        button.style.color = '#6b7280';
+                    }
+                } else {
+                    alert(result.message || 'An error occurred. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error toggling favourite:', error);
+                alert('An error occurred. Please try again.');
+            }
+        }
     </script>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        @Html.AntiForgeryToken()
+    }
 }

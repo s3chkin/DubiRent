@@ -121,6 +121,21 @@ body {
   z-index: 10;
 }
 
+/* Mobile/Responsive menu - remove underline, add background color */
+@media (max-width: 991px) {
+  .nav-link.active::after {
+    display: none;
+  }
+
+  .nav-link.active {
+    background-color: rgba(254, 86, 88, 0.1);
+    color: #fe5658 !important;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.5rem 1rem !important;
+  }
+}
+
 .footer {
   padding: 2rem 0;
   margin-top: 4rem;
@@ -146,45 +161,11 @@ body {
   }
 }
 
-/* Loading Indicator Styles */
-.form-loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(255, 255, 255, 0.8);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  border-radius: inherit;
-}
-
-.form-loading-overlay .spinner-border {
-  width: 3rem;
-  height: 3rem;
-  border-width: 0.25em;
-}
-
-/* Disable pointer events when loading */
-.form-loading,
-.form-loading * {
-  pointer-events: none;
-  opacity: 0.7;
-}
-
-/* Button loading state */
+/* Button disabled state */
 button:disabled,
 button[disabled] {
   cursor: not-allowed;
   opacity: 0.7;
-}
-
-.spinner-border-sm {
-  width: 1rem;
-  height: 1rem;
-  border-width: 0.15em;
 }
 
 /* Favourite Button Styles */

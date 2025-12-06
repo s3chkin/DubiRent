@@ -121,6 +121,9 @@ namespace DubiRent.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
+                    // Assign default "User" role to new users
+                    await _userManager.AddToRoleAsync(user, "User");
+                    
                     _logger.LogInformation("User created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);

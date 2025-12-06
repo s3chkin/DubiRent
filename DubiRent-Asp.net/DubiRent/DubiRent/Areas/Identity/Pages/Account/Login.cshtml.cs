@@ -98,6 +98,16 @@ namespace DubiRent.Areas.Identity.Pages.Account
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            
+            // Log available external login providers for debugging
+            if (ExternalLogins == null || ExternalLogins.Count == 0)
+            {
+                _logger.LogWarning("No external login providers are configured. Check appsettings.json and ensure Google/Facebook credentials are set.");
+            }
+            else
+            {
+                _logger.LogInformation($"External login providers available: {string.Join(", ", ExternalLogins.Select(p => p.Name))}");
+            }
 
             ReturnUrl = returnUrl;
         }

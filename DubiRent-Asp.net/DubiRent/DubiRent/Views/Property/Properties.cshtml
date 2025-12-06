@@ -322,7 +322,6 @@
             }
 
             const token = tokenInput.value;
-            button.disabled = true;
 
             try {
                 const formData = new URLSearchParams();
@@ -356,8 +355,6 @@
             } catch (error) {
                 console.error('Error toggling favourite:', error);
                 alert('An error occurred. Please try again.');
-            } finally {
-                button.disabled = false;
             }
         }
     </script>

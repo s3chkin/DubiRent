@@ -86,7 +86,8 @@
         <!-- External Login Buttons -->
         @if ((Model.ExternalLogins?.Count ?? 0) > 0)
         {
-            <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" novalidate>
+                @Html.AntiForgeryToken()
                 <div class="external-login-container mb-4">
                     @foreach (var provider in Model.ExternalLogins!)
                     {

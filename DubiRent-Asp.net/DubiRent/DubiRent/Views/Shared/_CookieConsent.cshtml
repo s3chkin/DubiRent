@@ -1,0 +1,212 @@
+@* Cookie Consent Banner *@
+<div id="cookieConsent" class="cookie-consent-banner" style="display: none;">
+    <div class="cookie-consent-content">
+        <div class="cookie-consent-text">
+            <i class="fas fa-cookie-bite me-2"></i>
+            <span>We use cookies to enhance your browsing experience, analyze site traffic, and personalize content. By clicking "Accept All", you consent to our use of cookies.</span>
+        </div>
+        <div class="cookie-consent-buttons">
+            <a asp-area="" asp-controller="Home" asp-action="Privacy" class="btn btn-link cookie-link">Learn More</a>
+            <button type="button" class="btn btn-outline-light cookie-btn-reject" id="rejectCookies">Reject</button>
+            <button type="button" class="btn btn-light cookie-btn-accept" id="acceptCookies">Accept All</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .cookie-consent-banner {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+        color: white;
+        padding: 1.25rem 1.5rem;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+        z-index: 9999;
+        animation: slideUp 0.4s ease-out;
+    }
+
+    @@keyframes slideUp {
+        from {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .cookie-consent-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .cookie-consent-text {
+        flex: 1;
+        min-width: 280px;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        color: #e5e7eb;
+    }
+
+    .cookie-consent-text i {
+        font-size: 1.25rem;
+        color: #fe5658;
+        margin-top: 0.125rem;
+        flex-shrink: 0;
+    }
+
+    .cookie-consent-buttons {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .cookie-link {
+        color: #9ca3af;
+        text-decoration: none;
+        font-size: 0.875rem;
+        padding: 0.5rem 0;
+        transition: color 0.2s ease;
+    }
+
+    .cookie-link:hover {
+        color: #fe5658;
+        text-decoration: underline;
+    }
+
+    .cookie-btn-accept,
+    .cookie-btn-reject {
+        padding: 0.625rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .cookie-btn-accept {
+        background: linear-gradient(135deg, #fe5658 0%, #ff6b6d 100%);
+        color: white;
+        border: none;
+    }
+
+    .cookie-btn-accept:hover {
+        background: linear-gradient(135deg, #ff6b6d 0%, #ff7b7d 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(254, 86, 88, 0.4);
+        color: white;
+    }
+
+    .cookie-btn-reject {
+        background: transparent;
+        color: #e5e7eb;
+        border-color: #4b5563;
+    }
+
+    .cookie-btn-reject:hover {
+        background: #374151;
+        border-color: #6b7280;
+        color: white;
+    }
+
+    @@media (max-width: 768px) {
+        .cookie-consent-banner {
+            padding: 1rem;
+        }
+
+        .cookie-consent-content {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+
+        .cookie-consent-text {
+            min-width: auto;
+        }
+
+        .cookie-consent-buttons {
+            justify-content: stretch;
+            flex-wrap: wrap;
+        }
+
+        .cookie-btn-accept,
+        .cookie-btn-reject {
+            flex: 1;
+            min-width: 120px;
+        }
+    }
+</style>
+
+<script>
+    (function() {
+        // Check if user has already made a choice
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        const cookieConsent = getCookie('cookieConsent');
+        const cookieBanner = document.getElementById('cookieConsent');
+
+        // Show banner if no consent cookie exists
+        if (!cookieConsent && cookieBanner) {
+            cookieBanner.style.display = 'block';
+            
+            // Set expiration date (1 year from now)
+            const expirationDate = new Date();
+            expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+
+            // Accept button
+            document.getElementById('acceptCookies')?.addEventListener('click', function() {
+                document.cookie = `cookieConsent=accepted; expires=${expirationDate.toUTCString()}; path=/; SameSite=Lax`;
+                hideBanner();
+            });
+
+            // Reject button
+            document.getElementById('rejectCookies')?.addEventListener('click', function() {
+                document.cookie = `cookieConsent=rejected; expires=${expirationDate.toUTCString()}; path=/; SameSite=Lax`;
+                hideBanner();
+            });
+        }
+
+        function hideBanner() {
+            if (cookieBanner) {
+                cookieBanner.style.animation = 'slideDown 0.3s ease-out';
+                setTimeout(function() {
+                    cookieBanner.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        // Add slide down animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @@keyframes slideDown {
+                from {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateY(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    })();
+</script>
+
