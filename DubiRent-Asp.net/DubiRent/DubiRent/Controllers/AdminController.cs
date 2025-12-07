@@ -41,7 +41,9 @@ namespace DubiRent.Controllers
             _imageOptimizationService = imageOptimizationService;
         }
 
+        // Admin pages should NOT be cached (sensitive data)
         // GET: Admin Panel - Properties Management
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Index(string statusFilter = null, int page = 1, int pageSize = 12)
         {
             // Seed initial locations if none exist

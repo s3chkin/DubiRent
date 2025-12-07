@@ -478,7 +478,7 @@
                         </a>
                         @if (request.Status == ViewingRequestStatus.Pending)
                         {
-                            <form asp-action="UpdateRequestStatus" method="post" style="display: inline; flex: 1;" novalidate>
+                            <form asp-action="UpdateRequestStatus" method="post" class="approve-form" style="display: inline; flex: 1;" novalidate data-request-id="@request.Id">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@request.Id" />
                                 <input type="hidden" name="status" value="@((int)ViewingRequestStatus.Approved)" />
@@ -617,6 +617,37 @@
     }
 </style>
 
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" aria-labelledby="loadingModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 20px; border: none; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); background: transparent;">
+            <div class="modal-body text-center" style="padding: 3rem;">
+                <div class="spinner-border text-success" role="status" style="width: 4rem; height: 4rem; border-width: 0.4rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <h5 class="mt-4 fw-bold" style="color: white; font-size: 1.25rem;">Processing Request...</h5>
+                <p class="text-white-50 mb-0 mt-2" style="font-size: 0.9375rem;">Please wait while we approve the viewing request</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #loadingModal .modal-content {
+        background: rgba(0, 0, 0, 0.85) !important;
+        backdrop-filter: blur(10px);
+    }
+
+    #loadingModal .spinner-border {
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
+
 @section Scripts {
     <script>
         var cancelRequestModal = document.getElementById('cancelRequestModal');
@@ -652,5 +683,19 @@
                 }
             });
         }
+
+        // Loading modal for approve forms
+        var loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'), {
+            backdrop: 'static',
+            keyboard: false
+        });
+
+        // Handle approve form submissions
+        document.querySelectorAll('.approve-form').forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                // Show loading modal
+                loadingModal.show();
+            });
+        });
     </script>
 }

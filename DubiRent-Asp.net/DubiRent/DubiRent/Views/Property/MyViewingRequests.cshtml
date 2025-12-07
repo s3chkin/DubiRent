@@ -1,0 +1,509 @@
+@using DubiRent.Data.Models
+@model IEnumerable<ViewingRequest>
+@{
+    ViewData["Title"] = "My Viewing Requests";
+    ViewData["Description"] = "View and manage your property viewing requests. Track the status of your requests and see upcoming appointments.";
+    ViewData["Robots"] = "noindex, follow";
+}
+
+<partial name="_Breadcrumb" />
+
+<style>
+    body {
+        background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+        min-height: 100vh;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #fe5658 0%, #ff6b6d 50%, #ff787b 100%);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+        box-shadow: 0 4px 16px rgba(254, 86, 88, 0.2);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 10px;
+        padding: 0.875rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(254, 86, 88, 0.1);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none;
+        display: block;
+        color: inherit;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(254, 86, 88, 0.1);
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .stat-card.active {
+        background: linear-gradient(135deg, rgba(254, 86, 88, 0.1) 0%, rgba(254, 86, 88, 0.05) 100%);
+        border: 2px solid #fe5658;
+        box-shadow: 0 4px 12px rgba(254, 86, 88, 0.2);
+    }
+
+    .stat-card.active .stat-value {
+        color: #fe5658;
+    }
+
+    .stat-card.active .stat-icon {
+        background: linear-gradient(135deg, #fe5658 0%, #ff6b6d 100%);
+        color: white;
+    }
+
+    .stat-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, #ffe5e6 0%, #ffffff 100%);
+        color: #fe5658;
+    }
+
+    .stat-value {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #1f2937;
+        line-height: 1;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.6875rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .requests-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .request-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .request-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(254, 86, 88, 0.15);
+        border-color: rgba(254, 86, 88, 0.3);
+    }
+
+    .property-image-wrapper {
+        width: 100%;
+        height: 180px;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+        border: 2px solid #f3f4f6;
+        position: relative;
+    }
+
+    .property-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .request-card:hover .property-image {
+        transform: scale(1.05);
+    }
+
+    .status-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-approved {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-completed {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .status-cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .property-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
+    }
+
+    .property-title a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .property-title a:hover {
+        color: #fe5658;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-item i {
+        color: #fe5658;
+        font-size: 0.875rem;
+        width: 18px;
+    }
+
+    .info-label {
+        font-size: 0.75rem;
+        color: #6b7280;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .viewing-details {
+        background: #f9fafb;
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-left: 4px solid #fe5658;
+    }
+
+    .btn-view-property {
+        padding: 0.625rem 1rem;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        text-decoration: none;
+        width: 100%;
+        background: linear-gradient(135deg, #fe5658 0%, #ff6b6d 100%);
+        color: white;
+        margin-top: auto;
+    }
+
+    .btn-view-property:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(254, 86, 88, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .empty-state-icon {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #ffe5e6 0%, #ffffff 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: #fe5658;
+        font-size: 3rem;
+    }
+
+    @@media (max-width: 768px) {
+        .page-header {
+            padding: 1.5rem;
+        }
+
+        .requests-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .request-card {
+            padding: 1.25rem;
+        }
+
+        .property-image-wrapper {
+            height: 160px;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .requests-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="container py-4" style="max-width: 1400px;">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1 class="fw-bold mb-2" style="font-size: 2rem;">
+                    <i class="fas fa-calendar-check me-2"></i>My Viewing Requests
+                </h1>
+                <p class="mb-0 opacity-90">Track and manage your property viewing requests</p>
+            </div>
+            <div class="text-end">
+                <div class="d-flex align-items-baseline gap-2">
+                    <h2 class="fw-bold mb-0" style="font-size: 2.5rem;">@(ViewBag.TotalCount ?? 0)</h2>
+                    <span class="opacity-90" style="font-size: 1rem;">Total</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm mb-3" role="alert" style="border-left: 3px solid #10b981; padding: 0.625rem 1rem; font-size: 0.8125rem;">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm mb-3" role="alert" style="border-left: 3px solid #ef4444; padding: 0.625rem 1rem; font-size: 0.8125rem;">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Statistics Cards (Filter Buttons) -->
+    @{
+        var allRequests = ViewBag.AllRequests as IEnumerable<ViewingRequest> ?? Model ?? Enumerable.Empty<ViewingRequest>();
+        var currentFilter = ViewBag.StatusFilter as string;
+    }
+    @if (allRequests.Any())
+    {
+        <div class="stats-grid">
+            <a href="@Url.Action("MyViewingRequests", new { statusFilter = (string)null })" 
+               class="stat-card @(string.IsNullOrEmpty(currentFilter) ? "active" : "")">
+                <div class="stat-icon">
+                    <i class="fas fa-list"></i>
+                </div>
+                <div class="stat-value">@allRequests.Count()</div>
+                <div class="stat-label">All</div>
+            </a>
+            <a href="@Url.Action("MyViewingRequests", new { statusFilter = "Pending" })" 
+               class="stat-card @(currentFilter == "Pending" ? "active" : "")">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-value">@allRequests.Count(r => r.Status == ViewingRequestStatus.Pending)</div>
+                <div class="stat-label">Pending</div>
+            </a>
+            <a href="@Url.Action("MyViewingRequests", new { statusFilter = "Approved" })" 
+               class="stat-card @(currentFilter == "Approved" ? "active" : "")">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-value">@allRequests.Count(r => r.Status == ViewingRequestStatus.Approved)</div>
+                <div class="stat-label">Approved</div>
+            </a>
+            <a href="@Url.Action("MyViewingRequests", new { statusFilter = "Completed" })" 
+               class="stat-card @(currentFilter == "Completed" ? "active" : "")">
+                <div class="stat-icon">
+                    <i class="fas fa-check-double"></i>
+                </div>
+                <div class="stat-value">@allRequests.Count(r => r.Status == ViewingRequestStatus.Completed)</div>
+                <div class="stat-label">Completed</div>
+            </a>
+            <a href="@Url.Action("MyViewingRequests", new { statusFilter = "Cancelled" })" 
+               class="stat-card @(currentFilter == "Cancelled" ? "active" : "")">
+                <div class="stat-icon">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="stat-value">@allRequests.Count(r => r.Status == ViewingRequestStatus.Cancelled)</div>
+                <div class="stat-label">Cancelled</div>
+            </a>
+        </div>
+    }
+
+    <!-- Viewing Requests Grid -->
+    @if (Model != null && Model.Any())
+    {
+        <div class="requests-grid">
+            @foreach (var request in Model)
+            {
+                var mainImage = request.Property?.Images?.FirstOrDefault(img => img.IsMain) ?? request.Property?.Images?.FirstOrDefault();
+                var imageUrl = mainImage != null ? mainImage.ImageUrl : "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400";
+
+                <div class="request-card">
+                    <!-- Property Image -->
+                    <div class="property-image-wrapper">
+                        <img src="@imageUrl" alt="@request.Property?.Title" class="property-image"
+                             onerror="this.src='https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400'" />
+                    </div>
+
+                    <!-- Status Badge -->
+                    <span class="status-badge status-@request.Status.ToString().ToLower()">
+                        @request.Status
+                    </span>
+
+                    <!-- Property Title -->
+                    <h3 class="property-title">
+                        <a asp-action="Details" asp-route-id="@request.PropertyId">
+                            @request.Property?.Title
+                        </a>
+                    </h3>
+
+                    <!-- Property Location -->
+                    <div class="info-item mb-2">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>@request.Property?.Location?.Name, @request.Property?.Address</span>
+                    </div>
+
+                    <!-- Viewing Details -->
+                    <div class="viewing-details">
+                        <div class="info-label mb-2">
+                            <i class="fas fa-calendar-alt me-1"></i>Viewing Details
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <div class="info-label">Date</div>
+                                <div class="info-value">@request.PreferredDate.ToString("MMM dd, yyyy")</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="info-label">Time</div>
+                                <div class="info-value">
+                                    @{
+                                        var timeHour = request.PreferredTime.Hours;
+                                        var timeMinute = request.PreferredTime.Minutes;
+                                        var period = timeHour >= 12 ? "PM" : "AM";
+                                        var displayHour = timeHour > 12 ? timeHour - 12 : (timeHour == 0 ? 12 : timeHour);
+                                    }
+                                    @displayHour.ToString("00"):@timeMinute.ToString("00") @period
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-2 pt-2" style="border-top: 1px solid #e5e7eb;">
+                            <div class="info-label">Requested On</div>
+                            <div class="info-value" style="font-size: 0.8125rem;">@request.CreatedAt.ToString("MMM dd, yyyy 'at' HH:mm")</div>
+                        </div>
+                    </div>
+
+                    <!-- Property Info -->
+                    <div class="d-flex gap-3 mb-3" style="font-size: 0.8125rem; color: #6b7280;">
+                        <div class="info-item" style="margin-bottom: 0;">
+                            <i class="fas fa-bed"></i>
+                            <span>@request.Property?.Bedrooms Beds</span>
+                        </div>
+                        <div class="info-item" style="margin-bottom: 0;">
+                            <i class="fas fa-bath"></i>
+                            <span>@request.Property?.Bathrooms Baths</span>
+                        </div>
+                        <div class="info-item" style="margin-bottom: 0;">
+                            <i class="fas fa-ruler-combined"></i>
+                            <span>@request.Property?.SquareMeters m²</span>
+                        </div>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="mb-3" style="border-top: 1px solid #f3f4f6; padding-top: 0.75rem;">
+                        <div class="info-label mb-1">Price</div>
+                        <div class="info-value" style="font-size: 1.25rem; color: #fe5658; font-weight: 700;">
+                            $@request.Property?.PricePerMonth.ToString("N0") <span style="font-size: 0.75rem; font-weight: 500; color: #6b7280;">/month</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <a asp-action="Details" asp-route-id="@request.PropertyId" class="btn-view-property">
+                        <i class="fas fa-eye"></i>
+                        <span>View Property</span>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-calendar-times"></i>
+            </div>
+            <h4 class="fw-bold mb-2" style="font-size: 1.5rem; color: #1f2937;">No Viewing Requests</h4>
+            <p class="text-muted mb-4" style="font-size: 1rem;">
+                @if (!string.IsNullOrEmpty(currentFilter))
+                {
+                    <span>You don't have any @currentFilter.ToLower() viewing requests.</span>
+                }
+                else
+                {
+                    <span>You haven't submitted any viewing requests yet.</span>
+                }
+            </p>
+            <a asp-action="Properties" class="btn-view-property" style="width: auto; padding: 0.75rem 2rem; display: inline-flex;">
+                <i class="fas fa-search"></i>
+                <span>Browse Properties</span>
+            </a>
+        </div>
+    }
+</div>
+

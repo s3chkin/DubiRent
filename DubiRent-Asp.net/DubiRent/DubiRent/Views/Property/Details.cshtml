@@ -1,7 +1,15 @@
 ﻿@model DubiRent.Data.Models.Property
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<DubiRent.Data.Models.AppUser> SignInManager
+@inject UserManager<DubiRent.Data.Models.AppUser> UserManager
 @{
     ViewData["Title"] = Model?.Title ?? "Property Details";
     var allImages = Model?.Images?.ToList() ?? new List<DubiRent.Data.Models.PropertyImage>();
+    var isLoggedIn = SignInManager.IsSignedIn(User);
+    var isAdmin = ViewBag.IsAdmin as bool? ?? false;
+    var hasPaid = ViewBag.HasPaid as bool? ?? false;
+    var hasApprovedRequest = ViewBag.HasApprovedRequest as bool? ?? false;
+    var hasPendingRequest = ViewBag.HasPendingRequest as bool? ?? false;
     // Sort images so main image is always first
     var images = allImages.OrderByDescending(img => img.IsMain).ThenBy(img => img.Id).ToList();
     var mainImage = images.FirstOrDefault(img => img.IsMain) ?? images.FirstOrDefault();
@@ -715,72 +723,6 @@
                     <h4 class="fw-bold mb-2" style="font-size: 1.125rem;">Description</h4>
                     <p class="description-text mb-0">@Model?.Description</p>
                 </div>
-
-                <!-- Stripe Payment Button in Left Container -->
-                <div class="mt-3 pt-3" style="border-top: 1px solid #e5e7eb;">
-@using DubiRent.Helpers
-                    @using Microsoft.AspNetCore.Identity
-                    @inject SignInManager<DubiRent.Data.Models.AppUser> SignInManager
-                    @{
-                        var isLoggedIn = SignInManager.IsSignedIn(User);
-                        var isAdmin = ViewBag.IsAdmin as bool? ?? false;
-                        var hasPaid = ViewBag.HasPaid as bool? ?? false;
-                        var hasApprovedRequest = ViewBag.HasApprovedRequest as bool? ?? false;
-                        var hasPendingRequest = ViewBag.HasPendingRequest as bool? ?? false;
-                    }
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <div>
-                            <div class="price-display" style="font-size: 1.25rem; margin-bottom: 0.25rem;">
-                                $@Model?.PricePerMonth.ToString("N0")
-                                <span class="price-unit" style="font-size: 0.7rem;">per month</span>
-                            </div>
-                        </div>
-                    </div>
-                    @if (hasPaid)
-                    {
-                        <div class="alert alert-success mb-0" style="border-radius: 10px; background: #d1fae5; border: 1px solid #10b981; color: #065f46;">
-                            <i class="fas fa-check-circle me-2"></i>
-                            <strong>Payment Completed</strong>
-                            <p class="mb-0 mt-1 small">You have successfully paid for this property. Our team will contact you soon.</p>
-                        </div>
-                    }
-                    else if (isLoggedIn && !isAdmin && hasApprovedRequest)
-                    {
-                        <a asp-controller="Payment" asp-action="CreatePayment" asp-route-propertyId="@Model?.Id" class="stripe-btn text-decoration-none">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.594-7.305h.003z"/>
-                            </svg>
-                            <span>Pay with Stripe</span>
-                        </a>
-                    }
-                    else if (isLoggedIn && !isAdmin && !hasApprovedRequest && hasPendingRequest)
-                    {
-                        <div class="alert alert-info mb-0" style="border-radius: 10px; background: #eff6ff; border: 1px solid #3b82f6; color: #1e40af;">
-                            <i class="fas fa-info-circle me-2"></i>
-                            <strong>Waiting for Approval</strong>
-                            <p class="mb-0 mt-1 small">Your viewing request is pending approval. Once approved, you'll be able to proceed with payment.</p>
-                        </div>
-                    }
-                    else if (isLoggedIn && !isAdmin && !hasApprovedRequest && !hasPendingRequest)
-                    {
-                        <!-- No message shown - user hasn't submitted a request yet -->
-                    }
-                    else if (isLoggedIn && isAdmin)
-                    {
-                        <div class="alert alert-secondary mb-0" style="border-radius: 10px; background: #f3f4f6; border: 1px solid #9ca3af; color: #374151;">
-                            <i class="fas fa-shield-alt me-2"></i>
-                            <strong>Admin Account</strong>
-                            <p class="mb-0 mt-1 small">Payment is not available for administrator accounts.</p>
-                        </div>
-                    }
-                    else
-                    {
-                        <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Details", "Property", new { id = Model?.Id })" class="stripe-btn text-decoration-none" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);">
-                            <i class="fas fa-lock me-2"></i>
-                            <span>Login to Pay</span>
-                        </a>
-                    }
-                </div>
             </div>
         </div>
 
@@ -789,10 +731,7 @@
             <div class="fixed-sidebar">
                 <!-- Viewing Request Card -->
                 <div class="sidebar-card">
-                    @using Microsoft.AspNetCore.Identity
-                    @inject UserManager<DubiRent.Data.Models.AppUser> UserManager
                     @{
-                        // isLoggedIn is already declared above
                         var currentUser = isLoggedIn ? await UserManager.GetUserAsync(User) : null;
                         var userEmail = currentUser?.Email ?? "";
                     }
@@ -1014,6 +953,68 @@
                         </form>
                         }
                     }
+
+                    <!-- Payment Section in Right Container -->
+                    <div class="sidebar-card mt-3">
+                        <h4 class="sidebar-section-title mb-3">Payment</h4>
+                        @using DubiRent.Helpers
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div>
+                                <div class="price-display" style="font-size: 1.5rem; margin-bottom: 0.25rem; font-weight: 700; color: #1f2937;">
+                                    $@Model?.PricePerMonth.ToString("N0")
+                                </div>
+                                <span class="price-unit" style="font-size: 0.75rem; color: #6b7280;">per month</span>
+                            </div>
+                        </div>
+                        @if (hasPaid)
+                        {
+                            <div class="alert alert-success mb-0" style="border-radius: 10px; background: #d1fae5; border: 1px solid #10b981; color: #065f46;">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <strong>Payment Completed</strong>
+                                <p class="mb-0 mt-1 small">You have successfully paid for this property. Our team will contact you soon.</p>
+                            </div>
+                        }
+                        else if (isLoggedIn && !isAdmin && hasApprovedRequest)
+                        {
+                            <a asp-controller="Payment" asp-action="CreatePayment" asp-route-propertyId="@Model?.Id" class="stripe-btn text-decoration-none w-100 d-flex align-items-center justify-content-center">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.594-7.305h.003z"/>
+                                </svg>
+                                <span>Pay with Stripe</span>
+                            </a>
+                        }
+                        else if (isLoggedIn && !isAdmin && !hasApprovedRequest && hasPendingRequest)
+                        {
+                            <div class="alert alert-info mb-0" style="border-radius: 10px; background: #eff6ff; border: 1px solid #3b82f6; color: #1e40af;">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Waiting for Approval</strong>
+                                <p class="mb-0 mt-1 small">Your viewing request is pending approval. Once approved, you'll be able to proceed with payment.</p>
+                            </div>
+                        }
+                        else if (isLoggedIn && !isAdmin && !hasApprovedRequest && !hasPendingRequest)
+                        {
+                            <div class="alert alert-warning mb-0" style="border-radius: 10px; background: #fff7ed; border: 1px solid #f59e0b; color: #92400e;">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Request Viewing First</strong>
+                                <p class="mb-0 mt-1 small">Please request a viewing first. After approval, you'll be able to proceed with payment.</p>
+                            </div>
+                        }
+                        else if (isLoggedIn && isAdmin)
+                        {
+                            <div class="alert alert-secondary mb-0" style="border-radius: 10px; background: #f3f4f6; border: 1px solid #9ca3af; color: #374151;">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                <strong>Admin Account</strong>
+                                <p class="mb-0 mt-1 small">Payment is not available for administrator accounts.</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Details", "Property", new { id = Model?.Id })" class="stripe-btn text-decoration-none w-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);">
+                                <i class="fas fa-lock me-2"></i>
+                                <span>Login to Pay</span>
+                            </a>
+                        }
+                    </div>
                 </div>
             </div>
         </div>

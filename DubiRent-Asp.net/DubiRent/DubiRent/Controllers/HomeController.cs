@@ -6,6 +6,7 @@ using DubiRent.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace DubiRent.Controllers
 {
@@ -25,6 +26,8 @@ namespace DubiRent.Controllers
             this._userManager = userManager;
         }
 
+        // Cache Home page for 10 minutes (vary by search parameters if any)
+        [ResponseCache(Duration = 600, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] { "Title", "Address", "LocationId", "LocationName", "MinPrice", "MaxPrice", "MinSquareMeters", "MaxSquareMeters" })]
         public async Task<IActionResult> Index(PropertySearchModel search)
         {
             var query = db.Properties
@@ -148,6 +151,8 @@ namespace DubiRent.Controllers
             return View(properties);
         }
 
+        // Cache Privacy page for 1 hour (static content)
+        [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, VaryByHeader = "Accept-Language")]
         public IActionResult Privacy()
         {
             return View();
@@ -208,7 +213,8 @@ namespace DubiRent.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        // GET: Sitemap
+        // Cache Sitemap for 1 day
+        [ResponseCache(Duration = 86400, Location = ResponseCacheLocation.Any)]
         public async Task<IActionResult> Sitemap()
         {
             var baseUrl = $"{Request.Scheme}://{Request.Host}";

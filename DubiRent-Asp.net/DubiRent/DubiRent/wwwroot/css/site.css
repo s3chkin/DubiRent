@@ -275,6 +275,116 @@ body {
   }
 }
 
+/* User Menu Styles */
+.nav-item.dropdown {
+  position: relative;
+}
+
+.user-menu-btn {
+  cursor: pointer;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.user-menu-btn:hover {
+  background-color: rgba(254, 86, 88, 0.05) !important;
+  border-color: rgba(254, 86, 88, 0.1);
+}
+
+.user-menu-btn:focus,
+.user-menu-btn.show {
+  background-color: rgba(254, 86, 88, 0.05) !important;
+  border-color: rgba(254, 86, 88, 0.2);
+  box-shadow: 0 0 0 0.2rem rgba(254, 86, 88, 0.15);
+}
+
+.user-dropdown-menu {
+  animation: fadeInDown 0.2s ease-out;
+  position: absolute !important;
+  right: 0 !important;
+  left: auto !important;
+  margin-top: 0.5rem;
+  z-index: 1050;
+  transform: none !important;
+  will-change: transform, opacity;
+}
+
+.dropdown-toggle::after {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .nav-item.dropdown {
+    position: static;
+  }
+
+  .user-dropdown-menu {
+    position: static !important;
+    margin-top: 0.5rem;
+    width: 100% !important;
+    right: auto !important;
+    left: auto !important;
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user-menu-item {
+  color: #374151 !important;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.user-menu-item:hover {
+  background-color: rgba(254, 86, 88, 0.08) !important;
+  color: #fe5658 !important;
+  transform: translateX(4px);
+}
+
+.user-menu-item.active {
+  background-color: rgba(254, 86, 88, 0.1) !important;
+  color: #fe5658 !important;
+  font-weight: 600;
+}
+
+.user-menu-item.logout-btn:hover {
+  background-color: rgba(220, 38, 38, 0.1) !important;
+  color: #dc2626 !important;
+}
+
+.user-menu-item i {
+  transition: transform 0.2s ease;
+}
+
+.user-menu-item:hover i {
+  transform: scale(1.1);
+}
+
+/* Mobile adjustments for user menu */
+@media (max-width: 767px) {
+  .user-menu-btn {
+    padding: 0.5rem 0.75rem !important;
+  }
+
+  .user-menu-btn .d-none.d-lg-inline {
+    display: none !important;
+  }
+
+  .user-dropdown-menu {
+    width: 100% !important;
+    margin-top: 0.5rem !important;
+  }
+}
+
 /* Footer Styles */
 .site-footer {
   background: linear-gradient(135deg, #1f2937 0%, #111827 100%);

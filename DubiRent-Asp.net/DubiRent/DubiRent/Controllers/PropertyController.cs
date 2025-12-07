@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using DubiRent.Models;
 using DubiRent.Services;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace DubiRent.Controllers
 {
@@ -32,6 +33,8 @@ namespace DubiRent.Controllers
             return View();
         }
 
+        // Cache Properties list page for 5 minutes (vary by query parameters)
+        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] { "Title", "Address", "LocationId", "LocationName", "MinPrice", "MaxPrice", "MinSquareMeters", "MaxSquareMeters", "Bedrooms", "Bathrooms", "SortBy", "Page", "PageSize" })]
         public async Task<IActionResult> Properties(PropertySearchModel search)
         {
             // Seed initial locations if none exist
@@ -190,7 +193,8 @@ namespace DubiRent.Controllers
             db.SaveChanges();
         }
 
-        // GET: Property Details
+        // Cache Property Details for 5 minutes (vary by id)
+        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] { "id" })]
         public async Task<IActionResult> Details(int id)
         {
             var property = await db.Properties
@@ -422,6 +426,48 @@ namespace DubiRent.Controllers
             ViewBag.TotalCount = favouriteProperties.Count;
 
             return View(favouriteProperties);
+        }
+
+        // GET: My Viewing Requests
+        [Authorize]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> MyViewingRequests(string statusFilter = null)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["Error"] = "Please log in to view your viewing requests.";
+                return RedirectToAction(nameof(Properties));
+            }
+
+            var query = db.ViewingRequests
+                .Include(vr => vr.Property)
+                    .ThenInclude(p => p.Location)
+                .Include(vr => vr.Property)
+                    .ThenInclude(p => p.Images)
+                .Where(vr => vr.UserId == userId)
+                .AsQueryable();
+
+            // Apply status filter if provided
+            if (!string.IsNullOrEmpty(statusFilter) && Enum.TryParse<ViewingRequestStatus>(statusFilter, true, out var status))
+            {
+                query = query.Where(vr => vr.Status == status);
+            }
+
+            var requests = await query
+                .OrderByDescending(vr => vr.CreatedAt)
+                .ToListAsync();
+
+            // Get all requests for statistics
+            var allRequests = await db.ViewingRequests
+                .Where(vr => vr.UserId == userId)
+                .ToListAsync();
+
+            ViewBag.StatusFilter = statusFilter;
+            ViewBag.AllRequests = allRequests;
+            ViewBag.TotalCount = allRequests.Count;
+
+            return View(requests);
         }
     }
 }

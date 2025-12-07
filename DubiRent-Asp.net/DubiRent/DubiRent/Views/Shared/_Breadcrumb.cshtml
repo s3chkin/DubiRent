@@ -33,6 +33,10 @@
             {
                 breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "My Favourites", IsActive = true });
             }
+            else if (action == "MyViewingRequests")
+            {
+                breadcrumbItems.Add(new DubiRent.Models.BreadcrumbItem { Text = "My Viewing Requests", IsActive = true });
+            }
         }
         else if (controller == "Admin")
         {
