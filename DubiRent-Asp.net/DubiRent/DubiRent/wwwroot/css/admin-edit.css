@@ -1,0 +1,132 @@
+/* Admin Edit Property Page Styles */
+
+.admin-edit-page .form-card {
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.admin-edit-page .form-label {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.admin-edit-page .form-control, 
+.admin-edit-page .form-select {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 0.625rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.admin-edit-page .form-control:focus, 
+.admin-edit-page .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(254, 86, 88, 0.1);
+}
+
+.admin-edit-page .form-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.admin-edit-page .existing-image {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.admin-edit-page .existing-image:hover {
+    border-color: var(--primary-color);
+}
+
+.admin-edit-page .existing-image img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.admin-edit-page .image-delete-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(220, 38, 38, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.admin-edit-page .image-delete-btn:hover {
+    background: rgba(220, 38, 38, 1);
+    transform: scale(1.1);
+}
+
+.admin-edit-page .image-main-badge {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: rgba(34, 197, 94, 0.9);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.admin-edit-page .existing-image.selected {
+    border-color: var(--primary-color) !important;
+    border-width: 3px !important;
+}
+
+.admin-edit-page .existing-image input[type="radio"] {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+/* Modal Styles */
+.admin-edit-page .modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.admin-edit-page .modal-content {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.admin-edit-page .btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4) !important;
+}
+
+.admin-edit-page .btn-light:hover {
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+}
+

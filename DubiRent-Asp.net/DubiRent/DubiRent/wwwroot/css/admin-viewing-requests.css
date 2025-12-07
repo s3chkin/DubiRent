@@ -1,0 +1,343 @@
+/* Admin Viewing Requests Page Styles */
+
+.admin-viewing-requests-page body {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    min-height: 100vh;
+}
+
+.admin-viewing-requests-page .page-header {
+    background: linear-gradient(135deg, #fe5658 0%, #ff6b6d 50%, #ff787b 100%);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    color: white;
+    box-shadow: 0 4px 16px rgba(254, 86, 88, 0.2);
+}
+
+.admin-viewing-requests-page .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.admin-viewing-requests-page .stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 0.875rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(254, 86, 88, 0.1);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    color: inherit;
+}
+
+.admin-viewing-requests-page .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(254, 86, 88, 0.1);
+    text-decoration: none;
+    color: inherit;
+}
+
+.admin-viewing-requests-page .stat-card.active {
+    background: linear-gradient(135deg, rgba(254, 86, 88, 0.1) 0%, rgba(254, 86, 88, 0.05) 100%);
+    border: 2px solid #fe5658;
+    box-shadow: 0 4px 12px rgba(254, 86, 88, 0.2);
+}
+
+.admin-viewing-requests-page .stat-card.active .stat-value {
+    color: #fe5658;
+}
+
+.admin-viewing-requests-page .stat-card.active .stat-icon {
+    background: linear-gradient(135deg, #fe5658 0%, #ff6b6d 100%);
+    color: white;
+}
+
+.admin-viewing-requests-page .stat-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #ffe5e6 0%, #ffffff 100%);
+    color: #fe5658;
+}
+
+.admin-viewing-requests-page .stat-value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #1f2937;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.admin-viewing-requests-page .stat-label {
+    font-size: 0.6875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.admin-viewing-requests-page .requests-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.admin-viewing-requests-page .request-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-viewing-requests-page .request-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(254, 86, 88, 0.15);
+    border-color: rgba(254, 86, 88, 0.3);
+}
+
+.admin-viewing-requests-page .property-image-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid #f3f4f6;
+}
+
+.admin-viewing-requests-page .property-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.admin-viewing-requests-page .status-badge {
+    padding: 0.25rem 0.625rem;
+    border-radius: 6px;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.admin-viewing-requests-page .status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.admin-viewing-requests-page .status-approved {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.admin-viewing-requests-page .status-completed {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.admin-viewing-requests-page .status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.admin-viewing-requests-page .info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    color: #374151;
+}
+
+.admin-viewing-requests-page .info-item i {
+    color: #fe5658;
+    font-size: 0.75rem;
+    width: 16px;
+}
+
+.admin-viewing-requests-page .info-label {
+    font-size: 0.6875rem;
+    color: #6b7280;
+    font-weight: 500;
+    margin-bottom: 0.125rem;
+}
+
+.admin-viewing-requests-page .info-value {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.admin-viewing-requests-page .action-btn {
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.admin-viewing-requests-page .btn-approve {
+    background: #10b981;
+    color: white !important;
+}
+
+.admin-viewing-requests-page .btn-approve:hover {
+    background: #059669 !important;
+    transform: translateY(-1px);
+    color: white !important;
+}
+
+.admin-viewing-requests-page .btn-complete {
+    background: #3b82f6;
+    color: white !important;
+}
+
+.admin-viewing-requests-page .btn-complete:hover {
+    background: #2563eb !important;
+    transform: translateY(-1px);
+    color: white !important;
+}
+
+.admin-viewing-requests-page .btn-cancel {
+    background: #ef4444;
+    color: white !important;
+}
+
+.admin-viewing-requests-page .btn-cancel:hover {
+    background: #dc2626 !important;
+    transform: translateY(-1px);
+    color: white !important;
+}
+
+.admin-viewing-requests-page .btn-view {
+    background: linear-gradient(135deg, #fe5658 0%, #ff787b 100%);
+    color: white !important;
+}
+
+.admin-viewing-requests-page .btn-view:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(254, 86, 88, 0.3);
+    color: white !important;
+    background: linear-gradient(135deg, #fe3d40 0%, #fe5658 100%) !important;
+}
+
+.admin-viewing-requests-page .contact-link {
+    color: #1f2937;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.admin-viewing-requests-page .contact-link:hover {
+    color: #fe5658;
+}
+
+.admin-viewing-requests-page .empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.admin-viewing-requests-page .empty-state-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #ffe5e6 0%, #ffffff 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    color: #fe5658;
+    font-size: 1.75rem;
+}
+
+/* Loading Modal Styles */
+.admin-viewing-requests-page #loadingModal {
+    z-index: 10000;
+}
+
+.admin-viewing-requests-page #loadingModal .modal-content {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.admin-viewing-requests-page #loadingModal .spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.admin-viewing-requests-page #loadingModal .spinner-border {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+    .admin-viewing-requests-page .page-header {
+        padding: 1rem;
+    }
+
+    .admin-viewing-requests-page .requests-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .admin-viewing-requests-page .request-card {
+        padding: 1rem;
+    }
+
+    .admin-viewing-requests-page .property-image-wrapper {
+        width: 70px;
+        height: 70px;
+    }
+}
+
+@media (max-width: 576px) {
+    .admin-viewing-requests-page .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .admin-viewing-requests-page .requests-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-viewing-requests-page .action-btn span {
+        display: none;
+    }
+
+    .admin-viewing-requests-page .action-btn {
+        min-width: 40px;
+        justify-content: center;
+    }
+}
+

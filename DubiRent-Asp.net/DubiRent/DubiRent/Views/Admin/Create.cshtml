@@ -3,335 +3,14 @@
     ViewData["Title"] = "Add New Property";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin-create.css" asp-append-version="true" />
+}
+
 <partial name="_Breadcrumb" />
 
-<style>
-    .form-card {
-        border-radius: 10px;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-    }
-    
-    .form-label {
-        font-weight: 600;
-        color: #1f2937;
-        margin-bottom: 0.5rem;
-        font-size: 0.875rem;
-    }
-    
-    .form-control, .form-select {
-        border: 1px solid #e5e7eb;
-        border-radius: 10px;
-        padding: 0.625rem 1rem;
-        transition: all 0.3s ease;
-    }
-    
-    .form-control:focus, .form-select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(254, 86, 88, 0.1);
-    }
-    
-    .form-textarea {
-        min-height: 120px;
-        resize: vertical;
-    }
+<div class="admin-create-page">
 
-    /* Image Upload Styles */
-    .image-upload-container {
-        position: relative;
-    }
-
-    .upload-zone {
-        border: 2px dashed #d1d5db;
-        border-radius: 10px;
-        padding: 2.5rem;
-        text-align: center;
-        background: #f9fafb;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-
-    .upload-zone:hover {
-        border-color: var(--primary-color);
-        background: #fef2f2;
-    }
-
-    .upload-zone.drag-over {
-        border-color: var(--primary-color);
-        background: #fee2e2;
-        border-width: 3px;
-    }
-
-    .upload-zone-icon {
-        font-size: 3rem;
-        color: #9ca3af;
-        margin-bottom: 1rem;
-    }
-
-    .upload-zone-text {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #374151;
-        margin-bottom: 0.5rem;
-    }
-
-    .upload-zone-hint {
-        font-size: 0.875rem;
-        color: #6b7280;
-    }
-
-    .hidden-file-input {
-        display: none;
-    }
-
-    .image-preview-container {
-        margin-top: 1.5rem;
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 1rem;
-    }
-
-    .image-preview-item {
-        position: relative;
-        border-radius: 10px;
-        overflow: hidden;
-        border: 3px solid transparent;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        background: #fff;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .image-preview-item:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .image-preview-item.selected {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(254, 86, 88, 0.2);
-    }
-
-    .image-preview-item img {
-        width: 100%;
-        height: 150px;
-        object-fit: cover;
-        display: block;
-    }
-
-    .image-preview-actions {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        display: flex;
-        gap: 0.5rem;
-    }
-
-    .image-preview-btn {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 0.875rem;
-    }
-
-    .image-remove-btn {
-        background: rgba(220, 38, 38, 0.9);
-        color: white;
-    }
-
-    .image-remove-btn:hover {
-        background: rgba(220, 38, 38, 1);
-        transform: scale(1.1);
-    }
-
-    .image-main-badge {
-        position: absolute;
-        bottom: 8px;
-        left: 8px;
-        background: rgba(34, 197, 94, 0.95);
-        color: white;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: none;
-    }
-
-    .image-preview-item.selected .image-main-badge {
-        display: block;
-    }
-
-    .image-preview-item.selected::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(254, 86, 88, 0.05);
-        pointer-events: none;
-    }
-
-    /* Loading Overlay */
-    .form-loading-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 9999;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .form-loading-overlay.active {
-        display: flex;
-    }
-
-    .form-loading-content {
-        background: white;
-        padding: 2rem;
-        border-radius: 16px;
-        text-align: center;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    }
-
-    .form-loading-spinner {
-        width: 50px;
-        height: 50px;
-        border: 4px solid #f3f4f6;
-        border-top: 4px solid var(--primary-color);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 1rem;
-    }
-
-    @@keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    .form-loading-text {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #1f2937;
-        margin: 0;
-    }
-
-    /* Error Modal Styles */
-    .error-modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 10000;
-        align-items: center;
-        justify-content: center;
-        backdrop-filter: blur(4px);
-    }
-
-    .error-modal.show {
-        display: flex;
-    }
-
-    .error-modal-content {
-        background: white;
-        border-radius: 16px;
-        padding: 2rem;
-        max-width: 500px;
-        width: 90%;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        animation: slideDown 0.3s ease;
-    }
-
-    @@keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .error-modal-header {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .error-modal-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .error-modal-icon i {
-        font-size: 24px;
-        color: #dc2626;
-    }
-
-    .error-modal-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #1f2937;
-        margin: 0;
-    }
-
-    .error-modal-body {
-        color: #4b5563;
-        line-height: 1.6;
-        margin-bottom: 1.5rem;
-    }
-
-    .error-modal-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.75rem;
-    }
-
-    .btn-modal-close {
-        background: linear-gradient(135deg, #fe5658 0%, #ff6b6d 100%);
-        color: white;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 10px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .btn-modal-close:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(254, 86, 88, 0.3);
-    }
-</style>
-
-<!-- Loading Overlay -->
-<div id="formLoadingOverlay" class="form-loading-overlay">
-    <div class="form-loading-content">
-        <div class="form-loading-spinner"></div>
-        <p class="form-loading-text">Adding Property...</p>
-        <p class="text-muted small mb-0">Please wait while we process your request</p>
-    </div>
-</div>
 
 <!-- Error Modal -->
 <div id="errorModal" class="error-modal">
@@ -374,7 +53,7 @@
                         <label asp-for="Title" class="form-label">
                             <i class="fas fa-heading dubirent-red me-2"></i>Property Title
                         </label>
-                        <input asp-for="Title" class="form-control" placeholder="Enter property title" />
+                        <input required asp-for="Title" class="form-control" placeholder="Enter property title" />
                         <span asp-validation-for="Title" class="text-danger small"></span>
                     </div>
 
@@ -383,7 +62,7 @@
                         <label asp-for="Description" class="form-label">
                             <i class="fas fa-align-left dubirent-red me-2"></i>Description
                         </label>
-                        <textarea asp-for="Description" rows="20" class="form-control form-textarea" placeholder="Enter property description"></textarea>
+                        <textarea required asp-for="Description" rows="20" class="form-control form-textarea" placeholder="Enter property description"></textarea>
                         <span asp-validation-for="Description" class="text-danger small"></span>
                     </div>
 
@@ -392,7 +71,7 @@
                         <label asp-for="LocationName" class="form-label">
                             <i class="fas fa-map-marker-alt dubirent-red me-2"></i>Location
                         </label>
-                        <input asp-for="LocationName" class="form-control" placeholder="e.g., Dubai Marina, Downtown Dubai, Palm Jumeirah" />
+                            <input required asp-for="LocationName" class="form-control" placeholder="e.g., Dubai Marina, Downtown Dubai, Palm Jumeirah" />
                         <small class="form-text text-muted">Enter the location name (e.g., Dubai Marina, Downtown Dubai)</small>
                         <span asp-validation-for="LocationName" class="text-danger small"></span>
                     </div>
@@ -402,7 +81,7 @@
                         <label asp-for="Address" class="form-label">
                             <i class="fas fa-location-dot dubirent-red me-2"></i>Address
                         </label>
-                        <input asp-for="Address" class="form-control" placeholder="Enter full address" />
+                            <input required asp-for="Address" class="form-control" placeholder="Enter full address" />
                         <span asp-validation-for="Address" class="text-danger small"></span>
                     </div>
 
@@ -411,7 +90,7 @@
                         <label asp-for="PricePerMonth" class="form-label">
                             <i class="fas fa-dollar-sign dubirent-red me-2"></i>Price Per Month ($)
                         </label>
-                        <input asp-for="PricePerMonth" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                            <input required asp-for="PricePerMonth" type="number" step="0.01" class="form-control" placeholder="0.00" />
                         <span asp-validation-for="PricePerMonth" class="text-danger small"></span>
                     </div>
 
@@ -420,7 +99,7 @@
                         <label asp-for="Bedrooms" class="form-label">
                             <i class="fas fa-bed dubirent-red me-2"></i>Bedrooms
                         </label>
-                        <input asp-for="Bedrooms" type="number" min="0" class="form-control" placeholder="0" />
+                            <input required asp-for="Bedrooms" type="number" min="0" class="form-control" placeholder="0" />
                         <span asp-validation-for="Bedrooms" class="text-danger small"></span>
                     </div>
 
@@ -429,7 +108,7 @@
                         <label asp-for="Bathrooms" class="form-label">
                             <i class="fas fa-bath dubirent-red me-2"></i>Bathrooms
                         </label>
-                        <input asp-for="Bathrooms" type="number" min="0" class="form-control" placeholder="0" />
+                            <input required asp-for="Bathrooms" type="number" min="0" class="form-control" placeholder="0" />
                         <span asp-validation-for="Bathrooms" class="text-danger small"></span>
                     </div>
 
@@ -438,7 +117,7 @@
                         <label asp-for="SquareMeters" class="form-label">
                             <i class="fas fa-ruler-combined dubirent-red me-2"></i>Square Meters
                         </label>
-                        <input asp-for="SquareMeters" type="number" min="0" class="form-control" placeholder="0" />
+                            <input required asp-for="SquareMeters" type="number" min="0" class="form-control" placeholder="0" />
                         <span asp-validation-for="SquareMeters" class="text-danger small"></span>
                     </div>
 
@@ -447,7 +126,7 @@
                         <label asp-for="Status" class="form-label">
                             <i class="fas fa-info-circle dubirent-red me-2"></i>Status
                         </label>
-                        <select asp-for="Status" asp-items="ViewBag.Statuses" class="form-select"></select>
+                        <select  asp-for="Status" asp-items="ViewBag.Statuses" class="form-select"></select>
                         <span asp-validation-for="Status" class="text-danger small"></span>
                     </div>
 
@@ -468,7 +147,7 @@
                         </div>
 
                         <!-- Hidden File Input -->
-                        <input asp-for="Images" type="file" class="hidden-file-input" id="fileInput" multiple accept="image/png,image/jpeg,image/jpg" />
+                            <input required asp-for="Images" type="file" class="hidden-file-input" id="fileInput" multiple accept="image/png,image/jpeg,image/jpg" />
                         <span asp-validation-for="Images" class="text-danger small"></span>
 
                         <!-- Image Preview Container -->
@@ -492,209 +171,21 @@
         </div>
     </div>
 </div>
+    <!-- Loading Overlay -->
+    <div id="formLoadingOverlay" class="form-loading-overlay">
+        <div class="form-loading-content">
+            <div class="form-loading-spinner"></div>
+            <p class="form-loading-text">Adding Property...</p>
+            <p class="text-muted small mb-0">Please wait while we process your request</p>
+        </div>
+    </div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="~/js/admin-create.js" asp-append-version="true"></script>
     <script>
-        let selectedImages = [];
-        let mainImageIndex = 0;
-
-        const uploadZone = document.getElementById('uploadZone');
-        const fileInput = document.getElementById('fileInput');
-        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
-        const mainImageIndexInput = document.getElementById('mainImageIndex');
-
-        // Click on upload zone
-        uploadZone.addEventListener('click', () => {
-            fileInput.click();
-        });
-
-        // File input change
-        fileInput.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
-        });
-
-        // Drag and drop events
-        uploadZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadZone.classList.add('drag-over');
-        });
-
-        uploadZone.addEventListener('dragleave', () => {
-            uploadZone.classList.remove('drag-over');
-        });
-
-        uploadZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadZone.classList.remove('drag-over');
-            handleFiles(e.dataTransfer.files);
-        });
-
-        function showErrorModal(message) {
-            const modal = document.getElementById('errorModal');
-            const modalBody = document.getElementById('errorModalBody');
-            // Format message with line breaks for multiple errors
-            modalBody.innerHTML = message.split('\n').map(line => `<p style="margin-bottom: 0.5rem;">${line}</p>`).join('');
-            modal.classList.add('show');
-        }
-
-        function closeErrorModal() {
-            const modal = document.getElementById('errorModal');
-            modal.classList.remove('show');
-        }
-
-        // Close modal on outside click
-        document.getElementById('errorModal')?.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeErrorModal();
-            }
-        });
-
-        // Close modal on Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeErrorModal();
-            }
-        });
-
-        function handleFiles(files) {
-            Array.from(files).forEach((file, index) => {
-                if (file.type.startsWith('image/')) {
-                    // Check file size (5MB limit)
-                    if (file.size > 5 * 1024 * 1024) {
-                        showErrorModal(`File "${file.name}" exceeds the maximum file size of 5MB.`);
-                        return;
-                    }
-                    
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const imageData = {
-                            file: file,
-                            preview: e.target.result,
-                            index: selectedImages.length
-                        };
-                        selectedImages.push(imageData);
-                        renderImagePreview(imageData);
-                        updateFileInput();
-                        
-                        // Set first image as main by default
-                        if (selectedImages.length === 1) {
-                            setMainImage(0);
-                        }
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-
-        function renderImagePreview(imageData) {
-            const previewItem = document.createElement('div');
-            previewItem.className = 'image-preview-item';
-            previewItem.dataset.index = imageData.index;
-            
-            previewItem.innerHTML = `
-                <img src="${imageData.preview}" alt="Preview" />
-                <div class="image-preview-actions">
-                    <button type="button" class="image-preview-btn image-remove-btn" onclick="removeImage(${imageData.index})">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="image-main-badge">Main</div>
-            `;
-
-            previewItem.addEventListener('click', (e) => {
-                if (!e.target.closest('.image-remove-btn')) {
-                    setMainImage(imageData.index);
-                }
-            });
-
-            imagePreviewContainer.appendChild(previewItem);
-        }
-
-        function setMainImage(index) {
-            mainImageIndex = index;
-            mainImageIndexInput.value = index;
-            
-            // Update visual selection
-            document.querySelectorAll('.image-preview-item').forEach((item, i) => {
-                if (i === index) {
-                    item.classList.add('selected');
-                } else {
-                    item.classList.remove('selected');
-                }
-            });
-        }
-
-        function removeImage(index) {
-            // Remove from array
-            selectedImages = selectedImages.filter((img, i) => i !== index);
-
-            // Re-render all previews with updated indices
-            imagePreviewContainer.innerHTML = '';
-            selectedImages.forEach((img, i) => {
-                img.index = i;
-                renderImagePreview(img);
-            });
-
-            // Update main image if needed
-            if (selectedImages.length > 0) {
-                if (index === mainImageIndex) {
-                    // Main image was removed, set first as main
-                    setMainImage(0);
-                } else if (index < mainImageIndex) {
-                    // Adjust main image index
-                    mainImageIndex--;
-                    setMainImage(mainImageIndex);
-                } else {
-                    // Update visual selection for remaining items
-                    setMainImage(mainImageIndex);
-                }
-            } else {
-                mainImageIndex = 0;
-                mainImageIndexInput.value = 0;
-            }
-
-            // Update file input
-            updateFileInput();
-        }
-
-        function updateFileInput() {
-            const dt = new DataTransfer();
-            selectedImages.forEach(img => {
-                dt.items.add(img.file);
-            });
-            fileInput.files = dt.files;
-        }
-
-        // Update file input before form submit
-        const propertyForm = document.getElementById('propertyForm');
-        const loadingOverlay = document.getElementById('formLoadingOverlay');
-        
-        // Hide loading overlay on page load (in case form was returned with errors)
-        if (loadingOverlay) {
-            loadingOverlay.classList.remove('active');
-        }
-        
-        if (propertyForm) {
-            propertyForm.addEventListener('submit', (e) => {
-                updateFileInput();
-                
-                // Validate that at least one image is selected if images are required
-                if (selectedImages.length === 0) {
-                    e.preventDefault();
-                    showErrorModal('Please select at least one image for the property.');
-                    return false;
-                }
-                
-                // Show loading overlay
-                if (loadingOverlay) {
-                    loadingOverlay.classList.add('active');
-                }
-            });
-        }
-
         // Check for server-side validation errors and show in modal
         @{
             var modelErrors = ViewData.ModelState
@@ -710,7 +201,9 @@
                 if (errors && errors.length > 0) {
                     const errorMessage = errors.join('\n');
                     setTimeout(() => {
-                        showErrorModal(errorMessage);
+                        if (typeof showErrorModal === 'function') {
+                            showErrorModal(errorMessage);
+                        }
                     }, 300);
                 }
             });
