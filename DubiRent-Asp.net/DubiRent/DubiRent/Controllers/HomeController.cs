@@ -26,8 +26,8 @@ namespace DubiRent.Controllers
             this._userManager = userManager;
         }
 
-        // Cache Home page for 10 minutes (vary by search parameters if any)
-        [ResponseCache(Duration = 600, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] { "Title", "Address", "LocationId", "LocationName", "MinPrice", "MaxPrice", "MinSquareMeters", "MaxSquareMeters" })]
+        // Cache Home page for 10 minutes (vary by search parameters and authentication status)
+        [ResponseCache(Duration = 600, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] { "Title", "Address", "LocationId", "LocationName", "MinPrice", "MaxPrice", "MinSquareMeters", "MaxSquareMeters" }, VaryByHeader = "Cookie")]
         public async Task<IActionResult> Index(PropertySearchModel search)
         {
             var query = db.Properties

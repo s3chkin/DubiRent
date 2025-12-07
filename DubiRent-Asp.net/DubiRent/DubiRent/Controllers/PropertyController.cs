@@ -33,8 +33,8 @@ namespace DubiRent.Controllers
             return View();
         }
 
-        // Cache Properties list page for 5 minutes (vary by query parameters)
-        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] { "Title", "Address", "LocationId", "LocationName", "MinPrice", "MaxPrice", "MinSquareMeters", "MaxSquareMeters", "Bedrooms", "Bathrooms", "SortBy", "Page", "PageSize" })]
+        // Cache Properties list page for 5 minutes (vary by query parameters and authentication status)
+        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] { "Title", "Address", "LocationId", "LocationName", "MinPrice", "MaxPrice", "MinSquareMeters", "MaxSquareMeters", "Bedrooms", "Bathrooms", "SortBy", "Page", "PageSize" }, VaryByHeader = "Cookie")]
         public async Task<IActionResult> Properties(PropertySearchModel search)
         {
             // Seed initial locations if none exist
@@ -193,8 +193,8 @@ namespace DubiRent.Controllers
             db.SaveChanges();
         }
 
-        // Cache Property Details for 5 minutes (vary by id)
-        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] { "id" })]
+        // Cache Property Details for 5 minutes (vary by id and authentication status)
+        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] { "id" }, VaryByHeader = "Cookie")]
         public async Task<IActionResult> Details(int id)
         {
             var property = await db.Properties

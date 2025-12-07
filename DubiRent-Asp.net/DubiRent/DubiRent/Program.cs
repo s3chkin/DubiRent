@@ -57,6 +57,9 @@ namespace DubiRent
                 // Default cache policy
                 options.DefaultExpirationTimeSpan = TimeSpan.FromMinutes(10);
                 options.SizeLimit = 100; // Maximum number of cached responses
+                
+                // Don't cache responses for authenticated users
+                options.AddPolicy("NoAuth", builder => builder.NoCache());
             });
 
             // Static File Caching Configuration will be done in UseStaticFiles middleware
