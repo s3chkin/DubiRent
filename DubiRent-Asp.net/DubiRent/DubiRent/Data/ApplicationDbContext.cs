@@ -1,4 +1,4 @@
-﻿using DubiRent.Data.Models;
+using DubiRent.Data.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +10,19 @@ namespace DubiRent.Data
             : base(options)
         {
             this.Database.Migrate();
-            UpdateDescriptionColumn();
-            UpdateUserIdColumn();
-            RemoveIpAddressColumn();
+            if (Database.IsSqlServer())
+            {
+                UpdateDescriptionColumn();
+                UpdateUserIdColumn();
+                RemoveIpAddressColumn();
+            }
+        }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+            builder.Entity<Payment>().Property(e => e.Amount).HasPrecision(18, 2);
+            builder.Entity<Property>().Property(e => e.PricePerMonth).HasPrecision(18, 2);
         }
         
         private void UpdateDescriptionColumn()

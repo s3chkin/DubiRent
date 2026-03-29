@@ -1,421 +1,419 @@
 ﻿@model IEnumerable<DubiRent.Data.Models.Property>
 @{
-    ViewData["Title"] = "Properties";
-    ViewData["Description"] = "Browse our extensive collection of premium rental properties in Dubai. Find luxury apartments, modern penthouses, and exclusive homes in Dubai's most prestigious neighborhoods.";
-    ViewData["Keywords"] = "Dubai properties for rent, luxury apartments Dubai, rental properties Dubai, Dubai real estate listings, properties Dubai, rent in Dubai";
-    ViewData["Image"] = Context.Request.Scheme + "://" + Context.Request.Host + Url.Content("~/images/site-logo/DubiRent-cut.png");
-    ViewData["Type"] = "website";
-    ViewData["CanonicalUrl"] = Context.Request.Scheme + "://" + Context.Request.Host + Url.Action("Properties", "Property");
-    var searchModel = ViewBag.SearchModel as DubiRent.Models.PropertySearchModel ?? new DubiRent.Models.PropertySearchModel();
+	ViewData["Title"] = "Properties";
+	ViewData["Description"] = "Browse our extensive collection of premium rental properties in Dubai. Find luxury apartments, modern penthouses, and exclusive homes in Dubai's most prestigious neighborhoods.";
+	ViewData["Keywords"] = "Dubai properties for rent, luxury apartments Dubai, rental properties Dubai, Dubai real estate listings, properties Dubai, rent in Dubai";
+	ViewData["Image"] = Context.Request.Scheme + "://" + Context.Request.Host + Url.Content("~/images/site-logo/DubiRent-cut.png");
+	ViewData["Type"] = "website";
+	ViewData["CanonicalUrl"] = Context.Request.Scheme + "://" + Context.Request.Host + Url.Action("Properties", "Property");
+	var searchModel = ViewBag.SearchModel as DubiRent.Models.PropertySearchModel ?? new DubiRent.Models.PropertySearchModel();
     
-    // Structured Data for ItemList
-    var itemListStructuredData = new
-    {
-        @@context = "https://schema.org",
-        @type = "ItemList",
-        name = "Dubai Properties",
-        description = "Premium rental properties in Dubai",
-        numberOfItems = Model?.Count() ?? 0,
-        itemListElement = Model?.Select((p, index) => new
-        {
-            @@type = "ListItem",
-            position = index + 1,
-            item = new
-            {
-                @@type = "Product",
-                name = p.Title,
-                description = p.Description?.Length > 160 ? p.Description.Substring(0, 157) + "..." : p.Description,
-                image = p.Images?.FirstOrDefault(img => img.IsMain)?.ImageUrl != null 
-                    ? (p.Images.FirstOrDefault(img => img.IsMain).ImageUrl.StartsWith("http") 
-                        ? p.Images.FirstOrDefault(img => img.IsMain).ImageUrl 
-                        : Context.Request.Scheme + "://" + Context.Request.Host + p.Images.FirstOrDefault(img => img.IsMain).ImageUrl)
-                    : "",
-                offers = new
-                {
-                    @@type = "Offer",
-                    price = p.PricePerMonth,
-                    priceCurrency = "USD"
-                }
-            }
-        }).ToList()
-    };
-    ViewData["StructuredData"] = "<script type=\"application/ld+json\">" + System.Text.Json.JsonSerializer.Serialize(itemListStructuredData) + "</script>";
+	// Structured Data for ItemList
+	var itemListStructuredData = new
+	{
+		@@context = "https://schema.org",
+		@type = "ItemList",
+		name = "Dubai Properties",
+		description = "Premium rental properties in Dubai",
+		numberOfItems = Model?.Count() ?? 0,
+		itemListElement = Model?.Select((p, index) => new
+		{
+			@@type = "ListItem",
+			position = index + 1,
+			item = new
+			{
+				@@type = "Product",
+				name = p.Title,
+				description = p.Description?.Length > 160 ? p.Description.Substring(0, 157) + "..." : p.Description,
+				image = p.Images?.FirstOrDefault(img => img.IsMain)?.ImageUrl != null
+					? (p.Images.FirstOrDefault(img => img.IsMain).ImageUrl.StartsWith("http")
+						? p.Images.FirstOrDefault(img => img.IsMain).ImageUrl
+						: Context.Request.Scheme + "://" + Context.Request.Host + p.Images.FirstOrDefault(img => img.IsMain).ImageUrl)
+					: "",
+				offers = new
+				{
+					@@type = "Offer",
+					price = p.PricePerMonth,
+					priceCurrency = "USD"
+				}
+			}
+		}).ToList()
+	};
+	ViewData["StructuredData"] = "<script type=\"application/ld+json\">" + System.Text.Json.JsonSerializer.Serialize(itemListStructuredData) + "</script>";
 }
 
 <!-- Hero Section -->
 <partial name="_Breadcrumb" />
 <div class="text-center mb-5">
-            <h1 class="display-4 fw-bold mb-3">
-                Discover <span class="dubirent-red">Luxury Properties</span>
-            </h1>
-            <p class="text-muted fs-5">
-                Browse our exclusive collection of premium properties in Dubai's most prestigious locations
-            </p>
-        </div>
+	<h1 class="display-4 fw-bold mb-3">
+		Discover <span class="dubirent-red">Luxury Properties</span>
+	</h1>
+	<p class="text-muted fs-5">
+		Browse our exclusive collection of premium properties in Dubai's most prestigious locations
+	</p>
+</div>
 
-        <!-- Search and Filter Bar -->
-        <form asp-action="Properties" method="get" id="searchForm">
-            <div class="card border-0 rounded-4 p-4 shadow-lg mb-4" style="background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);">
-                <!-- First Row - 4 fields -->
-                <div class="row g-3 mb-3">
-                    <!-- Location -->
-                    <div class="col-6 col-md-3">
-                        <label class="d-block text-sm fw-semibold text-dark mb-2">
-                            <i class="fas fa-map-marker-alt me-2 dubirent-red"></i>Location
-                        </label>
-                        <input type="text" name="LocationName" value="@searchModel.LocationName" class="form-control rounded-4 py-2" placeholder="Enter location..." style="border: 1px solid #e5e7eb;" />
-                    </div>
+<!-- Search and Filter Bar -->
+<form asp-action="Properties" method="get" id="searchForm">
+	<div class="card border-0 rounded-4 p-4 shadow-lg mb-4" style="background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);">
+		<!-- First Row - 4 fields -->
+		<div class="row g-3 mb-3">
+			<!-- Location -->
+			<div class="col-6 col-md-3">
+				<label class="d-block text-sm fw-semibold text-dark mb-2">
+					<i class="fas fa-map-marker-alt me-2 dubirent-red"></i>Location
+				</label>
+				<input type="text" name="LocationName" value="@searchModel.LocationName" class="form-control rounded-4 py-2" placeholder="Enter location..." style="border: 1px solid #e5e7eb;" />
+			</div>
                     
-                    <!-- Min Price -->
-                    <div class="col-6 col-md-3">
-                        <label class="d-block text-sm fw-semibold text-dark mb-2">
-                            <i class="fas fa-dollar-sign me-2 dubirent-red"></i>Min Price ($)
-                        </label>
-                        <input type="number" name="MinPrice" value="@searchModel.MinPrice" class="form-control rounded-4 py-2" placeholder="Min" min="0" step="100" style="border: 1px solid #e5e7eb;" />
-                    </div>
+			<!-- Min Price -->
+			<div class="col-6 col-md-3">
+				<label class="d-block text-sm fw-semibold text-dark mb-2">
+					<i class="fas fa-dollar-sign me-2 dubirent-red"></i>Min Price ($)
+				</label>
+				<input type="number" name="MinPrice" value="@searchModel.MinPrice" class="form-control rounded-4 py-2" placeholder="Min" min="0" step="100" style="border: 1px solid #e5e7eb;" />
+			</div>
                     
-                    <!-- Max Price -->
-                    <div class="col-6 col-md-3">
-                        <label class="d-block text-sm fw-semibold text-dark mb-2">
-                            <i class="fas fa-dollar-sign me-2 dubirent-red"></i>Max Price ($)
-                        </label>
-                        <input type="number" name="MaxPrice" value="@searchModel.MaxPrice" class="form-control rounded-4 py-2" placeholder="Max" min="0" step="100" style="border: 1px solid #e5e7eb;" />
-                    </div>
+			<!-- Max Price -->
+			<div class="col-6 col-md-3">
+				<label class="d-block text-sm fw-semibold text-dark mb-2">
+					<i class="fas fa-dollar-sign me-2 dubirent-red"></i>Max Price ($)
+				</label>
+				<input type="number" name="MaxPrice" value="@searchModel.MaxPrice" class="form-control rounded-4 py-2" placeholder="Max" min="0" step="100" style="border: 1px solid #e5e7eb;" />
+			</div>
                     
-                    <!-- Min Size -->
-                    <div class="col-6 col-md-3">
-                        <label class="d-block text-sm fw-semibold text-dark mb-2">
-                            <i class="fas fa-ruler-combined me-2 dubirent-red"></i>Min Size (m²)
-                        </label>
-                        <input type="number" name="MinSquareMeters" value="@searchModel.MinSquareMeters" class="form-control rounded-4 py-2" placeholder="Min" min="0" style="border: 1px solid #e5e7eb;" />
-                    </div>
-                </div>
+			<!-- Min Size -->
+			<div class="col-6 col-md-3">
+				<label class="d-block text-sm fw-semibold text-dark mb-2">
+					<i class="fas fa-ruler-combined me-2 dubirent-red"></i>Min Size (m²)
+				</label>
+				<input type="number" name="MinSquareMeters" value="@searchModel.MinSquareMeters" class="form-control rounded-4 py-2" placeholder="Min" min="0" style="border: 1px solid #e5e7eb;" />
+			</div>
+		</div>
                 
-                <!-- Second Row - 3 fields + Search button -->
-                <div class="row g-3 align-items-end">
-                    <!-- Max Size -->
-                    <div class="col-6 col-md-3">
-                        <label class="d-block text-sm fw-semibold text-dark mb-2">
-                            <i class="fas fa-ruler-combined me-2 dubirent-red"></i>Max Size (m²)
-                        </label>
-                        <input type="number" name="MaxSquareMeters" value="@searchModel.MaxSquareMeters" class="form-control rounded-4 py-2" placeholder="Max" min="0" style="border: 1px solid #e5e7eb;" />
-                    </div>
+		<!-- Second Row - 3 fields + Search button -->
+		<div class="row g-3 align-items-end">
+			<!-- Max Size -->
+			<div class="col-6 col-md-3">
+				<label class="d-block text-sm fw-semibold text-dark mb-2">
+					<i class="fas fa-ruler-combined me-2 dubirent-red"></i>Max Size (m²)
+				</label>
+				<input type="number" name="MaxSquareMeters" value="@searchModel.MaxSquareMeters" class="form-control rounded-4 py-2" placeholder="Max" min="0" style="border: 1px solid #e5e7eb;" />
+			</div>
                     
-                    <!-- Bedrooms -->
-                    <div class="col-6 col-md-3">
-                        <label class="d-block text-sm fw-semibold text-dark mb-2">
-                            <i class="fas fa-bed me-2 dubirent-red"></i>Bedrooms
-                        </label>
-                        <select name="Bedrooms" class="form-select rounded-4 py-2" style="border: 1px solid #e5e7eb;">
-                            <option value="">Any</option>
-                            <option value="1" @@(searchModel.Bedrooms == 1 ? "selected" : "")>1</option>
-                            <option value="2" @@(searchModel.Bedrooms == 2 ? "selected" : "")>2</option>
-                            <option value="3" @@(searchModel.Bedrooms == 3 ? "selected" : "")>3</option>
-                            <option value="4" @@(searchModel.Bedrooms == 4 ? "selected" : "")>4</option>
-                            <option value="5" @@(searchModel.Bedrooms == 5 ? "selected" : "")>5+</option>
-                        </select>
-                    </div>
+			<div class="col-6 col-md-3">
+				<label class="d-block text-sm fw-semibold text-dark mb-2">
+					<i class="fas fa-bed me-2 dubirent-red"></i>Bedrooms
+				</label>
+				<select name="Bedrooms" class="form-select rounded-4 py-2" style="border: 1px solid #e5e7eb;">
+					<option value="">Any</option>
+					<option value="1" selected="@(searchModel.Bedrooms == 1)">1</option>
+					<option value="2" selected="@(searchModel.Bedrooms == 2)">2</option>
+					<option value="3" selected="@(searchModel.Bedrooms == 3)">3</option>
+					<option value="4" selected="@(searchModel.Bedrooms == 4)">4</option>
+					<option value="5" selected="@(searchModel.Bedrooms == 5)">5+</option>
+				</select>
+			</div>
+
+			<div class="col-6 col-md-3">
+				<label class="d-block text-sm fw-semibold text-dark mb-2">
+					<i class="fas fa-bath me-2 dubirent-red"></i>Bathrooms
+				</label>
+				<select name="Bathrooms" class="form-select rounded-4 py-2" style="border: 1px solid #e5e7eb;">
+					<option value="">Any</option>
+					<option value="1" selected="@(searchModel.Bathrooms == 1)">1</option>
+					<option value="2" selected="@(searchModel.Bathrooms == 2)">2</option>
+					<option value="3" selected="@(searchModel.Bathrooms == 3)">3</option>
+					<option value="4" selected="@(searchModel.Bathrooms == 4)">4</option>
+					<option value="5" selected="@(searchModel.Bathrooms == 5)">5+</option>
+				</select>
+			</div>
                     
-                    <!-- Bathrooms -->
-                    <div class="col-6 col-md-3">
-                        <label class="d-block text-sm fw-semibold text-dark mb-2">
-                            <i class="fas fa-bath me-2 dubirent-red"></i>Bathrooms
-                        </label>
-                        <select name="Bathrooms" class="form-select rounded-4 py-2" style="border: 1px solid #e5e7eb;">
-                            <option value="">Any</option>
-                            <option value="1" @@(searchModel.Bathrooms == 1 ? "selected" : "")>1</option>
-                            <option value="2" @@(searchModel.Bathrooms == 2 ? "selected" : "")>2</option>
-                            <option value="3" @@(searchModel.Bathrooms == 3 ? "selected" : "")>3</option>
-                            <option value="4" @@(searchModel.Bathrooms == 4 ? "selected" : "")>4</option>
-                            <option value="5" @@(searchModel.Bathrooms == 5 ? "selected" : "")>5+</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Search Button -->
-                    <div class="col-6 col-md-3 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100 rounded-4 py-2 d-flex align-items-center justify-content-center gap-2 text-white fw-semibold" style="border: none; background: linear-gradient(135deg, #fe5658 0%, #ff6b6d 100%); box-shadow: 0 4px 12px rgba(254, 86, 88, 0.2);">
-                            <i class="fas fa-search"></i>
-                            <span>Search</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </form>
+			<!-- Search Button -->
+			<div class="col-6 col-md-3 d-flex align-items-end">
+				<button type="submit" class="btn btn-primary w-100 rounded-4 py-2 d-flex align-items-center justify-content-center gap-2 text-white fw-semibold" style="border: none; background: linear-gradient(135deg, #fe5658 0%, #ff6b6d 100%); box-shadow: 0 4px 12px rgba(254, 86, 88, 0.2);">
+					<i class="fas fa-search"></i>
+					<span>Search</span>
+				</button>
+			</div>
+		</div>
+	</div>
+</form>
 
-        <!-- Results Summary and Sorting -->
-        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-            <p class="text-dark mb-0">
-                <span class="fw-semibold dubirent-red">@(ViewBag.TotalCount ?? 0)</span> properties found
-            </p>
-            <div class="d-flex align-items-center gap-3">
-                <span class="text-dark small">Sort by:</span>
-                <form method="get" style="display: inline;" id="sortForm">
-                    @if (!string.IsNullOrWhiteSpace(searchModel.Title))
-                    {
-                        <input type="hidden" name="Title" value="@searchModel.Title" />
-                    }
-                    @if (!string.IsNullOrWhiteSpace(searchModel.Address))
-                    {
-                        <input type="hidden" name="Address" value="@searchModel.Address" />
-                    }
-                    @if (!string.IsNullOrWhiteSpace(searchModel.LocationName))
-                    {
-                        <input type="hidden" name="LocationName" value="@searchModel.LocationName" />
-                    }
-                    @if (searchModel.LocationId.HasValue)
-                    {
-                        <input type="hidden" name="LocationId" value="@searchModel.LocationId.Value" />
-                    }
-                    @if (searchModel.MinPrice.HasValue)
-                    {
-                        <input type="hidden" name="MinPrice" value="@searchModel.MinPrice.Value" />
-                    }
-                    @if (searchModel.MaxPrice.HasValue)
-                    {
-                        <input type="hidden" name="MaxPrice" value="@searchModel.MaxPrice.Value" />
-                    }
-                    @if (searchModel.MinSquareMeters.HasValue)
-                    {
-                        <input type="hidden" name="MinSquareMeters" value="@searchModel.MinSquareMeters.Value" />
-                    }
-                    @if (searchModel.MaxSquareMeters.HasValue)
-                    {
-                        <input type="hidden" name="MaxSquareMeters" value="@searchModel.MaxSquareMeters.Value" />
-                    }
-                    @if (searchModel.Bedrooms.HasValue)
-                    {
-                        <input type="hidden" name="Bedrooms" value="@searchModel.Bedrooms.Value" />
-                    }
-                    @if (searchModel.Bathrooms.HasValue)
-                    {
-                        <input type="hidden" name="Bathrooms" value="@searchModel.Bathrooms.Value" />
-                    }
-                    @if (searchModel.Page > 1)
-                    {
-                        <input type="hidden" name="Page" value="1" />
-                    }
-                    <select name="SortBy" onchange="document.getElementById('sortForm').submit()" class="form-select rounded-4 py-2" style="border: 1px solid #e5e7eb; width: auto; min-width: 150px;">
-                        @if (searchModel.SortBy == "newest" || string.IsNullOrEmpty(searchModel.SortBy))
-                        {
-                            <option value="newest" selected>Newest First</option>
-                        }
-                        else
-                        {
-                            <option value="newest">Newest First</option>
-                        }
-                        @if (searchModel.SortBy == "price_asc")
-                        {
-                            <option value="price_asc" selected>Price: Low to High</option>
-                        }
-                        else
-                        {
-                            <option value="price_asc">Price: Low to High</option>
-                        }
-                        @if (searchModel.SortBy == "price_desc")
-                        {
-                            <option value="price_desc" selected>Price: High to Low</option>
-                        }
-                        else
-                        {
-                            <option value="price_desc">Price: High to Low</option>
-                        }
-                        @if (searchModel.SortBy == "size_desc")
-                        {
-                            <option value="size_desc" selected>Largest First</option>
-                        }
-                        else
-                        {
-                            <option value="size_desc">Largest First</option>
-                        }
-                    </select>
-                </form>
-            </div>
-        </div>
+<!-- Results Summary and Sorting -->
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+	<p class="text-dark mb-0">
+		<span class="fw-semibold dubirent-red">@(ViewBag.TotalCount ?? 0)</span> properties found
+	</p>
+	<div class="d-flex align-items-center gap-3">
+		<span class="text-dark small">Sort by:</span>
+		<form method="get" style="display: inline;" id="sortForm">
+			@if (!string.IsNullOrWhiteSpace(searchModel.Title))
+			{
+				<input type="hidden" name="Title" value="@searchModel.Title" />
+			}
+			@if (!string.IsNullOrWhiteSpace(searchModel.Address))
+			{
+				<input type="hidden" name="Address" value="@searchModel.Address" />
+			}
+			@if (!string.IsNullOrWhiteSpace(searchModel.LocationName))
+			{
+				<input type="hidden" name="LocationName" value="@searchModel.LocationName" />
+			}
+			@if (searchModel.LocationId.HasValue)
+			{
+				<input type="hidden" name="LocationId" value="@searchModel.LocationId.Value" />
+			}
+			@if (searchModel.MinPrice.HasValue)
+			{
+				<input type="hidden" name="MinPrice" value="@searchModel.MinPrice.Value" />
+			}
+			@if (searchModel.MaxPrice.HasValue)
+			{
+				<input type="hidden" name="MaxPrice" value="@searchModel.MaxPrice.Value" />
+			}
+			@if (searchModel.MinSquareMeters.HasValue)
+			{
+				<input type="hidden" name="MinSquareMeters" value="@searchModel.MinSquareMeters.Value" />
+			}
+			@if (searchModel.MaxSquareMeters.HasValue)
+			{
+				<input type="hidden" name="MaxSquareMeters" value="@searchModel.MaxSquareMeters.Value" />
+			}
+			@if (searchModel.Bedrooms.HasValue)
+			{
+				<input type="hidden" name="Bedrooms" value="@searchModel.Bedrooms.Value" />
+			}
+			@if (searchModel.Bathrooms.HasValue)
+			{
+				<input type="hidden" name="Bathrooms" value="@searchModel.Bathrooms.Value" />
+			}
+			@if (searchModel.Page > 1)
+			{
+				<input type="hidden" name="Page" value="1" />
+			}
+			<select name="SortBy" onchange="document.getElementById('sortForm').submit()" class="form-select rounded-4 py-2" style="border: 1px solid #e5e7eb; width: auto; min-width: 150px;">
+				@if (searchModel.SortBy == "newest" || string.IsNullOrEmpty(searchModel.SortBy))
+				{
+					<option value="newest" selected>Newest First</option>
+				}
+				else
+				{
+					<option value="newest">Newest First</option>
+				}
+				@if (searchModel.SortBy == "price_asc")
+				{
+					<option value="price_asc" selected>Price: Low to High</option>
+				}
+				else
+				{
+					<option value="price_asc">Price: Low to High</option>
+				}
+				@if (searchModel.SortBy == "price_desc")
+				{
+					<option value="price_desc" selected>Price: High to Low</option>
+				}
+				else
+				{
+					<option value="price_desc">Price: High to Low</option>
+				}
+				@if (searchModel.SortBy == "size_desc")
+				{
+					<option value="size_desc" selected>Largest First</option>
+				}
+				else
+				{
+					<option value="size_desc">Largest First</option>
+				}
+			</select>
+		</form>
+	</div>
+</div>
 
-        <!-- Property Cards -->
-        <div class="row g-4">
-            @if (Model != null && Model.Any())
-            {
-                @foreach (var property in Model)
-                {
-                    var mainImage = property.Images?.FirstOrDefault(img => img.IsMain) ?? property.Images?.FirstOrDefault();
-                    var imageUrl = mainImage != null ? mainImage.ImageUrl : "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600";
-                    var daysListed = (DateTime.Now - property.CreatedAt).Days;
-                    var daysText = daysListed == 0 ? "Today" : daysListed == 1 ? "1 day ago" : $"{daysListed} days ago";
+<!-- Property Cards -->
+<div class="row g-4">
+	@if (Model != null && Model.Any())
+	{
+		@foreach (var property in Model)
+		{
+			var mainImage = property.Images?.FirstOrDefault(img => img.IsMain) ?? property.Images?.FirstOrDefault();
+			var imageUrl = mainImage != null ? mainImage.ImageUrl : "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600";
+			var daysListed = (DateTime.Now - property.CreatedAt).Days;
+			var daysText = daysListed == 0 ? "Today" : daysListed == 1 ? "1 day ago" : $"{daysListed} days ago";
 
-                    <div class="col-12 col-sm-6 col-lg-4">
-                        <div class="card border-0 overflow-hidden modern-card h-100 bg-white property-card-homepage" style="border-radius: 20px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);">
-                            <div class="position-relative">
-                                <a asp-action="Details" asp-route-id="@property.Id" class="text-decoration-none">
-                                    @{
-                                        var webpUrl = ImageHelper.GetWebpPath(imageUrl);
-                                        var hasWebP = !string.IsNullOrEmpty(webpUrl) && !webpUrl.StartsWith("http") && ImageHelper.WebpExists(webpUrl, ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>());
-                                    }
-                                    @if (hasWebP)
-                                    {
-                                        <picture>
-                                            <source srcset="@webpUrl" type="image/webp">
-                                            <img src="@imageUrl"
-                                                 alt="@property.Title"
-                                                 class="card-img-top img-hover" 
-                                                 style="height: 220px; object-fit: cover; width: 100%;"
-                                                 loading="lazy"
-                                                 width="400"
-                                                 height="220"
-                                                 decoding="async" />
-                                        </picture>
-                                    }
-                                    else
-                                    {
-                                        <img src="@imageUrl"
-                                             alt="@property.Title"
-                                             class="card-img-top img-hover" 
-                                             style="height: 220px; object-fit: cover; width: 100%;"
-                                             loading="lazy"
-                                             width="400"
-                                             height="220"
-                                             decoding="async" />
-                                    }
-                                </a>
+			<div class="col-12 col-sm-6 col-lg-4">
+				<div class="card border-0 overflow-hidden modern-card h-100 bg-white property-card-homepage" style="border-radius: 20px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);">
+					<div class="position-relative">
+						<a asp-action="Details" asp-route-id="@property.Id" class="text-decoration-none">
+							@{
+								var webpUrl = ImageHelper.GetWebpPath(imageUrl);
+								var hasWebP = !string.IsNullOrEmpty(webpUrl) && !webpUrl.StartsWith("http") && ImageHelper.WebpExists(webpUrl, ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>());
+							}
+							@if (hasWebP)
+							{
+								<picture>
+									<source srcset="@webpUrl" type="image/webp">
+									<img src="@imageUrl"
+										 alt="@property.Title"
+										 class="card-img-top img-hover"
+										 style="height: 220px; object-fit: cover; width: 100%;"
+										 loading="lazy"
+										 width="400"
+										 height="220"
+										 decoding="async" />
+								</picture>
+							}
+							else
+							{
+								<img src="@imageUrl"
+									 alt="@property.Title"
+									 class="card-img-top img-hover"
+									 style="height: 220px; object-fit: cover; width: 100%;"
+									 loading="lazy"
+									 width="400"
+									 height="220"
+									 decoding="async" />
+							}
+						</a>
                                 
-                                <!-- Verified Badge -->
-                                <div class="position-absolute top-0 start-0 m-2 m-md-3 bg-white rounded-pill px-2 px-md-3 py-1 small fw-semibold" style="border: 1px solid rgba(254, 86, 88, 0.3); color: var(--primary-color); font-size: 0.75rem;">
-                                    <i class="fas fa-check-circle me-1"></i><span class="d-none d-sm-inline">Verified</span>
-                                </div>
+						<!-- Verified Badge -->
+						<div class="position-absolute top-0 start-0 m-2 m-md-3 bg-white rounded-pill px-2 px-md-3 py-1 small fw-semibold" style="border: 1px solid rgba(254, 86, 88, 0.3); color: var(--primary-color); font-size: 0.75rem;">
+							<i class="fas fa-check-circle me-1"></i><span class="d-none d-sm-inline">Verified</span>
+						</div>
                                 
-                                @if (daysListed <= 2)
-                                {
-                                    <!-- New Badge -->
-                                    <div class="position-absolute top-0 end-0 m-2 m-md-3 rounded-pill px-2 px-md-3 py-1 small fw-semibold text-white" style="background-color: #10b981; z-index: 5; font-size: 0.75rem;">
-                                        <i class="fas fa-clock me-1"></i><span class="d-none d-sm-inline">New</span>
-                                    </div>
-                                }
-                                else if (property.PricePerMonth >= 10000)
-                                {
-                                    <!-- Premium Badge -->
-                                    <div class="position-absolute top-0 end-0 m-2 m-md-3 rounded-pill px-2 px-md-3 py-1 small fw-semibold text-white" style="background-color: #3b82f6; z-index: 5; font-size: 0.75rem;">
-                                        <i class="fas fa-crown me-1"></i><span class="d-none d-sm-inline">Premium</span>
-                                    </div>
-                                }
-                            </div>
+						@if (daysListed <= 2)
+						{
+							<!-- New Badge -->
+							<div class="position-absolute top-0 end-0 m-2 m-md-3 rounded-pill px-2 px-md-3 py-1 small fw-semibold text-white" style="background-color: #10b981; z-index: 5; font-size: 0.75rem;">
+								<i class="fas fa-clock me-1"></i><span class="d-none d-sm-inline">New</span>
+							</div>
+						}
+						else if (property.PricePerMonth >= 10000)
+						{
+							<!-- Premium Badge -->
+							<div class="position-absolute top-0 end-0 m-2 m-md-3 rounded-pill px-2 px-md-3 py-1 small fw-semibold text-white" style="background-color: #3b82f6; z-index: 5; font-size: 0.75rem;">
+								<i class="fas fa-crown me-1"></i><span class="d-none d-sm-inline">Premium</span>
+							</div>
+						}
+					</div>
                             
-                            <div class="card-body p-3 p-md-4">
-                                @{
-                                    var favouriteIds = ViewBag.FavouritePropertyIds as HashSet<int> ?? new HashSet<int>();
-                                    var isFavourite = User.Identity.IsAuthenticated && favouriteIds.Contains(property.Id);
-                                }
-                                <div class="d-flex justify-content-between align-items-start mb-2 gap-2">
-                                    <h5 class="card-title fw-bold mb-0" style="flex: 1; min-width: 0; font-size: 1rem; word-wrap: break-word; overflow-wrap: break-word;">@property.Title</h5>
-                                    @if (User.Identity.IsAuthenticated)
-                                    {
-                                        <button class="btn btn-link p-0 border-0 favourite-btn flex-shrink-0" style="font-size: 1.2rem; line-height: 1; @(isFavourite ? "color: #fe5658;" : "color: #6b7280;")" data-property-id="@property.Id" onclick="event.preventDefault(); toggleFavouriteCard(this, @property.Id)">
-                                            <i class="@(isFavourite ? "fas" : "far") fa-heart"></i>
-                                        </button>
-                                    }
-                                </div>
+					<div class="card-body p-3 p-md-4">
+						@{
+							var favouriteIds = ViewBag.FavouritePropertyIds as HashSet<int> ?? new HashSet<int>();
+							var isFavourite = User.Identity.IsAuthenticated && favouriteIds.Contains(property.Id);
+						}
+						<div class="d-flex justify-content-between align-items-start mb-2 gap-2">
+							<h5 class="card-title fw-bold mb-0" style="flex: 1; min-width: 0; font-size: 1rem; word-wrap: break-word; overflow-wrap: break-word;">@property.Title</h5>
+							@if (User.Identity.IsAuthenticated)
+							{
+								<button class="btn btn-link p-0 border-0 favourite-btn flex-shrink-0" style="font-size: 1.2rem; line-height: 1; @(isFavourite ? "color: #fe5658;" : "color: #6b7280;")" data-property-id="@property.Id" onclick="event.preventDefault(); toggleFavouriteCard(this, @property.Id)">
+									<i class="@(isFavourite ? "fas" : "far") fa-heart"></i>
+								</button>
+							}
+						</div>
                                 
-                                <p class="text-muted small mb-2 d-flex align-items-center" style="font-size: 0.8125rem;">
-                                    <i class="fas fa-map-marker-alt me-2"></i><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@property.Location?.Name, @property.Location?.City</span>
-                                </p>
+						<p class="text-muted small mb-2 d-flex align-items-center" style="font-size: 0.8125rem;">
+							<i class="fas fa-map-marker-alt me-2"></i><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@property.Location?.Name, @property.Location?.City</span>
+						</p>
                                 
-                                <p class="dubirent-red fs-5 fw-bold mb-3" style="font-size: 1.125rem;">
-                                    $@property.PricePerMonth.ToString("N0") <span class="text-muted small fw-normal">/month</span>
-                                </p>
+						<p class="dubirent-red fs-5 fw-bold mb-3" style="font-size: 1.125rem;">
+							$@property.PricePerMonth.ToString("N0") <span class="text-muted small fw-normal">/month</span>
+						</p>
                                 
-                                <div class="d-flex justify-content-between align-items-center mb-3 pb-3 flex-wrap gap-2" style="border-top: 1px solid #f3f4f6; border-bottom: 1px solid #f3f4f6; padding-top: 0.75rem;">
-                                    <span class="text-muted small d-flex align-items-center" style="font-size: 0.75rem;">
-                                        <i class="fas fa-ruler-combined me-2 dubirent-red"></i><span class="d-none d-sm-inline">@property.SquareMeters m²</span><span class="d-sm-none">@property.SquareMeters m²</span>
-                                    </span>
-                                    <span class="text-muted small d-flex align-items-center" style="font-size: 0.75rem;">
-                                        <i class="fas fa-bed me-2 dubirent-red"></i><span class="d-none d-sm-inline">@property.Bedrooms Bedrooms</span><span class="d-sm-none">@property.Bedrooms</span>
-                                    </span>
-                                    <span class="text-muted small d-flex align-items-center" style="font-size: 0.75rem;">
-                                        <i class="fas fa-bath me-2 dubirent-red"></i><span class="d-none d-sm-inline">@property.Bathrooms Bathrooms</span><span class="d-sm-none">@property.Bathrooms</span>
-                                    </span>
-                                </div>
+						<div class="d-flex justify-content-between align-items-center mb-3 pb-3 flex-wrap gap-2" style="border-top: 1px solid #f3f4f6; border-bottom: 1px solid #f3f4f6; padding-top: 0.75rem;">
+							<span class="text-muted small d-flex align-items-center" style="font-size: 0.75rem;">
+								<i class="fas fa-ruler-combined me-2 dubirent-red"></i><span class="d-none d-sm-inline">@property.SquareMeters m²</span><span class="d-sm-none">@property.SquareMeters m²</span>
+							</span>
+							<span class="text-muted small d-flex align-items-center" style="font-size: 0.75rem;">
+								<i class="fas fa-bed me-2 dubirent-red"></i><span class="d-none d-sm-inline">@property.Bedrooms Bedrooms</span><span class="d-sm-none">@property.Bedrooms</span>
+							</span>
+							<span class="text-muted small d-flex align-items-center" style="font-size: 0.75rem;">
+								<i class="fas fa-bath me-2 dubirent-red"></i><span class="d-none d-sm-inline">@property.Bathrooms Bathrooms</span><span class="d-sm-none">@property.Bathrooms</span>
+							</span>
+						</div>
                                 
-                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                    <p class="text-muted small mb-0 d-flex align-items-center" style="font-size: 0.75rem;">
-                                        <i class="far fa-calendar me-2"></i><span class="d-none d-sm-inline">Listed @daysText</span><span class="d-sm-none">@daysText</span>
-                                    </p>
-                                    <a asp-action="Details" asp-route-id="@property.Id" class="btn btn-primary rounded-4 px-3 px-md-4 py-2 text-white small text-decoration-none" style="border: none; font-size: 0.75rem; white-space: nowrap;">
-                                        <span class="d-none d-sm-inline">View Details</span><span class="d-sm-none">View</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            }
-            else
-            {
-                <div class="col-12">
-                    <div class="card empty-state border-0 shadow-sm p-5 text-center">
-                        <div class="mb-4">
-                            <div class="dubirent-bg-red d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px;">
-                                <i class="fas fa-home fa-3x text-white"></i>
-                            </div>
-                        </div>
-                        <h4 class="fw-bold mb-2">No Properties Available</h4>
-                        <p class="text-muted mb-0">We're sorry, but there are no properties available at the moment. Please check back later.</p>
-                    </div>
-                </div>
-            }
-        </div>
+						<div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+							<p class="text-muted small mb-0 d-flex align-items-center" style="font-size: 0.75rem;">
+								<i class="far fa-calendar me-2"></i><span class="d-none d-sm-inline">Listed @daysText</span><span class="d-sm-none">@daysText</span>
+							</p>
+							<a asp-action="Details" asp-route-id="@property.Id" class="btn btn-primary rounded-4 px-3 px-md-4 py-2 text-white small text-decoration-none" style="border: none; font-size: 0.75rem; white-space: nowrap;">
+								<span class="d-none d-sm-inline">View Details</span><span class="d-sm-none">View</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		}
+	}
+	else
+	{
+		<div class="col-12">
+			<div class="card empty-state border-0 shadow-sm p-5 text-center">
+				<div class="mb-4">
+					<div class="dubirent-bg-red d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px;">
+						<i class="fas fa-home fa-3x text-white"></i>
+					</div>
+				</div>
+				<h4 class="fw-bold mb-2">No Properties Available</h4>
+				<p class="text-muted mb-0">We're sorry, but there are no properties available at the moment. Please check back later.</p>
+			</div>
+		</div>
+	}
+</div>
         
-        <!-- Pagination -->
-        @await Html.PartialAsync("_Pagination")
+<!-- Pagination -->
+@await Html.PartialAsync("_Pagination")
 
 @if (User.Identity.IsAuthenticated)
 {
-    @Html.AntiForgeryToken()
-    <script>
-        async function toggleFavouriteCard(button, propertyId) {
-            if (!button || !propertyId) return;
+	@Html.AntiForgeryToken()
+	<script>
+		async function toggleFavouriteCard(button, propertyId) {
+			if (!button || !propertyId) return;
 
-            const icon = button.querySelector('i');
-            const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+			const icon = button.querySelector('i');
+			const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
             
-            if (!tokenInput) {
-                alert('Security token not found. Please refresh the page.');
-                return;
-            }
+			if (!tokenInput) {
+				alert('Security token not found. Please refresh the page.');
+				return;
+			}
 
-            const token = tokenInput.value;
+			const token = tokenInput.value;
 
-            try {
-                const formData = new URLSearchParams();
-                formData.append('propertyId', propertyId);
-                formData.append('__RequestVerificationToken', token);
+			try {
+				const formData = new URLSearchParams();
+				formData.append('propertyId', propertyId);
+				formData.append('__RequestVerificationToken', token);
 
-                const response = await fetch('@Url.Action("ToggleFavourite", "Property")', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'RequestVerificationToken': token
-                    },
-                    body: formData.toString()
-                });
+				const response = await fetch('@Url.Action("ToggleFavourite", "Property")', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						'RequestVerificationToken': token
+					},
+					body: formData.toString()
+				});
 
-                const result = await response.json();
+				const result = await response.json();
 
-                if (result.success) {
-                    if (result.isFavourite) {
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                        button.style.color = '#fe5658';
-                    } else {
-                        icon.classList.remove('fas');
-                        icon.classList.add('far');
-                        button.style.color = '#6b7280';
-                    }
-                } else {
-                    alert(result.message || 'An error occurred. Please try again.');
-                }
-            } catch (error) {
-                console.error('Error toggling favourite:', error);
-                alert('An error occurred. Please try again.');
-            }
-        }
-    </script>
+				if (result.success) {
+					if (result.isFavourite) {
+						icon.classList.remove('far');
+						icon.classList.add('fas');
+						button.style.color = '#fe5658';
+					} else {
+						icon.classList.remove('fas');
+						icon.classList.add('far');
+						button.style.color = '#6b7280';
+					}
+				} else {
+					alert(result.message || 'An error occurred. Please try again.');
+				}
+			} catch (error) {
+				console.error('Error toggling favourite:', error);
+				alert('An error occurred. Please try again.');
+			}
+		}
+	</script>
 }
